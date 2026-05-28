@@ -72,7 +72,7 @@ export default async function IncomePage() {
             <CardContent>
               <div className="divide-y divide-white/5">
                 {recurring.map((source) => {
-                  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG]
+                  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
                   return (
                     <div key={source.id} className="flex items-center gap-4 px-5 py-4 group hover:bg-ink-600/20 transition-colors">
                       <div className="size-10 rounded-xl bg-brand-900/60 flex items-center justify-center text-xl shrink-0">
@@ -117,7 +117,7 @@ export default async function IncomePage() {
             <CardContent>
               <div className="divide-y divide-white/5">
                 {nonRecurring.map((source) => {
-                  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG]
+                  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
                   return (
                     <div key={source.id} className="flex items-center gap-4 px-5 py-4 group hover:bg-ink-600/20 transition-colors">
                       <div className="size-10 rounded-xl bg-ink-700 flex items-center justify-center text-xl shrink-0">

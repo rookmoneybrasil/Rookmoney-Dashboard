@@ -33,7 +33,7 @@ export default async function BillsPage() {
   }
 
   const allGroups = Array.from(grouped.values()).map((items) => {
-    const sorted    = [...items].sort((a, b) => a.installmentCurrent! - b.installmentCurrent!)
+    const sorted    = [...items].sort((a, b) => (a.installmentCurrent ?? 0) - (b.installmentCurrent ?? 0))
     const paidCount = items.filter((b) => b.isPaid).length
     const total     = items[0].installmentTotal ?? items.length
     const nextDue   = sorted.find((b) => !b.isPaid) ?? sorted[sorted.length - 1]

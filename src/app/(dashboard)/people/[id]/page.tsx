@@ -142,7 +142,7 @@ export default async function PersonPage({ params }: Props) {
   const { singles: singleSettled, groupList: groupSettled } = groupEntries(settledEntries)
 
   // Groups that have at least one open entry — pull them from the full entries
-  const openGroupIds = new Set(openEntries.filter((e) => e.installmentGroupId).map((e) => e.installmentGroupId!))
+  const openGroupIds = new Set(openEntries.filter((e) => e.installmentGroupId).map((e) => e.installmentGroupId as string))
   const allGroupMap  = new Map<string, PersonEntryRow[]>()
   for (const e of allEntries) {
     if (e.installmentGroupId) {

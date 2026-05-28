@@ -34,21 +34,71 @@ export default async function DashboardPage() {
 
   // Adapt projections to the format ProjectionsSection expects
   const projData = {
-    projections: data.projections.map((p, i) => ({
-      month:            p.month,
+    projections: data.projections.map((p) => ({
+      month:             p.month,
+      label:             format(new Date(p.month), "MMM. yy", { locale: ptBR }),
       cumulativeBalance: p.projectedBalance,
-      monthlyResult:    p.projectedIncome - p.projectedExpense,
+      income:            p.projectedIncome,
+      expense:           p.projectedExpense,
+      balance:           p.projectedIncome - p.projectedExpense,
+      monthlyResult:     p.projectedIncome - p.projectedExpense,
+      incomeItems:       { sources: [], recurring: [], people: [] },
+      expenseItems:      { bills:   [], recurring: [], people: [] },
     })),
   }
 
-  // Adapt health to FinancialHealthCard format
+  // ── Financial health details ──────────────────────────────────────
+  const savingsRate   = data.monthIncome > 0 ? Math.round(((data.monthIncome - data.monthExpense) / data.monthIncome) * 100) : 0
+  const savingsScore  = Math.min(30, Math.max(0, Math.round(savingsRate * 0.3)))
+  const billsScore    = data.overdueCount === 0 ? 20 : Math.max(0, 20 - data.overdueCount * 5)
+  const goalsScore    = data.goals.length > 0 ? 20 : 0
+  const totalScore    = savingsScore + billsScore + goalsScore
+
+  const grade = totalScore >= 60 ? 'A' : totalScore >= 45 ? 'B' : totalScore >= 30 ? 'C' : 'D'
   const health = {
-    score:       data.healthScore,
-    grade:       data.healthScore >= 80 ? 'A' : data.healthScore >= 60 ? 'B' : data.healthScore >= 40 ? 'C' : 'D',
-    label:       data.healthScore >= 80 ? 'Muito bom' : data.healthScore >= 60 ? 'Bom' : data.healthScore >= 40 ? 'Regular' : 'Atenção',
-    color:       data.healthScore >= 60 ? 'success' : 'warning',
-    insights:    [] as string[],
-    categories:  [],
+    score:      Math.min(100, totalScore + 30), // base 30 + components
+    grade:      grade as 'S' | 'A' | 'B' | 'C' | 'D' | 'F',
+    label:      totalScore >= 60 ? 'Muito bom' : totalScore >= 45 ? 'Bom' : totalScore >= 30 ? 'Regular' : 'Atenção',
+    color:      totalScore >= 45 ? 'text-success' : totalScore >= 30 ? 'text-amber-400' : 'text-danger',
+    components: [
+      {
+        key:    'savings_rate',
+        label:  'Taxa de poupança',
+        score:  savingsScore,
+        max:    30,
+        detail: data.monthIncome > 0
+          ? `${savingsRate >= 0 ? 'Poupou' : 'Gastou'} ${Math.abs(savingsRate)}% da renda`
+          : 'Sem renda registrada',
+        status: savingsRate >= 20 ? 'good' : savingsRate >= 0 ? 'ok' : 'bad',
+      },
+      {
+        key:    'bills_on_time',
+        label:  'Contas em dia',
+        score:  billsScore,
+        max:    20,
+        detail: data.overdueCount === 0 ? 'Nenhuma conta em atraso' : `${data.overdueCount} conta(s) em atraso`,
+        status: data.overdueCount === 0 ? 'good' : 'bad',
+      },
+      {
+        key:    'goals',
+        label:  'Metas ativas',
+        score:  goalsScore,
+        max:    20,
+        detail: data.goals.length > 0 ? `${data.goals.length} meta(s) em andamento` : 'Nenhuma meta definida',
+        status: data.goals.length > 0 ? 'good' : 'warn',
+      },
+    ],
+    tips: [
+      ...(data.goals.length === 0
+        ? [{ icon: '🎯', message: 'Defina metas financeiras para guiar suas decisões.', href: '/goals' }]
+        : []),
+      ...(savingsRate < 10
+        ? [{ icon: '📊', message: 'Defina orçamentos por categoria para controlar melhor os gastos.', href: '/budget' }]
+        : []),
+      ...(data.overdueCount > 0
+        ? [{ icon: '⚠️', message: `Você tem ${data.overdueCount} conta(s) em atraso. Regularize o quanto antes.`, href: '/bills' }]
+        : []),
+    ],
   }
 
   return (
@@ -178,6 +228,101 @@ export default async function DashboardPage() {
 
       {/* ── Financial Health ───────────────────────────────────────── */}
       <FinancialHealthCard health={health as never} />
+
+      {/* ── Bottom grid: A Receber · Contas próximas · Insight ─────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        {/* A Receber */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ArrowDownToLine className="size-4 text-gold-500" />
+              A Receber
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.totalReceivable === 0 ? (
+              <p className="text-sm text-slate-600 py-2 text-center">Nada a receber no momento.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {data.totalPeopleReceivable > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-400">De pessoas</span>
+                    <span className="text-sm font-semibold text-success">{formatCurrency(data.totalPeopleReceivable)}</span>
+                  </div>
+                )}
+                {data.totalIncomeReceivable > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-400">Rendas eventuais</span>
+                    <span className="text-sm font-semibold text-success">{formatCurrency(data.totalIncomeReceivable)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t border-white/6 pt-2 mt-1">
+                  <span className="text-sm font-semibold text-slate-300">Total</span>
+                  <span className="text-base font-bold text-success">{formatCurrency(data.totalReceivable)}</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Contas próximas */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Contas próximas</CardTitle>
+              <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {data.upcomingBills.length === 0 ? (
+              <p className="text-sm text-slate-600 py-2 text-center">Nenhuma conta próxima.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {data.upcomingBills.map((bill) => {
+                  const status = classifyBillStatus(bill.dueDate, bill.isPaid)
+                  return (
+                    <div key={bill.id} className="flex items-center justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-slate-300 truncate">{bill.name}</p>
+                        <p className="text-xs text-slate-600">{formatDate(new Date(bill.dueDate))}</p>
+                      </div>
+                      <span className={`text-sm font-semibold shrink-0 ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-300'}`}>
+                        {formatCurrency(Number(bill.amount))}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Rook Insight */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="size-7 rounded-full bg-brand-700 border border-brand-600/40 overflow-hidden shrink-0">
+                <img src={MASCOT_SRCS['happy']} alt="Rook" className="object-contain w-full h-full" />
+              </div>
+              Rook
+              <Badge variant="default" size="sm">Insight</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {data.overdueCount > 0
+                ? `⚠️ Você tem ${data.overdueCount} conta${data.overdueCount > 1 ? 's' : ''} em atraso. Regularize o quanto antes!`
+                : data.monthBalance > 0
+                ? `✅ Você ficou no positivo este mês. Saldo: ${formatCurrency(data.monthBalance)}.`
+                : data.monthBalance < 0
+                ? `📉 Saldo negativo este mês (${formatCurrency(data.monthBalance)}). Revise seus gastos.`
+                : `💡 Sem movimentações ainda. Registre suas receitas e despesas para acompanhar.`}
+            </p>
+          </CardContent>
+        </Card>
+
+      </div>
 
       {/* ── Projeções ──────────────────────────────────────────────── */}
       <ProjectionsSection projections={projData.projections as never} />
