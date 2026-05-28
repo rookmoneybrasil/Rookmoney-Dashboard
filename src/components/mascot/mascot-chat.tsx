@@ -71,7 +71,7 @@ export function MascotChat({ onClose }: Props) {
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => ({ role: m.role, content: m.content }))
 
-      const res = await fetch('/api/chat', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/v1/chat`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ messages: apiMessages }),

@@ -1,12 +1,16 @@
 'use client'
 
 import { Zap } from 'lucide-react'
+import { clientApi } from '@/lib/api-client'
 
 export function UpgradeButton() {
   async function handleUpgrade() {
-    const res  = await fetch('/api/billing/checkout', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
+    try {
+      const { url } = await clientApi.createCheckout()
+      if (url) window.location.href = url
+    } catch (err) {
+      console.error('Checkout error:', err)
+    }
   }
 
   return (
@@ -22,9 +26,12 @@ export function UpgradeButton() {
 
 export function ManageSubscriptionButton() {
   async function handlePortal() {
-    const res  = await fetch('/api/billing/portal', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
+    try {
+      const { url } = await clientApi.createPortal()
+      if (url) window.location.href = url
+    } catch (err) {
+      console.error('Portal error:', err)
+    }
   }
 
   return (

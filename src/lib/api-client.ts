@@ -214,6 +214,10 @@ export const clientApi = {
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
 
+  // Billing (Stripe)
+  createCheckout: () => clientFetch<{ url: string }>('/billing/checkout', { method: 'POST' }),
+  createPortal:   () => clientFetch<{ url: string }>('/billing/portal',   { method: 'POST' }),
+
   // Admin
   adminSetPlan:  (id: string, plan: 'FREE' | 'PRO') =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ plan }) }),
