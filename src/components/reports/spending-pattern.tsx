@@ -1,7 +1,7 @@
 'use client'
 
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts'
-import type { DaySpending } from '@/app/actions/reports'
+import type { SpendingDay as DaySpending } from '@/lib/api-client'
 
 function formatBRL(value: number) {
   if (value >= 1000) return `R$${(value / 1000).toFixed(1)}k`

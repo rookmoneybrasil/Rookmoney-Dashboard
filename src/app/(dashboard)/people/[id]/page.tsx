@@ -1,15 +1,14 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock } from 'lucide-react'
-import { getPerson } from '@/app/actions/people'
-import { getCategories } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { EntryModal } from '@/components/people/entry-modal'
 import { EntryActions } from '@/components/people/entry-actions'
 import { InstallmentGroup } from '@/components/people/installment-group'
 import { EditPersonButton } from '@/components/people/person-modal'
 import { DeletePersonButton } from '@/components/people/delete-person-button'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { PersonEntryRow } from '@/app/actions/people'
+import type { PersonEntryRow } from '@/lib/api-client'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -121,7 +120,7 @@ interface Props {
 
 export default async function PersonPage({ params }: Props) {
   const { id } = await params
-  const [person, categories] = await Promise.all([getPerson(id), getCategories()])
+  const [person, categories] = await Promise.all([serverApi.person(id), serverApi.categories()])
   if (!person) notFound()
 
   const allEntries   = person.entries

@@ -3,9 +3,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
-import { getBills, markBillPaid, deleteBill, deleteBillGroup, deleteInstallmentGroup } from '@/app/actions/bills'
+import { markBillPaid, deleteBill, deleteBillGroup, deleteInstallmentGroup } from '@/app/actions/bills'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
-import { getCategories } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 
@@ -17,7 +17,7 @@ const statusConfig = {
 }
 
 export default async function BillsPage() {
-  const [bills, categories] = await Promise.all([getBills(), getCategories()])
+  const [bills, categories] = await Promise.all([serverApi.bills(), serverApi.categories()])
 
   /* ── Split installment groups from regular bills ── */
   const grouped = new Map<string, typeof bills>()

@@ -1,12 +1,13 @@
 import { Lock, Tag } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getCategories, deleteCategory } from '@/app/actions/categories'
+import { deleteCategory } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
 import { CategoryModal } from '@/components/categories/category-modal'
 
 export default async function CategoriesPage() {
-  const categories = await getCategories()
+  const categories = await serverApi.categories()
 
   const defaults = categories.filter((c) => c.isDefault)
   const custom   = categories.filter((c) => !c.isDefault)

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ChevronDown, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
-import type { CategoryTrend } from '@/app/actions/reports'
+import type { CategoryTrend } from '@/lib/api-client'
 
 interface Props {
   categories: CategoryTrend[]

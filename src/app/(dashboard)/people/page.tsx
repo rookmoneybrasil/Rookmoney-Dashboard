@@ -1,11 +1,11 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { Users, TrendingUp, TrendingDown, ArrowRight, CheckCircle } from 'lucide-react'
-import { getPeople } from '@/app/actions/people'
+import { serverApi } from '@/lib/api-client'
 import { PersonModal } from '@/components/people/person-modal'
 import { PeopleFilters } from '@/components/people/people-filters'
 import { formatCurrency } from '@/lib/utils'
-import type { PersonWithBalance } from '@/app/actions/people'
+import type { Person as PersonWithBalance } from '@/lib/api-client'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -31,7 +31,7 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
   const filter = (sp.filter as string) ?? 'all'
   const sort   = (sp.sort   as string) ?? 'name'
 
-  const allPeople = await getPeople()
+  const allPeople = await serverApi.people()
 
   // ── Filter ──────────────────────────────────────────────────────
   let people = allPeople.filter((p) => {
@@ -148,9 +148,9 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-white truncate">{person.name}</p>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      {person.openCount === 0
+                      {person.openEntriesCount === 0
                         ? 'Sem lançamentos pendentes'
-                        : `${person.openCount} lançamento${person.openCount !== 1 ? 's' : ''} pendente${person.openCount !== 1 ? 's' : ''}`}
+                        : `${person.openEntriesCount} lançamento${person.openEntriesCount !== 1 ? 's' : ''} pendente${person.openEntriesCount !== 1 ? 's' : ''}`}
                     </p>
                   </div>
 

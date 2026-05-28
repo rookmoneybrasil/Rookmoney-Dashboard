@@ -5,9 +5,9 @@ import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { getTransactions, deleteTransaction, type TransactionFilter } from '@/app/actions/transactions'
+import { deleteTransaction, type TransactionFilter } from '@/app/actions/transactions'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
-import { getCategories } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { TransactionModal } from '@/components/transactions/transaction-modal'
 import { EditTransactionModal } from '@/components/transactions/edit-transaction-modal'
 import { TransactionFilters } from '@/components/transactions/transaction-filters'
@@ -31,9 +31,15 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
     pageSize:   20,
   }
 
+  const txParams: Record<string, string> = { page: String(page), pageSize: '20' }
+  if (filter.type)       txParams.type       = filter.type
+  if (filter.search)     txParams.search     = filter.search
+  if (filter.categoryId) txParams.categoryId = filter.categoryId
+  if (filter.month)      txParams.month      = filter.month
+
   const [{ items: transactions, total, totalPages, page: currentPage }, categories] = await Promise.all([
-    getTransactions(filter),
-    getCategories(),
+    serverApi.transactions(txParams),
+    serverApi.categories(),
   ])
 
   const now        = new Date()

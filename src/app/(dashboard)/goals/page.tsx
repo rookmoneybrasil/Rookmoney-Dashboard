@@ -5,14 +5,15 @@ import { Progress, CircularProgress } from '@/components/ui/progress'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { formatCurrency, formatDate, calculateProgress } from '@/lib/utils'
-import { getGoals, deleteGoal } from '@/app/actions/goals'
+import { deleteGoal } from '@/app/actions/goals'
+import { serverApi } from '@/lib/api-client'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
 import { GoalModal } from '@/components/goals/goal-modal'
 import { EditGoalModal } from '@/components/goals/edit-goal-modal'
 import { ContributeButton } from '@/components/goals/contribute-button'
 
 export default async function GoalsPage() {
-  const allGoals = await getGoals(true)
+  const allGoals = await serverApi.goals(true)
 
   const active    = allGoals.filter((g) => !g.isCompleted)
   const completed = allGoals.filter((g) =>  g.isCompleted)

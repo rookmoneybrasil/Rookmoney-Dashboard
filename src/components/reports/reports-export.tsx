@@ -3,12 +3,14 @@
 import { FileDown, Printer } from 'lucide-react'
 
 interface MonthData {
-  month:        string
+  month?:       string
+  monthKey?:    string
   monthFull:    string
   totalIncome:  number
   totalExpense: number
   balance:      number
-  categoryBreakdown: { name: string; total: number; pct: number }[]
+  categoryBreakdown?: { name: string; total: number; pct: number }[]
+  savingsRate?: number
 }
 
 export function ReportsExport({ data }: { data: MonthData[] }) {

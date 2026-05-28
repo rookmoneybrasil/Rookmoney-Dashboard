@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, CheckCircle2 } from 'lucide-react'
 import { EntryActions } from './entry-actions'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import type { PersonEntryRow } from '@/app/actions/people'
+import type { PersonEntryRow } from '@/lib/api-client'
 
 interface Props {
   personId: string

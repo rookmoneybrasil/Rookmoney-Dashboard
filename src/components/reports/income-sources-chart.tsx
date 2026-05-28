@@ -1,7 +1,7 @@
 'use client'
 
 import { formatCurrency } from '@/lib/utils'
-import type { IncomeSource } from '@/app/actions/reports'
+import type { IncomeSourceReport as IncomeSource } from '@/lib/api-client'
 
 export function IncomeSourcesChart({ sources, totalIncome }: { sources: IncomeSource[]; totalIncome: number }) {
   if (sources.length === 0) {

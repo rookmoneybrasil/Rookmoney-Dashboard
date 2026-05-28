@@ -5,9 +5,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { getBudgets, deleteBudget } from '@/app/actions/budgets'
+import { deleteBudget } from '@/app/actions/budgets'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
-import { getCategories } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { BudgetModal } from '@/components/budget/budget-modal'
 import { BudgetMonthPicker } from '@/components/budget/budget-month-picker'
 
@@ -18,8 +18,8 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
   const month = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
 
   const [budgets, categories] = await Promise.all([
-    getBudgets(month),
-    getCategories(),
+    serverApi.budget(month),
+    serverApi.categories(),
   ])
 
   const monthLabel = format(new Date(month + '-02'), 'MMMM yyyy', { locale: ptBR })

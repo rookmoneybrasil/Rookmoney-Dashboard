@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { BarChart3, TrendingDown, Calendar, Layers } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
-import { getReportsData } from '@/app/actions/reports'
+import { serverApi } from '@/lib/api-client'
 import { ReportsFilters } from '@/components/reports/reports-filters'
 import { ReportsExport } from '@/components/reports/reports-export'
 import { MonthlyChart } from '@/components/reports/monthly-chart'
@@ -21,7 +21,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
   const months = Math.min(Math.max(Number(sp.months ?? '6'), 1), 24)
   const month  = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
 
-  const data = await getReportsData(months - 1, month)
+  const data = await serverApi.reports(months)
   const { monthly, period, topExpenses, spendingByDay, categoryTrend, incomeSources } = data
 
   const periodExpense = period.totalExpense

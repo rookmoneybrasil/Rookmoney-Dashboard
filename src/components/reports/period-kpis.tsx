@@ -2,7 +2,7 @@
 
 import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
-import type { PeriodStats } from '@/app/actions/reports'
+import type { PeriodReport as PeriodStats } from '@/lib/api-client'
 
 function KpiCard({
   label, value, sub, icon: Icon, variant,

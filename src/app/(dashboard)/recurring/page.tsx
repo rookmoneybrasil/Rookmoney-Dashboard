@@ -2,8 +2,8 @@ import { RefreshCw, TrendingUp, TrendingDown } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { getRecurringTransactions, deleteRecurringTransaction, toggleRecurringTransaction } from '@/app/actions/recurring-transactions'
-import { getCategories } from '@/app/actions/categories'
+import { deleteRecurringTransaction, toggleRecurringTransaction } from '@/app/actions/recurring-transactions'
+import { serverApi, type RecurringTransaction, type Category } from '@/lib/api-client'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
 import { RecurringModal } from '@/components/recurring/recurring-modal'
 
@@ -15,8 +15,8 @@ const freqLabel: Record<string, string> = {
 
 export default async function RecurringPage() {
   const [items, categories] = await Promise.all([
-    getRecurringTransactions(),
-    getCategories(),
+    serverApi.recurring(),
+    serverApi.categories(),
   ])
 
   const active   = items.filter((r) => r.isActive)
@@ -82,8 +82,8 @@ function RecurringRow({
   rec,
   categories,
 }: {
-  rec: Awaited<ReturnType<typeof getRecurringTransactions>>[number]
-  categories: Awaited<ReturnType<typeof getCategories>>
+  rec: RecurringTransaction
+  categories: Category[]
 }) {
   const isIncome = rec.type === 'INCOME'
 

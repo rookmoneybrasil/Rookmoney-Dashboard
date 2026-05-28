@@ -1,7 +1,7 @@
 'use client'
 
 import { formatCurrency } from '@/lib/utils'
-import type { TopExpense } from '@/app/actions/reports'
+import type { TopExpense } from '@/lib/api-client'
 
 export function TopExpenses({ expenses, periodExpense }: { expenses: TopExpense[]; periodExpense: number }) {
   if (expenses.length === 0) {

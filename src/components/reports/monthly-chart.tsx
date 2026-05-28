@@ -13,7 +13,9 @@ import {
 } from 'recharts'
 
 type MonthlyDataPoint = {
-  month:        string
+  month?:       string
+  monthKey?:    string
+  monthFull?:   string
   totalIncome:  number
   totalExpense: number
   balance:      number

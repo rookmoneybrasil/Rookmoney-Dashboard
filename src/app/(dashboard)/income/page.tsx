@@ -2,8 +2,8 @@ import { Banknote, RefreshCw, Zap } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { getIncomeSources, deleteIncomeSource } from '@/app/actions/income-sources'
-import { getCategories } from '@/app/actions/categories'
+import { deleteIncomeSource } from '@/app/actions/income-sources'
+import { serverApi } from '@/lib/api-client'
 import { IncomeSourceModal } from '@/components/income/income-source-modal'
 import { RegisterReceiptModal } from '@/components/income/register-receipt-modal'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
@@ -16,7 +16,7 @@ const TYPE_CONFIG = {
 }
 
 export default async function IncomePage() {
-  const [sources, categories] = await Promise.all([getIncomeSources(), getCategories()])
+  const [sources, categories] = await Promise.all([serverApi.incomeSources(), serverApi.categories()])
 
   const recurring    = sources.filter((s) => s.isRecurring)
   const nonRecurring = sources.filter((s) => !s.isRecurring)
