@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect, useActionState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
-import { createPerson, updatePerson } from '@/app/actions/people'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 const AVATAR_COLORS = [
   '#3b82f6', '#8b5cf6', '#ec4899', '#ef4444',
@@ -31,15 +32,13 @@ export function PersonModal({ person, trigger }: Props) {
   const [open, setOpen]     = useState(false)
   const [color, setColor]   = useState(person?.color ?? AVATAR_COLORS[0])
 
-  const action = person
-    ? updatePerson.bind(null, person.id)
-    : createPerson
-
-  const [state, formAction, pending] = useActionState(action, undefined)
-
-  useEffect(() => {
-    if (state && !state.error) setOpen(false)
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; color: string; notes: string }) =>
+      person
+        ? clientApi.updatePerson(person.id, data)
+        : clientApi.createPerson(data),
+    { onSuccess: () => setOpen(false) },
+  )
 
   useEffect(() => {
     if (open) setColor(person?.color ?? AVATAR_COLORS[0])
@@ -64,10 +63,21 @@ export function PersonModal({ person, trigger }: Props) {
           <ModalTitle>{person ? 'Editar pessoa' : 'Nova pessoa'}</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const fd = new FormData(e.currentTarget)
+            mutate({
+              name:  fd.get('name') as string,
+              color: fd.get('color') as string,
+              notes: fd.get('notes') as string,
+            })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 

@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
-import { createCategory, updateCategory } from '@/app/actions/categories'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 const COLOR_PRESETS = [
   '#3B82F6','#8B5CF6','#EC4899','#F59E0B','#10B981',
@@ -23,17 +23,28 @@ export function CategoryModal({ category }: Props) {
   const [open, setOpen]   = useState(false)
   const [color, setColor] = useState(category?.color ?? '#3B82F6')
 
-  const action = isEdit
-    ? updateCategory.bind(null, category!.id)
-    : createCategory
-  const [state, formAction, pending] = useActionState(action, undefined)
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; icon: string; color: string }) =>
+      isEdit
+        ? clientApi.updateCategory(category!.id, { name: data.name, icon: data.icon, color: data.color })
+        : clientApi.createCategory({ name: data.name, icon: data.icon, color: data.color }),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        if (!isEdit) setColor('#3B82F6')
+      },
+    },
+  )
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      if (!isEdit) setColor('#3B82F6')
-    }
-  }, [state, isEdit])
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      name: fd.get('name') as string,
+      icon: fd.get('icon') as string,
+      color,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -56,9 +67,9 @@ export function CategoryModal({ category }: Props) {
           <ModalTitle>{isEdit ? 'Editar categoria' : 'Nova categoria'}</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{state.error}</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <div className="grid grid-cols-[1fr_72px] gap-3">
@@ -79,7 +90,6 @@ export function CategoryModal({ category }: Props) {
                   style={{ backgroundColor: c }} />
               ))}
             </div>
-            <input type="hidden" name="color" value={color} />
           </FormField>
 
           {/* Preview */}

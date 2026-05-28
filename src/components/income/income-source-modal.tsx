@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { createIncomeSource, updateIncomeSource } from '@/app/actions/income-sources'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 import { triggerMascot } from '@/lib/mascot'
 
 const TYPE_LABELS = {
@@ -33,15 +33,18 @@ export function IncomeSourceModal({ source, categories = [] }: Props) {
   const [isRecurring, setRec]     = useState(source?.isRecurring ?? true)
   const [categoryId, setCatId]    = useState(source?.categoryId ?? '')
 
-  const boundAction = isEdit ? updateIncomeSource.bind(null, source.id) : createIncomeSource
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
-
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      if (!isEdit) triggerMascot('happy', 'Nova fonte de renda cadastrada! 💰')
-    }
-  }, [state, isEdit])
+  const { mutate, pending, error } = useMutation(
+    (data: Parameters<typeof clientApi.createIncomeSource>[0]) =>
+      isEdit
+        ? clientApi.updateIncomeSource(source.id, data)
+        : clientApi.createIncomeSource(data),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        if (!isEdit) triggerMascot('happy', 'Nova fonte de renda cadastrada! 💰')
+      },
+    },
+  )
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -64,9 +67,25 @@ export function IncomeSourceModal({ source, categories = [] }: Props) {
           <ModalTitle>{isEdit ? 'Editar fonte de renda' : 'Nova fonte de renda'}</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{state.error}</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const fd = new FormData(e.currentTarget)
+            const dayRaw = fd.get('dayOfMonth') as string
+            mutate({
+              name:        fd.get('name') as string,
+              type:        fd.get('type') as string,
+              amount:      parseFloat(fd.get('amount') as string),
+              isRecurring: fd.get('isRecurring') === 'true',
+              dayOfMonth:  dayRaw ? parseInt(dayRaw, 10) : null,
+              notes:       (fd.get('notes') as string) || null,
+              categoryId:  (fd.get('categoryId') as string) || null,
+            })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <FormField label="Nome" htmlFor="name" required>

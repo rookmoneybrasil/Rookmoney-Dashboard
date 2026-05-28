@@ -1,25 +1,49 @@
 'use client'
 
-import { useActionState } from 'react'
-import { changePassword } from '@/app/actions/settings'
+import { useRef, useState } from 'react'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 import { Input, FormField } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 
 export function PasswordForm() {
-  const [state, formAction, pending] = useActionState(changePassword, undefined)
+  const formRef = useRef<HTMLFormElement>(null)
+  const [success, setSuccess] = useState(false)
+  const { mutate, pending, error } = useMutation(
+    (data: { currentPassword: string; newPassword: string }) =>
+      clientApi.changePassword(data),
+    {
+      onSuccess: () => {
+        setSuccess(true)
+        formRef.current?.reset()
+      },
+    },
+  )
 
   return (
     <Card>
       <CardHeader><CardTitle>Segurança</CardTitle></CardHeader>
       <CardContent>
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form
+          ref={formRef}
+          onSubmit={(e) => {
+            e.preventDefault()
+            setSuccess(false)
+            const fd = new FormData(e.currentTarget)
+            mutate({
+              currentPassword: fd.get('currentPassword') as string,
+              newPassword:     fd.get('newPassword') as string,
+            })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
-          {state?.success && (
+          {success && (
             <p className="text-sm text-success bg-success/10 border border-success/20 px-3 py-2 rounded-lg">
               Senha alterada com sucesso!
             </p>

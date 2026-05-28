@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useActionState } from 'react'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -10,7 +10,8 @@ import { Input, FormField, Textarea } from '@/components/ui/input'
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/ui/select'
-import { createPersonEntry } from '@/app/actions/people'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 import { formatCurrency } from '@/lib/utils'
 
 interface Category {
@@ -33,9 +34,19 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const [amount, setAmount]          = useState('')
   const [categoryId, setCatId]       = useState('')
 
-  const [state, formAction, pending] = useActionState(
-    createPersonEntry.bind(null, personId),
-    undefined,
+  const { mutate, pending, error } = useMutation(
+    (data: Parameters<typeof clientApi.createEntry>[1] & { installments?: number }) =>
+      clientApi.createEntry(personId, data),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        setEntryType('THEY_OWE_ME')
+        setParcelado(false)
+        setInst(2)
+        setAmount('')
+        setCatId('')
+      },
+    },
   )
 
   const today         = new Date().toISOString().split('T')[0]
@@ -43,17 +54,6 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const perInst       = isParcelado && installments > 1
     ? Math.round((amountNum / installments) * 100) / 100
     : amountNum
-
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      setEntryType('THEY_OWE_ME')
-      setParcelado(false)
-      setInst(2)
-      setAmount('')
-      setCatId('')
-    }
-  }, [state])
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -70,10 +70,25 @@ export function EntryModal({ personId, personName, categories }: Props) {
           <ModalTitle>Lançamento — {personName}</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const fd = new FormData(e.currentTarget)
+            mutate({
+              type:         fd.get('type') as EntryType,
+              description:  fd.get('description') as string,
+              amount:       parseFloat(fd.get('amount') as string),
+              date:         fd.get('date') as string,
+              notes:        (fd.get('notes') as string) || null,
+              categoryId:   (fd.get('categoryId') as string) || null,
+              installments: parseInt(fd.get('installments') as string, 10) || 1,
+            })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 

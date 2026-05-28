@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { Upload, ScanLine, CheckCircle2, AlertCircle, X, ImageIcon, Loader2 } from 'lucide-react'
-import { createTransaction } from '@/app/actions/transactions'
+import { clientApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 
 interface Category { id: string; name: string; color: string; icon: string }
@@ -105,16 +105,20 @@ export function ReceiptScanner({ categories }: Props) {
   const handleSave = async () => {
     if (!editForm.amount || !editForm.type || !editForm.date || !editForm.categoryId) return
     setSaving(true)
-    const fd = new FormData()
-    fd.set('amount',      String(editForm.amount))
-    fd.set('type',        editForm.type)
-    fd.set('description', editForm.description ?? '')
-    fd.set('date',        editForm.date)
-    fd.set('categoryId',  editForm.categoryId)
-    const result = await createTransaction(undefined, fd)
-    setSaving(false)
-    if (result?.error) { setScanError(result.error); return }
-    setSaved(true)
+    try {
+      await clientApi.createTransaction({
+        amount:      editForm.amount,
+        type:        editForm.type as 'INCOME' | 'EXPENSE',
+        description: editForm.description ?? '',
+        date:        editForm.date,
+        categoryId:  editForm.categoryId,
+      })
+      setSaved(true)
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : 'Erro ao salvar')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const confidenceLabel = { high: '✓ Alta confiança', medium: '~ Confiança média', low: '⚠ Baixa confiança' }

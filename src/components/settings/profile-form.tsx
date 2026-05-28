@@ -1,7 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
-import { updateProfile } from '@/app/actions/settings'
+import { useState } from 'react'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 import { Avatar } from '@/components/ui/avatar'
 import { Input, FormField } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -11,19 +12,31 @@ import { Separator } from '@/components/ui/separator'
 interface Props { name: string; email: string }
 
 export function ProfileForm({ name, email }: Props) {
-  const [state, formAction, pending] = useActionState(updateProfile, undefined)
+  const [success, setSuccess] = useState(false)
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string }) => clientApi.updateProfile(data),
+    { onSuccess: () => setSuccess(true) },
+  )
 
   return (
     <Card>
       <CardHeader><CardTitle>Perfil</CardTitle></CardHeader>
       <CardContent>
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            setSuccess(false)
+            const fd = new FormData(e.currentTarget)
+            mutate({ name: fd.get('name') as string })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
-          {state?.success && (
+          {success && (
             <p className="text-sm text-success bg-success/10 border border-success/20 px-3 py-2 rounded-lg">
               Perfil atualizado com sucesso!
             </p>

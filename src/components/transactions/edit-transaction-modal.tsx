@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Pencil, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -11,8 +10,9 @@ import { Input, FormField } from '@/components/ui/input'
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/ui/select'
-import { updateTransaction } from '@/app/actions/transactions'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Category { id: string; name: string; icon: string; color: string }
 
@@ -36,18 +36,35 @@ export function EditTransactionModal({ transaction, categories }: Props) {
   const [categoryId, setCatId] = useState(transaction.categoryId)
   const [description, setDesc] = useState(transaction.description ?? '')
 
-  const boundAction = updateTransaction.bind(null, transaction.id)
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
-
   const detectedBrand = getServiceBrand(description, undefined)
 
   const dateStr = typeof transaction.date === 'string'
     ? transaction.date.slice(0, 10)
     : new Date(transaction.date).toISOString().slice(0, 10)
 
-  useEffect(() => {
-    if (state && !state.error) setOpen(false)
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }) =>
+      clientApi.updateTransaction(transaction.id, {
+        amount: parseFloat(data.amount),
+        type: data.type,
+        description: data.description,
+        date: data.date,
+        categoryId: data.categoryId,
+      }),
+    { onSuccess: () => setOpen(false) },
+  )
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      amount: fd.get('amount') as string,
+      type,
+      description: fd.get('description') as string,
+      date: fd.get('date') as string,
+      categoryId,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -62,9 +79,9 @@ export function EditTransactionModal({ transaction, categories }: Props) {
       <ModalContent size="sm">
         <ModalHeader><ModalTitle>Editar transação</ModalTitle></ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{state.error}</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <div className="grid grid-cols-2 gap-1 rounded-lg bg-ink-900 p-1">
@@ -81,7 +98,6 @@ export function EditTransactionModal({ transaction, categories }: Props) {
               </button>
             ))}
           </div>
-          <input type="hidden" name="type" value={type} />
 
           <FormField label="Valor (R$)" htmlFor="amount" required>
             <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
@@ -138,7 +154,6 @@ export function EditTransactionModal({ transaction, categories }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-              <input type="hidden" name="categoryId" value={categoryId} />
             </FormField>
           </div>
 

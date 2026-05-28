@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import {
   Modal,
@@ -19,10 +18,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import {
-  createRecurringTransaction,
-  updateRecurringTransaction,
-} from '@/app/actions/recurring-transactions'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Category {
   id:    string
@@ -50,21 +47,18 @@ interface Props {
 export function RecurringModal({ categories, item }: Props) {
   const isEdit = !!item
 
-  const boundAction = isEdit
-    ? updateRecurringTransaction.bind(null, item.id)
-    : createRecurringTransaction
-
   const [open, setOpen]            = useState(false)
   const [type, setType]            = useState(item?.type ?? 'EXPENSE')
   const [categoryId, setCatId]     = useState(item?.categoryId ?? '')
   const [frequency, setFrequency]  = useState(item?.frequency ?? 'MONTHLY')
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-    }
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: Parameters<typeof clientApi.createRecurring>[0]) =>
+      isEdit
+        ? clientApi.updateRecurring(item.id, data)
+        : clientApi.createRecurring(data),
+    { onSuccess: () => setOpen(false) },
+  )
 
   // Re-init state when item changes
   useEffect(() => {
@@ -100,10 +94,26 @@ export function RecurringModal({ categories, item }: Props) {
           <ModalTitle>{isEdit ? 'Editar recorrência' : 'Nova recorrência'}</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const fd = new FormData(e.currentTarget)
+            const dayRaw = fd.get('dayOfMonth') as string
+            mutate({
+              name:        fd.get('name') as string,
+              type:        fd.get('type') as 'INCOME' | 'EXPENSE',
+              amount:      parseFloat(fd.get('amount') as string),
+              frequency:   fd.get('frequency') as string,
+              dayOfMonth:  dayRaw ? parseInt(dayRaw, 10) : null,
+              description: (fd.get('description') as string) || null,
+              categoryId:  fd.get('categoryId') as string,
+            })
+          }}
+          className="flex flex-col gap-4"
+        >
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 

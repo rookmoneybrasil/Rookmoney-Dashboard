@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { TrendingUp, TrendingDown, Sparkles, X, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
-import type { MonthProjection, ProjectionItem } from '@/app/actions/projections'
+import type { MonthProjection, ProjectionItem } from '@/lib/api-client'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

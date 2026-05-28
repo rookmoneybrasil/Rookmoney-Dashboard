@@ -67,8 +67,9 @@ async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── API namespace ────────────────────────────────────────────────────────────
 
 export const serverApi = {
-  // Auth
-  me: () => serverFetch<User>('/auth/me'),
+  // Auth / profile
+  me:       () => serverFetch<User>('/auth/me'),
+  settings: () => serverFetch<User>('/settings'),
 
   // Dashboard
   dashboard: () => serverFetch<DashboardData>('/dashboard'),
@@ -109,7 +110,7 @@ export const serverApi = {
   adminStats: () => serverFetch<AdminStats>('/admin/stats'),
   adminUsers: (params?: Record<string, string>) =>
     serverFetch<AdminUsersPage>(`/admin/users${toQs(params)}`),
-  adminUser: (id: string) => serverFetch<AdminUser>(`/admin/users/${id}`),
+  adminUser: (id: string) => serverFetch<AdminUserDetail>(`/admin/users/${id}`),
 }
 
 export const clientApi = {
@@ -163,6 +164,49 @@ export const clientApi = {
   deleteBudget: (id: string) =>
     clientFetch<void>(`/budget/${id}`, { method: 'DELETE' }),
 
+  // Income Sources
+  createIncomeSource: (data: IncomeSourceInput) =>
+    clientFetch<IncomeSource>('/income-sources', { method: 'POST', body: JSON.stringify(data) }),
+  updateIncomeSource: (id: string, data: Partial<IncomeSourceInput>) =>
+    clientFetch<IncomeSource>(`/income-sources/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteIncomeSource: (id: string) =>
+    clientFetch<void>(`/income-sources/${id}`, { method: 'DELETE' }),
+
+  // Recurring Transactions
+  createRecurring: (data: RecurringInput) =>
+    clientFetch<RecurringTransaction>('/recurring', { method: 'POST', body: JSON.stringify(data) }),
+  updateRecurring: (id: string, data: Partial<RecurringInput>) =>
+    clientFetch<RecurringTransaction>(`/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteRecurring: (id: string) =>
+    clientFetch<void>(`/recurring/${id}`, { method: 'DELETE' }),
+  toggleRecurring: (id: string) =>
+    clientFetch<RecurringTransaction>(`/recurring/${id}?action=toggle`, { method: 'POST' }),
+
+  // People
+  createPerson: (data: PersonInput) =>
+    clientFetch<Person>('/people', { method: 'POST', body: JSON.stringify(data) }),
+  updatePerson: (id: string, data: Partial<PersonInput>) =>
+    clientFetch<Person>(`/people/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deletePerson: (id: string) =>
+    clientFetch<void>(`/people/${id}`, { method: 'DELETE' }),
+  createEntry: (personId: string, data: EntryInput) =>
+    clientFetch<PersonEntry>(`/people/${personId}?action=entry`, { method: 'POST', body: JSON.stringify(data) }),
+  settleEntry: (id: string) =>
+    clientFetch<PersonEntry>(`/people/entries/${id}?action=settle`, { method: 'POST' }),
+  unsettleEntry: (id: string) =>
+    clientFetch<PersonEntry>(`/people/entries/${id}?action=unsettle`, { method: 'POST' }),
+  deleteEntry: (id: string) =>
+    clientFetch<void>(`/people/entries/${id}`, { method: 'DELETE' }),
+
+  // Settings
+  getProfile: () => clientFetch<User>('/settings'),
+  updateProfile: (data: { name?: string; whatsappPhone?: string }) =>
+    clientFetch<User>('/settings', { method: 'PATCH', body: JSON.stringify(data) }),
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    clientFetch<void>('/settings?action=password', { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteAccount: () =>
+    clientFetch<void>('/settings', { method: 'DELETE' }),
+
   // Admin
   adminSetPlan:  (id: string, plan: 'FREE' | 'PRO') =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ plan }) }),
@@ -171,6 +215,13 @@ export const clientApi = {
   adminDeleteUser: (id: string) =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'DELETE' }),
 }
+
+// ─── Types for dashboard components ──────────────────────────────────────────
+export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
+export type HealthTip       = { icon: string; message: string; href?: string }
+export type FinancialHealth = { score: number; grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F'; label: string; color: string; components: HealthComponent[]; tips: HealthTip[] }
+export type ProjectionItem  = { id: string; label: string; amount: number; sublabel?: string; icon?: string }
+export type MonthProjection = { month: string; label: string; income: number; expense: number; balance: number; cumulativeBalance: number; monthlyResult?: number; items?: ProjectionItem[]; incomeItems: { sources: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] }; expenseItems: { bills: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] } }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -182,7 +233,7 @@ function toQs(params?: Record<string, string>): string {
 
 // ─── Types (mirror API responses) ────────────────────────────────────────────
 
-export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean }
+export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number> }
 export interface AuthResponse { token: string; user: User }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }
@@ -195,6 +246,10 @@ export interface GoalInput { name: string; targetAmount: number; currentAmount?:
 export interface Bill { id: string; name: string; amount: number; dueDate: string; isPaid: boolean; paidAt: string | null; isRecurring: boolean; notes: string | null; categoryId: string | null; category: Category | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; paidTransactionId: string | null; createdAt: string; updatedAt: string; userId: string }
 export interface BillInput { name: string; amount: number; dueDate: string; isRecurring?: boolean; categoryId?: string; installments?: number; notes?: string }
 export interface Budget { id: string; categoryId: string; month: string; amount: number; category: Category }
+export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; notes?: string | null; categoryId?: string | null }
+export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
+export interface PersonInput { name: string; color?: string | null; notes?: string | null }
+export interface EntryInput { type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; notes?: string | null; categoryId?: string | null }
 export interface BudgetItem extends Budget { spent: number }
 export interface Person { id: string; name: string; color: string | null; notes: string | null; createdAt: string; updatedAt: string; userId: string; balance: number; openEntriesCount: number; openCount?: number; entries?: PersonEntry[] }
 export interface PersonDetail extends Person { entries: PersonEntry[] }
@@ -212,6 +267,7 @@ export interface CategoryTrend { categoryId: string; name: string; icon: string;
 export interface TopExpense { id: string; description: string | null; amount: number; date: string; category: Category }
 export interface SpendingDay { day: number; total: number; count?: number }
 export interface IncomeSourceReport { name: string; total: number; icon?: string; color?: string; pct?: number }
-export interface AdminStats { totalUsers: number; proUsers: number; freeUsers: number; proRate: number; newThisMonth: number; totalTransactions: number; mrr: number; arr: number }
-export interface AdminUser { id: string; name: string; email: string; plan: string; isAdmin: boolean; createdAt: string; _count: { transactions: number; goals: number; bills: number } }
+export interface AdminStats { totalUsers: number; proUsers: number; freeUsers: number; proRate: number; newToday: number; newThisWeek: number; newThisMonth: number; totalTransactions: number; transactionsThisMonth: number; totalGoals: number; mrr: number; arr: number; recentUsers: { id: string; name: string; email: string; plan: string; createdAt: string }[] }
+export interface AdminUser { id: string; name: string; email: string; plan: string; isAdmin: boolean; createdAt: string; updatedAt: string; whatsappPhone?: string | null; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; _count: { transactions: number; goals: number; bills: number; budgets: number; people: number } }
+export interface AdminUserDetail { user: AdminUser; recentTransactions: Transaction[] }
 export interface AdminUsersPage { users: AdminUser[]; total: number; page: number; totalPages: number }

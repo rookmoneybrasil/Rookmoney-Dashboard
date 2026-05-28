@@ -1,84 +1,20 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getAdminUser, setUserPlan, toggleUserAdmin, deleteUserAsAdmin } from '@/app/actions/admin'
+import { serverApi } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {
-  ArrowLeft, Crown, Shield, Trash2, TrendingUp, TrendingDown,
+  ArrowLeft, Crown, TrendingUp, TrendingDown,
   ReceiptText, Target, FileText, PiggyBank, Users,
 } from 'lucide-react'
+import { PlanToggle, AdminToggle, DeleteButton } from './user-action-buttons'
 
 interface Props { params: Promise<{ id: string }> }
-
-// ── Plan toggle button ─────────────────────────────────────────────────────────
-
-function PlanToggle({ userId, currentPlan }: { userId: string; currentPlan: string }) {
-  const isProNow = currentPlan === 'PRO'
-  const nextPlan = isProNow ? 'FREE' : 'PRO'
-
-  return (
-    <form action={async () => {
-      'use server'
-      await setUserPlan(userId, nextPlan as 'FREE' | 'PRO')
-    }}>
-      <button
-        type="submit"
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-          isProNow
-            ? 'bg-ink-700 hover:bg-ink-600 border border-white/8 text-slate-300'
-            : 'bg-amber-900/60 hover:bg-amber-800/60 border border-amber-700/40 text-amber-300'
-        }`}
-      >
-        <Crown className="size-4" />
-        {isProNow ? 'Rebaixar para Free' : 'Promover para Pro'}
-      </button>
-    </form>
-  )
-}
-
-function AdminToggle({ userId, isAdmin }: { userId: string; isAdmin: boolean }) {
-  return (
-    <form action={async () => {
-      'use server'
-      await toggleUserAdmin(userId, !isAdmin)
-    }}>
-      <button
-        type="submit"
-        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-ink-700 hover:bg-ink-600 border border-white/8 text-slate-300 transition-colors"
-      >
-        <Shield className="size-4" />
-        {isAdmin ? 'Remover admin' : 'Tornar admin'}
-      </button>
-    </form>
-  )
-}
-
-function DeleteButton({ userId }: { userId: string }) {
-  return (
-    <form action={async () => {
-      'use server'
-      await deleteUserAsAdmin(userId)
-    }}>
-      <button
-        type="submit"
-        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-danger/10 hover:bg-danger/20 border border-danger/30 text-danger transition-colors"
-        onClick={(e) => {
-          if (!confirm('Tem certeza? Esta ação é irreversível e deleta TODOS os dados do usuário.')) {
-            e.preventDefault()
-          }
-        }}
-      >
-        <Trash2 className="size-4" />
-        Deletar conta
-      </button>
-    </form>
-  )
-}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function AdminUserPage({ params }: Props) {
   const { id }  = await params
-  const result  = await getAdminUser(id)
+  const result = await serverApi.adminUser(id)
   if (!result) notFound()
 
   const { user, recentTransactions } = result

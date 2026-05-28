@@ -1,4 +1,4 @@
-import { getAdminStats } from '@/app/actions/admin'
+import { serverApi } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Users, Crown, TrendingUp, ArrowUpRight, Receipt, Target } from 'lucide-react'
 import Link from 'next/link'
@@ -24,7 +24,7 @@ function KPICard({ label, value, sub, icon: Icon, color }: {
 }
 
 export default async function AdminDashboard() {
-  const s = await getAdminStats()
+  const s = await serverApi.adminStats()
 
   return (
     <div className="flex flex-col gap-8">

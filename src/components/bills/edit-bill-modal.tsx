@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -11,7 +10,8 @@ import { Input, FormField, Textarea } from '@/components/ui/input'
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/ui/select'
-import { updateBill } from '@/app/actions/bills'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Category { id: string; name: string; icon: string; color: string }
 
@@ -28,18 +28,37 @@ interface Bill {
 interface Props { bill: Bill; categories: Category[] }
 
 export function EditBillModal({ bill, categories }: Props) {
-  const [open, setOpen]          = useState(false)
-  const [isRecurring, setRec]    = useState(bill.isRecurring)
-  const [categoryId, setCatId]   = useState(bill.categoryId ?? '')
-
-  const boundAction = updateBill.bind(null, bill.id)
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
+  const [open, setOpen]        = useState(false)
+  const [isRecurring, setRec]  = useState(bill.isRecurring)
+  const [categoryId, setCatId] = useState(bill.categoryId ?? '')
 
   const dateStr = bill.dueDate.slice(0, 10)
 
-  useEffect(() => {
-    if (state && !state.error) setOpen(false)
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; amount: string; dueDate: string; categoryId: string; notes: string; isRecurring: boolean }) =>
+      clientApi.updateBill(bill.id, {
+        name: data.name,
+        amount: parseFloat(data.amount),
+        dueDate: data.dueDate,
+        categoryId: data.categoryId || undefined,
+        notes: data.notes || undefined,
+        isRecurring: data.isRecurring,
+      }),
+    { onSuccess: () => setOpen(false) },
+  )
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      name: fd.get('name') as string,
+      amount: fd.get('amount') as string,
+      dueDate: fd.get('dueDate') as string,
+      categoryId,
+      notes: fd.get('notes') as string,
+      isRecurring,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -52,9 +71,9 @@ export function EditBillModal({ bill, categories }: Props) {
       <ModalContent size="sm">
         <ModalHeader><ModalTitle>Editar conta</ModalTitle></ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{state.error}</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <FormField label="Nome da conta" htmlFor="name" required>
@@ -80,7 +99,6 @@ export function EditBillModal({ bill, categories }: Props) {
                 ))}
               </SelectContent>
             </Select>
-            <input type="hidden" name="categoryId" value={categoryId} />
           </FormField>
 
           <FormField label="Observações" htmlFor="notes">
@@ -89,7 +107,6 @@ export function EditBillModal({ bill, categories }: Props) {
           </FormField>
 
           <label className="flex items-center gap-3 cursor-pointer">
-            <input type="hidden" name="isRecurring" value={isRecurring ? 'true' : 'false'} />
             <div onClick={() => setRec(!isRecurring)}
               className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors ${isRecurring ? 'bg-brand-600' : 'bg-ink-600'}`}>
               <span className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isRecurring ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />

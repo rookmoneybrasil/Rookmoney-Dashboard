@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import {
   Modal,
@@ -13,8 +12,9 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
-import { addContribution } from '@/app/actions/goals'
 import { triggerMascot } from '@/lib/mascot'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Props {
   goalId: string
@@ -24,18 +24,26 @@ interface Props {
 
 export function ContributeButton({ goalId, goalName, remaining }: Props) {
   const [open, setOpen] = useState(false)
-  const boundAction = addContribution.bind(null, goalId)
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      triggerMascot('celebrating', `Aporte adicionado em "${goalName}"! Continue assim! 💰`)
-    }
-  }, [state, goalName])
+  const { mutate, pending, error } = useMutation(
+    (data: { amount: string }) =>
+      clientApi.contributeToGoal(goalId, parseFloat(data.amount)),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        triggerMascot('celebrating', `Aporte adicionado em "${goalName}"! Continue assim! 💰`)
+      },
+    },
+  )
 
   const fmt = (v: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({ amount: fd.get('amount') as string })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -55,10 +63,10 @@ export function ContributeButton({ goalId, goalName, remaining }: Props) {
           </ModalDescription>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 

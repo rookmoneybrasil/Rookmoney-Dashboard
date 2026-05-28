@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
 import { triggerMascot } from '@/lib/mascot'
@@ -21,7 +20,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import { createTransaction } from '@/app/actions/transactions'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Category {
   id: string
@@ -35,29 +35,50 @@ interface Props {
 }
 
 export function TransactionModal({ categories }: Props) {
-  const [open, setOpen]            = useState(false)
-  const [type, setType]            = useState<'INCOME' | 'EXPENSE'>('EXPENSE')
-  const [categoryId, setCatId]     = useState('')
-  const [description, setDesc]     = useState('')
-  const [state, formAction, pending] = useActionState(createTransaction, undefined)
+  const [open, setOpen]        = useState(false)
+  const [type, setType]        = useState<'INCOME' | 'EXPENSE'>('EXPENSE')
+  const [categoryId, setCatId] = useState('')
+  const [description, setDesc] = useState('')
 
   const detectedBrand = getServiceBrand(description, undefined)
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      setType('EXPENSE')
-      setCatId('')
-      setDesc('')
-      if (type === 'INCOME') {
-        triggerMascot('happy', 'Receita registrada! Dinheiro entrando! 💵')
-      } else {
-        triggerMascot('counting', 'Despesa registrada! Fique de olho no saldo. 📝')
-      }
-    }
-  }, [state, type])
+  const { mutate, pending, error } = useMutation(
+    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }) =>
+      clientApi.createTransaction({
+        amount: parseFloat(data.amount),
+        type: data.type,
+        description: data.description,
+        date: data.date,
+        categoryId: data.categoryId,
+      }),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        setType('EXPENSE')
+        setCatId('')
+        setDesc('')
+        if (type === 'INCOME') {
+          triggerMascot('happy', 'Receita registrada! Dinheiro entrando! 💵')
+        } else {
+          triggerMascot('counting', 'Despesa registrada! Fique de olho no saldo. 📝')
+        }
+      },
+    },
+  )
 
   const today = new Date().toISOString().split('T')[0]
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      amount: fd.get('amount') as string,
+      type,
+      description: fd.get('description') as string,
+      date: fd.get('date') as string,
+      categoryId,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -74,10 +95,10 @@ export function TransactionModal({ categories }: Props) {
           <ModalTitle>Nova transação</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 
@@ -108,7 +129,6 @@ export function TransactionModal({ categories }: Props) {
               Receita
             </button>
           </div>
-          <input type="hidden" name="type" value={type} />
 
           <FormField label="Valor (R$)" htmlFor="amount" required>
             <Input
@@ -200,7 +220,6 @@ export function TransactionModal({ categories }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-              <input type="hidden" name="categoryId" value={categoryId} />
             </FormField>
           </div>
 

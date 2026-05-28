@@ -1,10 +1,10 @@
-import { getCategories } from '@/app/actions/categories'
+import { serverApi } from '@/lib/api-client'
 import { CSVImporter } from '@/components/import/csv-importer'
 import { ReceiptScanner } from '@/components/import/receipt-scanner'
 import { Tabs } from '@/components/import/import-tabs'
 
 export default async function ImportPage() {
-  const categories = await getCategories()
+  const categories = await serverApi.categories()
 
   const cats = categories.map((c) => ({
     id:    c.id,

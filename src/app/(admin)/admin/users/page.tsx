@@ -1,4 +1,4 @@
-import { getAdminUsers } from '@/app/actions/admin'
+import { serverApi } from '@/lib/api-client'
 import { formatDate } from '@/lib/utils'
 import { Search, ArrowUpRight, Crown } from 'lucide-react'
 import Link from 'next/link'
@@ -11,7 +11,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
   const plan   = (sp.plan   as string) ?? ''
   const page   = Math.max(1, Number(sp.page ?? '1') || 1)
 
-  const { users, total, totalPages } = await getAdminUsers({ search, plan, page })
+  const { users, total, totalPages } = await serverApi.adminUsers({ search, plan, page: String(page) })
 
   return (
     <div className="flex flex-col gap-6">

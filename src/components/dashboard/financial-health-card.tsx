@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronDown, ExternalLink } from 'lucide-react'
-import type { FinancialHealth, HealthComponent } from '@/app/actions/financial-health'
+import type { FinancialHealth, HealthComponent } from '@/lib/api-client'
 
 // ─── Arc SVG ──────────────────────────────────────────────────────────────────
 

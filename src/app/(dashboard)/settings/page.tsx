@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { getProfile } from '@/app/actions/settings'
+import { serverApi } from '@/lib/api-client'
 import { ProfileForm } from '@/components/settings/profile-form'
 import { PasswordForm } from '@/components/settings/password-form'
 import { UpgradeButton, ManageSubscriptionButton } from '@/components/settings/billing-buttons'
@@ -8,27 +8,16 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { isPro, PRO_FEATURES, FREE_LIMITS } from '@/lib/features'
-import { db } from '@/lib/db'
-import { getSession } from '@/lib/auth'
-import { getWhatsAppPhone } from '@/app/actions/whatsapp'
 import { Check, Zap, Crown, MessageCircle } from 'lucide-react'
 import { UpgradeBanner } from '@/components/settings/upgrade-banner'
 import { DeleteAccountButton } from '@/components/settings/delete-account-button'
 import { ExportDataButton } from '@/components/settings/export-data-button'
 
-async function getPlan(): Promise<string> {
-  const session = await getSession()
-  if (!session) return 'FREE'
-  const user = await db.user.findUnique({
-    where:  { id: session.userId },
-    select: { plan: true },
-  })
-  return user?.plan ?? 'FREE'
-}
-
 export default async function SettingsPage() {
-  const [user, plan, whatsappPhone] = await Promise.all([getProfile(), getPlan(), getWhatsAppPhone()])
-  const pro = isPro(plan)
+  const user         = await serverApi.settings()
+  const plan         = user.plan ?? 'FREE'
+  const whatsappPhone = user.whatsappPhone ?? null
+  const pro          = isPro(plan)
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto">

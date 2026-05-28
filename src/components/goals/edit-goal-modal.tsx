@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
-import { updateGoal } from '@/app/actions/goals'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 const COLOR_PRESETS = ['#3B82F6','#8B5CF6','#EC4899','#F59E0B','#10B981','#EF4444']
 
@@ -29,16 +29,33 @@ export function EditGoalModal({ goal }: Props) {
   const [open, setOpen]   = useState(false)
   const [color, setColor] = useState(goal.color ?? '#3B82F6')
 
-  const boundAction = updateGoal.bind(null, goal.id)
-  const [state, formAction, pending] = useActionState(boundAction, undefined)
-
   const deadlineStr = goal.deadline
     ? (typeof goal.deadline === 'string' ? goal.deadline : new Date(goal.deadline).toISOString()).slice(0, 10)
     : ''
 
-  useEffect(() => {
-    if (state && !state.error) setOpen(false)
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; targetAmount: string; deadline: string; color: string; icon: string }) =>
+      clientApi.updateGoal(goal.id, {
+        name: data.name,
+        targetAmount: parseFloat(data.targetAmount),
+        deadline: data.deadline || undefined,
+        color: data.color,
+        icon: data.icon || undefined,
+      }),
+    { onSuccess: () => setOpen(false) },
+  )
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      name: fd.get('name') as string,
+      targetAmount: fd.get('targetAmount') as string,
+      deadline: fd.get('deadline') as string,
+      color,
+      icon: fd.get('icon') as string,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -51,9 +68,9 @@ export function EditGoalModal({ goal }: Props) {
       <ModalContent size="sm">
         <ModalHeader><ModalTitle>Editar meta</ModalTitle></ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{state.error}</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <div className="grid grid-cols-[1fr_80px] gap-3">
@@ -83,7 +100,6 @@ export function EditGoalModal({ goal }: Props) {
                   style={{ backgroundColor: c }} />
               ))}
             </div>
-            <input type="hidden" name="color" value={color} />
           </FormField>
 
           <ModalFooter>

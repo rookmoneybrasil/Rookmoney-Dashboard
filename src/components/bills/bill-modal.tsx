@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import {
   Modal,
@@ -19,10 +18,11 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import { createBill } from '@/app/actions/bills'
 import { triggerMascot } from '@/lib/mascot'
 import { formatCurrency } from '@/lib/utils'
 import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 interface Category {
   id: string
@@ -36,33 +36,58 @@ interface Props {
 }
 
 export function BillModal({ categories }: Props) {
-  const [open, setOpen]              = useState(false)
-  const [isRecurring, setRec]        = useState(false)
-  const [categoryId, setCatId]       = useState('')
-  const [isParcelado, setParcelado]  = useState(false)
-  const [installments, setInst]      = useState(2)
-  const [amount, setAmount]          = useState('')
-  const [name, setName]              = useState('')
-  const [state, formAction, pending] = useActionState(createBill, undefined)
+  const [open, setOpen]             = useState(false)
+  const [isRecurring, setRec]       = useState(false)
+  const [categoryId, setCatId]      = useState('')
+  const [isParcelado, setParcelado] = useState(false)
+  const [installments, setInst]     = useState(2)
+  const [amount, setAmount]         = useState('')
+  const [name, setName]             = useState('')
 
   const detectedBrand = getServiceBrand(name, undefined)
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      setRec(false)
-      setCatId('')
-      setParcelado(false)
-      setInst(2)
-      setAmount('')
-      setName('')
-      triggerMascot('determined', 'Conta registrada! Não esqueça de pagar no prazo. 📅')
-    }
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; amount: string; dueDate: string; isRecurring: boolean; categoryId: string; installments?: number; notes: string }) =>
+      clientApi.createBill({
+        name: data.name,
+        amount: parseFloat(data.amount),
+        dueDate: data.dueDate,
+        isRecurring: data.isRecurring,
+        categoryId: data.categoryId || undefined,
+        installments: data.installments,
+        notes: data.notes || undefined,
+      }),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        setRec(false)
+        setCatId('')
+        setParcelado(false)
+        setInst(2)
+        setAmount('')
+        setName('')
+        triggerMascot('determined', 'Conta registrada! Não esqueça de pagar no prazo. 📅')
+      },
+    },
+  )
 
   const today          = new Date().toISOString().split('T')[0]
   const amountNum      = parseFloat(amount) || 0
   const perInstallment = isParcelado && installments > 1 ? amountNum / installments : amountNum
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      name,
+      amount,
+      dueDate: fd.get('dueDate') as string,
+      isRecurring,
+      categoryId,
+      installments: isParcelado ? installments : undefined,
+      notes: fd.get('notes') as string,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -79,10 +104,10 @@ export function BillModal({ categories }: Props) {
           <ModalTitle>Nova conta a pagar</ModalTitle>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 
@@ -209,14 +234,12 @@ export function BillModal({ categories }: Props) {
                   {formatCurrency(amountNum)} total
                 </p>
               )}
-              <input type="hidden" name="installments" value={installments} />
             </div>
           )}
 
           {/* Recorrente toggle */}
           {!isParcelado && (
             <label className="flex items-center gap-3 cursor-pointer">
-              <input type="hidden" name="isRecurring" value={isRecurring ? 'true' : 'false'} />
               <div
                 onClick={() => setRec(!isRecurring)}
                 className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus:outline-none ${
@@ -246,7 +269,6 @@ export function BillModal({ categories }: Props) {
                 ))}
               </SelectContent>
             </Select>
-            <input type="hidden" name="categoryId" value={categoryId} />
           </FormField>
 
           <FormField label="Observações" htmlFor="notes">

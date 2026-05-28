@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useActionState } from 'react'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import {
   Modal,
@@ -13,8 +12,9 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
-import { createGoal } from '@/app/actions/goals'
 import { triggerMascot } from '@/lib/mascot'
+import { clientApi } from '@/lib/api-client'
+import { useMutation } from '@/hooks/use-mutation'
 
 const COLORS = [
   { value: '#3B82F6', label: 'Azul'    },
@@ -28,15 +28,40 @@ const COLORS = [
 export function GoalModal() {
   const [open, setOpen]   = useState(false)
   const [color, setColor] = useState(COLORS[0].value)
-  const [state, formAction, pending] = useActionState(createGoal, undefined)
 
-  useEffect(() => {
-    if (state && !state.error) {
-      setOpen(false)
-      setColor(COLORS[0].value)
-      triggerMascot('euphoric', 'Nova meta criada! Vamos conquistar isso! 🎯')
-    }
-  }, [state])
+  const { mutate, pending, error } = useMutation(
+    (data: { name: string; targetAmount: string; currentAmount: string; icon: string; deadline: string; description: string; color: string }) =>
+      clientApi.createGoal({
+        name: data.name,
+        targetAmount: parseFloat(data.targetAmount),
+        currentAmount: data.currentAmount ? parseFloat(data.currentAmount) : undefined,
+        icon: data.icon || undefined,
+        deadline: data.deadline || undefined,
+        description: data.description || undefined,
+        color: data.color,
+      }),
+    {
+      onSuccess: () => {
+        setOpen(false)
+        setColor(COLORS[0].value)
+        triggerMascot('euphoric', 'Nova meta criada! Vamos conquistar isso! 🎯')
+      },
+    },
+  )
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    mutate({
+      name: fd.get('name') as string,
+      targetAmount: fd.get('targetAmount') as string,
+      currentAmount: fd.get('currentAmount') as string,
+      icon: fd.get('icon') as string,
+      deadline: fd.get('deadline') as string,
+      description: fd.get('description') as string,
+      color,
+    })
+  }
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -54,10 +79,10 @@ export function GoalModal() {
           <ModalDescription>Defina o objetivo e o valor alvo.</ModalDescription>
         </ModalHeader>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {state?.error && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {error && (
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {state.error}
+              {error}
             </p>
           )}
 
@@ -130,7 +155,6 @@ export function GoalModal() {
                 />
               ))}
             </div>
-            <input type="hidden" name="color" value={color} />
           </FormField>
 
           <FormField label="Descrição" htmlFor="description">
