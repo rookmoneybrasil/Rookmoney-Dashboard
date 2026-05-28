@@ -1,0 +1,128 @@
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+/* ─── Card ──────────────────────────────────────────────────────── */
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'elevated' | 'outline' | 'glass'
+  padding?: 'none' | 'sm' | 'md' | 'lg'
+}
+
+export function Card({
+  className,
+  variant = 'default',
+  padding = 'md',
+  ...props
+}: CardProps) {
+  return (
+    <div
+      className={cn(
+        'rounded-xl transition-colors',
+        {
+          default:  'bg-ink-700 border border-white/6',
+          elevated: 'bg-ink-600 border border-white/8 shadow-[0_4px_24px_rgba(3,7,16,0.5)]',
+          outline:  'bg-transparent border border-ink-500',
+          glass:    'glass',
+        }[variant],
+        {
+          none: '',
+          sm:   'p-3',
+          md:   'p-5',
+          lg:   'p-6',
+        }[padding],
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+/* ─── CardHeader ───────────────────────────────────────────────── */
+export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('flex flex-col gap-1 pb-4', className)} {...props} />
+}
+
+/* ─── CardTitle ────────────────────────────────────────────────── */
+export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return (
+    <h3
+      className={cn('text-base font-semibold text-slate-100 leading-tight', className)}
+      {...props}
+    />
+  )
+}
+
+/* ─── CardDescription ──────────────────────────────────────────── */
+export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p className={cn('text-sm text-slate-500 leading-relaxed', className)} {...props} />
+  )
+}
+
+/* ─── CardContent ──────────────────────────────────────────────── */
+export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('', className)} {...props} />
+}
+
+/* ─── CardFooter ───────────────────────────────────────────────── */
+export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn('flex items-center pt-4 border-t border-white/6', className)}
+      {...props}
+    />
+  )
+}
+
+/* ─── StatCard ─────────────────────────────────────────────────── */
+export interface StatCardProps {
+  label: string
+  value: string
+  sub?: string
+  icon?: React.ReactNode
+  trend?: { value: number; label?: string }
+  variant?: 'default' | 'income' | 'expense' | 'gold'
+  className?: string
+}
+
+export function StatCard({ label, value, sub, icon, trend, variant = 'default', className }: StatCardProps) {
+  const isPositive = trend && trend.value >= 0
+
+  const variantStyles = {
+    default: 'bg-ink-700 border-white/6',
+    income:  'bg-success-subtle border-success/20',
+    expense: 'bg-danger-subtle border-danger/20',
+    gold:    'bg-gold-900 border-gold-500/20',
+  }
+
+  const valueStyles = {
+    default: 'text-slate-100',
+    income:  'text-success',
+    expense: 'text-danger',
+    gold:    'text-gold-400',
+  }
+
+  return (
+    <div className={cn('rounded-xl border p-5 flex flex-col gap-3', variantStyles[variant], className)}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{label}</span>
+        {icon && (
+          <div className="size-8 rounded-lg bg-ink-600/50 flex items-center justify-center text-slate-400">
+            {icon}
+          </div>
+        )}
+      </div>
+      <div className="flex items-end justify-between gap-2">
+        <span className={cn('text-2xl font-bold leading-none tracking-tight', valueStyles[variant])}>
+          {value}
+        </span>
+        {trend && (
+          <span className={cn('text-xs font-medium', isPositive ? 'text-success' : 'text-danger')}>
+            {isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+            {trend.label && <span className="text-slate-500 ml-1">{trend.label}</span>}
+          </span>
+        )}
+      </div>
+      {sub && <span className="text-xs text-slate-500">{sub}</span>}
+    </div>
+  )
+}

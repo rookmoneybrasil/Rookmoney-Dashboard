@@ -1,26 +1,513 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ─── Ink Scale — dark navy backgrounds + light text ──────────── */
+  --color-ink-950: #030710;
+  --color-ink-900: #080E1D;
+  --color-ink-800: #0C1628;
+  --color-ink-700: #111E32;
+  --color-ink-600: #162641;
+  --color-ink-500: #1D3255;
+  --color-ink-400: #2E4A70;
+  --color-ink-300: #4A72A0;
+  --color-ink-200: #7CA0C8;
+  --color-ink-100: #B0CCE8;
+  --color-ink-50:  #E4EFF8;
+
+  /* ─── Brand Blue ────────────────────────────────────────────────── */
+  --color-brand-900: #061430;
+  --color-brand-800: #0D2460;
+  --color-brand-700: #1A3D8F;
+  --color-brand-600: #2563EB;
+  --color-brand-500: #3B82F6;
+  --color-brand-400: #60A5FA;
+  --color-brand-300: #93C5FD;
+  --color-brand-200: #BFDBFE;
+
+  /* ─── Gold Accent ───────────────────────────────────────────────── */
+  --color-gold-900: #1C0D00;
+  --color-gold-600: #D97706;
+  --color-gold-500: #F59E0B;
+  --color-gold-400: #FCD34D;
+  --color-gold-300: #FDE68A;
+
+  /* ─── Semantic ──────────────────────────────────────────────────── */
+  --color-success:        #22C55E;
+  --color-success-muted:  #14532D;
+  --color-success-subtle: #052E16;
+  --color-danger:         #F43F5E;
+  --color-danger-muted:   #881337;
+  --color-danger-subtle:  #450A0A;
+  --color-warning:        #F97316;
+  --color-warning-muted:  #7C2D12;
+  --color-warning-subtle: #431407;
+
+  /* ─── Typography ────────────────────────────────────────────────── */
+  --font-sans: var(--font-poppins), 'Poppins', system-ui, sans-serif;
+
+  /* ─── Radius ────────────────────────────────────────────────────── */
+  --radius-sm:  0.375rem;
+  --radius-md:  0.625rem;
+  --radius-lg:  0.875rem;
+  --radius-xl:  1.125rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─── Base ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ink-900);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--color-ink-800); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-500);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-ink-400); }
+
+/* ─── Selection ───────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: #f1f5f9;
+}
+
+/* ─── Focus ring ──────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* ─── Utilities ───────────────────────────────────────────────────── */
+@layer utilities {
+  .glass {
+    background: rgba(11, 22, 40, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--color-brand-600), var(--color-brand-400));
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, var(--color-gold-600), var(--color-gold-400));
+  }
+
+  .gradient-surface {
+    background: linear-gradient(180deg, var(--color-ink-800) 0%, var(--color-ink-900) 100%);
+  }
+
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .glow-brand { box-shadow: 0 0 24px rgba(59, 130, 246, 0.25); }
+  .glow-gold  { box-shadow: 0 0 24px rgba(245, 158, 11, 0.25); }
+}
+
+/* ─── Mascot animations ──────────────────────────────────────────── */
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(-1deg); }
+  66%       { transform: translateY(-4px) rotate(1deg); }
+}
+
+@keyframes mascot-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40%       { transform: translateY(-14px) scale(1.05); }
+  60%       { transform: translateY(-10px) scale(1.02); }
+}
+
+@keyframes mascot-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-6deg); }
+  40%       { transform: rotate(6deg); }
+  60%       { transform: rotate(-4deg); }
+  80%       { transform: rotate(4deg); }
+}
+
+@keyframes bubble-in {
+  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+@keyframes bubble-out {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.85) translateY(6px); }
+}
+
+.mascot-float  { animation: mascot-float  3s ease-in-out infinite; }
+.mascot-bounce { animation: mascot-bounce 0.6s ease-in-out 2; }
+.mascot-shake  { animation: mascot-shake  0.5s ease-in-out 2; }
+.bubble-in     { animation: bubble-in     0.3s ease-out forwards; }
+.bubble-out    { animation: bubble-out    0.25s ease-in  forwards; }
+
+/* ─── Border Glow (React Bits — exact source port) ────────────────── */
+
+.border-glow-card {
+  --edge-proximity: 0;
+  --cursor-angle: 45deg;
+  --edge-sensitivity: 30;
+  --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+  --border-radius: 12px;
+  --glow-padding: 40px;
+  --cone-spread: 25;
+
+  position: relative;
+  border-radius: var(--border-radius);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0.01px);
+  display: grid;
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: var(--card-bg, #0C1628);
+  overflow: visible;
+}
+
+/* ── Shared reset for all three glow layers ── */
+.border-glow-card::before,
+.border-glow-card::after,
+.border-glow-card > .edge-light {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity 0.25s ease-out;
+  z-index: -1;
+}
+
+/* Fade out when cursor leaves */
+.border-glow-card:not(:hover):not(.sweep-active)::before,
+.border-glow-card:not(:hover):not(.sweep-active)::after,
+.border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
+  opacity: 0 !important;
+  transition: opacity 0.75s ease-in-out;
+}
+
+/* ── ::before — Colored mesh-gradient border ── */
+.border-glow-card::before {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card-bg, #0C1628) 0 100%) padding-box,
+    linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+    var(--gradient-one)   border-box,
+    var(--gradient-two)   border-box,
+    var(--gradient-three) border-box,
+    var(--gradient-four)  border-box,
+    var(--gradient-five)  border-box,
+    var(--gradient-six)   border-box,
+    var(--gradient-seven) border-box,
+    var(--gradient-base)  border-box;
+  opacity: calc(
+    (var(--edge-proximity) - var(--color-sensitivity)) /
+    (100 - var(--color-sensitivity))
+  );
+  mask-image: conic-gradient(
+    from var(--cursor-angle) at center,
+    black        calc(var(--cone-spread) * 1%),
+    transparent  calc((var(--cone-spread) + 15) * 1%),
+    transparent  calc((100 - var(--cone-spread) - 15) * 1%),
+    black        calc((100 - var(--cone-spread)) * 1%)
+  );
+}
+
+/* ── ::after — Gradient fill near edges (soft-light blend) ── */
+.border-glow-card::after {
+  border: 1px solid transparent;
+  background:
+    var(--gradient-one)   padding-box,
+    var(--gradient-two)   padding-box,
+    var(--gradient-three) padding-box,
+    var(--gradient-four)  padding-box,
+    var(--gradient-five)  padding-box,
+    var(--gradient-six)   padding-box,
+    var(--gradient-seven) padding-box,
+    var(--gradient-base)  padding-box;
+  mask-image:
+    linear-gradient(to bottom, black, black),
+    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      transparent 5%, black 15%, black 85%, transparent 95%
+    );
+  mask-composite: subtract, add, add, add, add, add;
+  opacity: calc(
+    var(--fill-opacity, 0.3) *
+    (var(--edge-proximity) - var(--color-sensitivity)) /
+    (100 - var(--color-sensitivity))
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* ── .edge-light — Outer directional glow (plus-lighter blend) ── */
+.border-glow-card > .edge-light {
+  inset: calc(var(--glow-padding) * -1);
+  pointer-events: none;
+  z-index: 1;
+  mask-image: conic-gradient(
+    from var(--cursor-angle) at center,
+    black 2.5%, transparent 10%, transparent 90%, black 97.5%
+  );
+  opacity: calc(
+    (var(--edge-proximity) - var(--edge-sensitivity)) /
+    (100 - var(--edge-sensitivity))
+  );
+  mix-blend-mode: plus-lighter;
+}
+
+/* The actual box-shadow glows live on this pseudo-element */
+.border-glow-card > .edge-light::before {
+  content: "";
+  position: absolute;
+  inset: var(--glow-padding);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0  0px 1px  var(--glow-color,    hsl(40deg 80% 80% / 100%)),
+    inset 0 0  1px 0    var(--glow-color-60,  hsl(40deg 80% 80% /  60%)),
+    inset 0 0  3px 0    var(--glow-color-50,  hsl(40deg 80% 80% /  50%)),
+    inset 0 0  6px 0    var(--glow-color-40,  hsl(40deg 80% 80% /  40%)),
+    inset 0 0 15px 0    var(--glow-color-30,  hsl(40deg 80% 80% /  30%)),
+    inset 0 0 25px 2px  var(--glow-color-20,  hsl(40deg 80% 80% /  20%)),
+    inset 0 0 50px 2px  var(--glow-color-10,  hsl(40deg 80% 80% /  10%)),
+          0 0  1px 0    var(--glow-color-60,  hsl(40deg 80% 80% /  60%)),
+          0 0  3px 0    var(--glow-color-50,  hsl(40deg 80% 80% /  50%)),
+          0 0  6px 0    var(--glow-color-40,  hsl(40deg 80% 80% /  40%)),
+          0 0 15px 0    var(--glow-color-30,  hsl(40deg 80% 80% /  30%)),
+          0 0 25px 2px  var(--glow-color-20,  hsl(40deg 80% 80% /  20%)),
+          0 0 50px 2px  var(--glow-color-10,  hsl(40deg 80% 80% /  10%));
+}
+
+/* Content layer — always on top */
+.border-glow-inner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: auto;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* ─── Sidebar glass nav icon hover ────────────────────────────────── */
+.glass-nav-btn:hover .gi-back,
+.glass-nav-btn:focus-visible .gi-back {
+  transform: rotate(25deg) translate3d(-4px, -4px, 4px) !important;
+}
+.glass-nav-btn:hover .gi-front,
+.glass-nav-btn:focus-visible .gi-front {
+  transform: translate3d(0, 0, 14px) !important;
+}
+
+/* ─── Glass Icons (React Bits) ────────────────────────────────────── */
+
+.glass-icons-grid {
+  display: grid;
+  gap: 3em;
+  grid-template-columns: repeat(var(--gi-cols, 3), 1fr);
+  padding: 1.5em 0;
+  overflow: visible;
+}
+
+/* Single glass icon button */
+.glass-icon-btn {
+  background: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  width: 4.5em;
+  height: 4.5em;
+  perspective: 24em;
+  transform-style: preserve-3d;
+  -webkit-tap-highlight-color: transparent;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Shared transitions */
+.glass-icon-back,
+.glass-icon-front,
+.glass-icon-label {
+  transition:
+    opacity   0.3s cubic-bezier(0.83, 0, 0.17, 1),
+    transform 0.3s cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+/* Shared shape */
+.glass-icon-back,
+.glass-icon-front {
+  border-radius: 1.25em;
+  position: absolute;
+  inset: 0;
+}
+
+/* Colored tilted back layer */
+.glass-icon-back {
+  box-shadow: 0.5em -0.5em 0.75em hsla(223,10%,10%,0.15);
+  display: block;
+  transform: rotate(15deg);
+  transform-origin: 100% 100%;
+  will-change: transform;
+}
+
+/* Frosted glass front layer */
+.glass-icon-front {
+  background-color: hsla(0,0%,100%,0.12);
+  box-shadow: 0 0 0 0.1em hsla(0,0%,100%,0.25) inset;
+  backdrop-filter: blur(0.75em);
+  -webkit-backdrop-filter: blur(0.75em);
+  display: flex;
+  transform-origin: 80% 50%;
+  will-change: transform;
+}
+
+/* Icon wrapper */
+.glass-icon-inner {
+  margin: auto;
+  width: 1.5em;
+  height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Label (hidden by default, appears on hover) */
+.glass-icon-label {
+  font-size: 0.75em;
+  white-space: nowrap;
+  text-align: center;
+  line-height: 2;
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* Hover / focus animations */
+.glass-icon-btn:hover .glass-icon-back,
+.glass-icon-btn:focus-visible .glass-icon-back {
+  transform: rotate(25deg) translate3d(-0.5em, -0.5em, 0.5em);
+}
+
+.glass-icon-btn:hover .glass-icon-front,
+.glass-icon-btn:focus-visible .glass-icon-front {
+  transform: translate3d(0, 0, 2em);
+}
+
+.glass-icon-btn:hover .glass-icon-label,
+.glass-icon-btn:focus-visible .glass-icon-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(20%);
+}
+
+/* ─── CardSwap (React Bits) ───────────────────────────────────────── */
+
+.card-swap-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  perspective: 900px;
+  overflow: visible;
+}
+
+.card-swap-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: #0C1628;
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .card-swap-container { transform: scale(0.75) translate(25%, 25%); }
+}
+@media (max-width: 480px) {
+  .card-swap-container { transform: scale(0.55) translate(25%, 25%); }
+}
+
+/* ─── Print / PDF ─────────────────────────────────────────────────── */
+@media print {
+  /* Página */
+  @page { margin: 1.2cm; size: A4 portrait; }
+
+  /* Esconder nav/sidebar/header e elementos marcados */
+  nav, aside, header, footer,
+  .print\:hidden { display: none !important; }
+
+  /* Resetar layout geral */
+  html, body {
+    background: white !important;
+    color: #1e293b !important;
+    font-size: 12px !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove altura fixa do shell — deixa o conteúdo fluir */
+  .flex.h-screen { display: block !important; height: auto !important; overflow: visible !important; }
+  main { overflow: visible !important; padding: 0 !important; }
+
+  /* Container de relatório: largura total */
+  .max-w-6xl { max-width: 100% !important; }
+
+  /* Grids viram coluna única em print */
+  .grid { display: block !important; }
+  .grid > * { margin-bottom: 1rem; width: 100% !important; }
+
+  /* Cards — fundo branco, sem sombra, não quebrar no meio */
+  [class*="bg-ink"],
+  [class*="rounded-xl"],
+  [class*="rounded-lg"] {
+    background: white !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Cores de texto */
+  * { color: #1e293b !important; }
+  [class*="text-slate-5"], [class*="text-slate-6"] { color: #64748b !important; }
+  [class*="text-success"], .text-success { color: #16a34a !important; }
+  [class*="text-danger"],  .text-danger  { color: #dc2626 !important; }
+  [class*="text-brand"]   { color: #2563eb !important; }
+  [class*="text-amber"]   { color: #d97706 !important; }
+
+  /* Bordas */
+  [class*="border-ink"],
+  [class*="border-white"] { border-color: #e2e8f0 !important; }
+
+  /* Gráficos: garantir altura mínima e visibilidade */
+  .recharts-wrapper,
+  .recharts-surface { overflow: visible !important; }
+
+  /* Quebra de página */
+  .page-break { page-break-before: always; }
 }
