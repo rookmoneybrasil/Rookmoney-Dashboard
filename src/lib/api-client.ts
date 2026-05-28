@@ -214,6 +214,9 @@ export const clientApi = {
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
 
+  // Export
+  exportData: () => clientFetch<Record<string, unknown>>('/export'),
+
   // Billing (Stripe)
   createCheckout: () => clientFetch<{ url: string }>('/billing/checkout', { method: 'POST' }),
   createPortal:   () => clientFetch<{ url: string }>('/billing/portal',   { method: 'POST' }),

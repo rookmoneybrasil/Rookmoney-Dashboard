@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Download, Loader2, CheckCircle } from 'lucide-react'
-import { exportUserData } from '@/app/actions/export'
+import { clientApi } from '@/lib/api-client'
 
 export function ExportDataButton() {
   const [state, setState] = useState<'idle' | 'loading' | 'done'>('idle')
@@ -10,7 +10,7 @@ export function ExportDataButton() {
   async function handleExport() {
     setState('loading')
     try {
-      const data = await exportUserData()
+      const data = await clientApi.exportData()
       const json = JSON.stringify(data, null, 2)
       const blob = new Blob([json], { type: 'application/json' })
       const url  = URL.createObjectURL(blob)
