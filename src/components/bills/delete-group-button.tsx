@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { X, Check, AlertTriangle } from 'lucide-react'
-import { deleteInstallmentGroup } from '@/app/actions/bills'
+import { clientApi } from '@/lib/api-client'
+import { useRouter } from 'next/navigation'
 
 export function DeleteGroupButton({ groupId }: { groupId: string }) {
   const [confirming, setConfirming] = useState(false)
   const [pending, setPending]       = useState(false)
+  const router = useRouter()
 
   if (confirming) {
     return (
@@ -18,7 +20,8 @@ export function DeleteGroupButton({ groupId }: { groupId: string }) {
         <button
           onClick={async () => {
             setPending(true)
-            await deleteInstallmentGroup(groupId)
+            await clientApi.deleteInstallmentGroup(groupId)
+            router.refresh()
           }}
           disabled={pending}
           className="h-6 px-2 rounded text-xs font-medium bg-danger/15 text-danger hover:bg-danger/25 transition-colors border border-danger/20"

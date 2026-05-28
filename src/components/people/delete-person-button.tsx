@@ -1,19 +1,16 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
-import { Trash2 } from 'lucide-react'
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
-import { deletePerson } from '@/app/actions/people'
+import { clientApi } from '@/lib/api-client'
 
 export function DeletePersonButton({ personId }: { personId: string }) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
 
   return (
     <ConfirmDeleteButton
       action={async () => {
-        await deletePerson(personId)
+        await clientApi.deletePerson(personId)
         router.push('/people')
       }}
       icon="trash"

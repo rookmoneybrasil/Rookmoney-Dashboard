@@ -2,11 +2,10 @@ import { Banknote, RefreshCw, Zap } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { deleteIncomeSource } from '@/app/actions/income-sources'
 import { serverApi } from '@/lib/api-client'
 import { IncomeSourceModal } from '@/components/income/income-source-modal'
 import { RegisterReceiptModal } from '@/components/income/register-receipt-modal'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { DeleteIncomeSourceButton } from '@/components/ui/delete-buttons'
 
 const TYPE_CONFIG = {
   EMPLOYMENT: { label: 'CLT / PJ',  icon: '💼', variant: 'brand'   as const },
@@ -95,11 +94,7 @@ export default async function IncomePage() {
                         </span>
                         <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <IncomeSourceModal source={source} categories={categories} />
-                          <ConfirmDeleteButton
-                            action={deleteIncomeSource.bind(null, source.id)}
-                            label="Excluir fonte?"
-                            title="Excluir fonte de renda"
-                          />
+                          <DeleteIncomeSourceButton id={source.id} />
                         </div>
                       </div>
                     </div>
@@ -144,11 +139,7 @@ export default async function IncomePage() {
                         <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <RegisterReceiptModal source={source} categories={categories} />
                           <IncomeSourceModal source={source} categories={categories} />
-                          <ConfirmDeleteButton
-                            action={deleteIncomeSource.bind(null, source.id)}
-                            label="Excluir fonte?"
-                            title="Excluir fonte de renda"
-                          />
+                          <DeleteIncomeSourceButton id={source.id} />
                         </div>
                       </div>
                     </div>

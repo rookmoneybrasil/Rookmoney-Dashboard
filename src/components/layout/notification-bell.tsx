@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Bell, Receipt, Target, PieChart } from 'lucide-react'
-import type { AppNotification } from '@/app/actions/notifications'
+import type { AppNotification } from '@/lib/api-client'
 
 interface Props {
   notifications: AppNotification[]

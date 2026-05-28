@@ -5,8 +5,8 @@ import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { deleteTransaction, type TransactionFilter } from '@/app/actions/transactions'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { type TransactionFilter } from '@/lib/api-client'
+import { DeleteTransactionButton } from '@/components/ui/delete-buttons'
 import { serverApi } from '@/lib/api-client'
 import { TransactionModal } from '@/components/transactions/transaction-modal'
 import { EditTransactionModal } from '@/components/transactions/edit-transaction-modal'
@@ -153,12 +153,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
 
                       <EditTransactionModal transaction={{ ...tx, amount: Number(tx.amount) }} categories={categories} />
 
-                      <ConfirmDeleteButton
-                        action={deleteTransaction.bind(null, tx.id)}
-                        icon="trash"
-                        title="Excluir transação"
-                        label="Excluir?"
-                      />
+                      <DeleteTransactionButton id={tx.id} />
                     </div>
                   </div>
                 )

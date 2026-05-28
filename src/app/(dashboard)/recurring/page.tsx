@@ -2,9 +2,8 @@ import { RefreshCw, TrendingUp, TrendingDown } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { deleteRecurringTransaction, toggleRecurringTransaction } from '@/app/actions/recurring-transactions'
 import { serverApi, type RecurringTransaction, type Category } from '@/lib/api-client'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { DeleteRecurringButton, ToggleRecurringButton } from '@/components/ui/delete-buttons'
 import { RecurringModal } from '@/components/recurring/recurring-modal'
 
 const freqLabel: Record<string, string> = {
@@ -131,25 +130,11 @@ function RecurringRow({
 
       {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Toggle active */}
-        <form action={async () => { 'use server'; await toggleRecurringTransaction(rec.id, !rec.isActive) }}>
-          <button
-            type="submit"
-            className="h-7 px-2 rounded-lg text-xs font-medium transition-colors border border-white/10 text-slate-500 hover:text-slate-300 hover:bg-ink-600"
-            title={rec.isActive ? 'Desativar' : 'Ativar'}
-          >
-            {rec.isActive ? 'Desativar' : 'Ativar'}
-          </button>
-        </form>
+        <ToggleRecurringButton id={rec.id} isActive={rec.isActive} />
 
         <RecurringModal categories={categories} item={rec} />
 
-        <ConfirmDeleteButton
-          action={deleteRecurringTransaction.bind(null, rec.id)}
-          label="Excluir recorrência?"
-          title="Excluir"
-          icon="trash"
-        />
+        <DeleteRecurringButton id={rec.id} />
       </div>
     </div>
   )

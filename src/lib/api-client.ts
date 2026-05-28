@@ -106,6 +106,9 @@ export const serverApi = {
   // Recurring
   recurring: () => serverFetch<RecurringTransaction[]>('/recurring'),
 
+  // Notifications
+  notifications: () => serverFetch<AppNotification[]>('/notifications'),
+
   // Admin
   adminStats: () => serverFetch<AdminStats>('/admin/stats'),
   adminUsers: (params?: Record<string, string>) =>
@@ -207,6 +210,10 @@ export const clientApi = {
   deleteAccount: () =>
     clientFetch<void>('/settings', { method: 'DELETE' }),
 
+  // Bill groups
+  deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
+  deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
+
   // Admin
   adminSetPlan:  (id: string, plan: 'FREE' | 'PRO') =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ plan }) }),
@@ -215,6 +222,8 @@ export const clientApi = {
   adminDeleteUser: (id: string) =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'DELETE' }),
 }
+
+export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget'; title: string; message: string; href: string; urgency: 'high' | 'medium' }
 
 // ─── Types for dashboard components ──────────────────────────────────────────
 export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
@@ -239,6 +248,7 @@ export interface Category { id: string; name: string; icon: string; color: strin
 export interface CategoryInput { name: string; icon: string; color: string }
 export interface Transaction { id: string; amount: number; type: 'INCOME' | 'EXPENSE'; description: string | null; date: string; category: Category; categoryId: string; userId: string; createdAt: string; updatedAt: string }
 export interface TransactionInput { amount: number; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }
+export type TransactionFilter = { month?: string; type?: 'INCOME' | 'EXPENSE' | 'ALL'; categoryId?: string; search?: string; page?: number; pageSize?: number }
 export interface TransactionPage { items: Transaction[]; total: number; page: number; totalPages: number }
 export interface GoalContribution { id: string; amount: number; note: string | null; createdAt: string }
 export interface Goal { id: string; name: string; targetAmount: number; currentAmount: number; deadline: string | null; description: string | null; icon: string | null; color: string | null; isCompleted: boolean; completedAt: string | null; createdAt: string; updatedAt: string; userId: string; contributions: GoalContribution[] }

@@ -5,8 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { deleteBudget } from '@/app/actions/budgets'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { DeleteBudgetButton } from '@/components/ui/delete-buttons'
 import { serverApi } from '@/lib/api-client'
 import { BudgetModal } from '@/components/budget/budget-modal'
 import { BudgetMonthPicker } from '@/components/budget/budget-month-picker'
@@ -116,12 +115,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
                     </div>
                     <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                       <BudgetModal categories={categories} month={month} budget={b} />
-                      <ConfirmDeleteButton
-                        action={deleteBudget.bind(null, b.id)}
-                        label="Excluir orçamento?"
-                        title="Excluir orçamento"
-                        className="size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10 transition-colors"
-                      />
+                      <DeleteBudgetButton id={b.id} />
                     </div>
                   </div>
                 )

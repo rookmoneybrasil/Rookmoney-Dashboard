@@ -5,9 +5,8 @@ import { Progress, CircularProgress } from '@/components/ui/progress'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { formatCurrency, formatDate, calculateProgress } from '@/lib/utils'
-import { deleteGoal } from '@/app/actions/goals'
 import { serverApi } from '@/lib/api-client'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { DeleteGoalButton } from '@/components/ui/delete-buttons'
 import { GoalModal } from '@/components/goals/goal-modal'
 import { EditGoalModal } from '@/components/goals/edit-goal-modal'
 import { ContributeButton } from '@/components/goals/contribute-button'
@@ -101,12 +100,7 @@ export default async function GoalsPage() {
                     remaining={remaining}
                   />
                   <EditGoalModal goal={{ id: goal.id, name: goal.name, targetAmount: Number(goal.targetAmount), currentAmount: Number(goal.currentAmount), deadline: goal.deadline, description: goal.description, icon: goal.icon, color: goal.color }} />
-                  <ConfirmDeleteButton
-                    action={deleteGoal.bind(null, goal.id)}
-                    label="Excluir meta?"
-                    title="Excluir meta"
-                    className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10"
-                  />
+                  <DeleteGoalButton id={goal.id} />
                 </div>
               </div>
 

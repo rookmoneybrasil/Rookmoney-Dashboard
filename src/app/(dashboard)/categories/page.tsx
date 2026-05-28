@@ -1,9 +1,8 @@
 import { Lock, Tag } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { deleteCategory } from '@/app/actions/categories'
 import { serverApi } from '@/lib/api-client'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { DeleteCategoryButton } from '@/components/ui/delete-buttons'
 import { CategoryModal } from '@/components/categories/category-modal'
 
 export default async function CategoriesPage() {
@@ -43,12 +42,7 @@ export default async function CategoriesPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <div className="size-4 rounded-full border border-white/10" style={{ backgroundColor: cat.color }} />
                       <CategoryModal category={cat} />
-                      <ConfirmDeleteButton
-                        action={deleteCategory.bind(null, cat.id)}
-                        icon="trash"
-                        label="Excluir categoria?"
-                        title="Excluir categoria"
-                      />
+                      <DeleteCategoryButton id={cat.id} />
                     </div>
                   </div>
                 ))}

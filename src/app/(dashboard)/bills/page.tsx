@@ -3,9 +3,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
-import { markBillPaid, deleteBill, deleteBillGroup, deleteInstallmentGroup } from '@/app/actions/bills'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
 import { serverApi } from '@/lib/api-client'
+import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 
@@ -163,24 +162,7 @@ export default async function BillsPage() {
                                   >
                                     {inst.isPaid ? 'Pago' : s === 'overdue' ? 'Atrasado' : s === 'urgent' ? 'Urgente' : 'Pendente'}
                                   </Badge>
-                                  {!inst.isPaid && (
-                                    <form action={async () => { 'use server'; await markBillPaid(inst.id, true) }}>
-                                      <button type="submit"
-                                        className="opacity-0 group-hover/inst:opacity-100 size-6 rounded flex items-center justify-center bg-success/10 text-success hover:bg-success/20 transition-all"
-                                        title="Marcar pago">
-                                        <Check className="size-3" />
-                                      </button>
-                                    </form>
-                                  )}
-                                  {inst.isPaid && (
-                                    <form action={async () => { 'use server'; await markBillPaid(inst.id, false) }}>
-                                      <button type="submit"
-                                        className="opacity-0 group-hover/inst:opacity-100 size-6 rounded flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-ink-600 transition-all text-xs"
-                                        title="Desfazer">
-                                        ↩
-                                      </button>
-                                    </form>
-                                  )}
+                                  <MarkBillPaidButton id={inst.id} isPaid={inst.isPaid} />
                                 </div>
                               </div>
                             )
@@ -188,12 +170,7 @@ export default async function BillsPage() {
                         </div>
 
                         {/* Cancel group */}
-                        <ConfirmDeleteButton
-                          action={deleteBillGroup.bind(null, group.groupId)}
-                          label="Cancelar parcelas restantes?"
-                          title="Cancelar parcelas restantes"
-                          className="w-full h-7 rounded-lg text-xs text-slate-700 hover:text-danger hover:bg-danger/10 transition-colors border border-white/5 hover:border-danger/20 flex items-center justify-center gap-1.5"
-                        />
+                        <DeleteBillGroupButton groupId={group.groupId} />
                       </div>
                     </details>
                   </CardContent>
@@ -237,18 +214,8 @@ export default async function BillsPage() {
                           <Badge variant={cfg.variant} size="sm" dot>{cfg.label}</Badge>
                         </div>
                         <EditBillModal bill={bill} categories={categories} />
-                        <form action={async () => { 'use server'; await markBillPaid(bill.id, true) }}>
-                          <button type="submit"
-                            className="size-8 rounded-lg flex items-center justify-center bg-success/10 text-success hover:bg-success/20 transition-colors"
-                            title="Marcar como paga">
-                            <Check className="size-4" />
-                          </button>
-                        </form>
-                        <ConfirmDeleteButton
-                          action={deleteBill.bind(null, bill.id)}
-                          label="Excluir conta?"
-                          title="Excluir conta"
-                        />
+                        <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
+                        <DeleteBillButton id={bill.id} />
                       </div>
                     </div>
                   )
@@ -278,13 +245,7 @@ export default async function BillsPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(bill.amount)}</span>
                       <Badge variant="success" size="sm">Pago</Badge>
-                      <form action={async () => { 'use server'; await markBillPaid(bill.id, false) }}>
-                        <button type="submit"
-                          className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-ink-600 text-xs"
-                          title="Desfazer pagamento">
-                          ↩
-                        </button>
-                      </form>
+                      <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
                     </div>
                   </div>
                 ))}
@@ -320,11 +281,7 @@ export default async function BillsPage() {
                         {formatCurrency(group.grandTotal)}
                       </span>
                       <Badge variant="success" size="sm">{group.total}/{group.total}</Badge>
-                      <ConfirmDeleteButton
-                        action={deleteInstallmentGroup.bind(null, group.groupId)}
-                        label="Excluir histórico?"
-                        title="Excluir do histórico"
-                      />
+                      <DeleteInstallmentGroupButton groupId={group.groupId} />
                     </div>
                   </div>
                 ))}
