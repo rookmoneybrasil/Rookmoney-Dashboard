@@ -1,6 +1,7 @@
 import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine } from 'lucide-react'
 import { ProjectionsSection } from '@/components/dashboard/projections-section'
 import { FinancialHealthCard } from '@/components/dashboard/financial-health-card'
+import { DashboardGreeting } from '@/components/dashboard/greeting'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Image from 'next/image'
@@ -104,18 +105,12 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
 
-      {/* ── Page title ─────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <WithTooltip content={moodLabel[mood] ?? ''} side="right">
-          <div className="shrink-0 size-20 relative cursor-default">
-            <Image src={MASCOT_SRCS[mood === 'idle' ? 'happy' : mood]} alt="humor" fill className="object-contain" />
-          </div>
-        </WithTooltip>
-        <div>
-          <h1 className="text-xl font-semibold text-slate-100 capitalize">{greeting}, {firstName}.</h1>
-          <p className="text-sm text-slate-500 mt-0.5 capitalize">{monthLabel} · Visão geral</p>
-        </div>
-      </div>
+      {/* ── Page title — client component to avoid hydration mismatch ── */}
+      <DashboardGreeting
+        firstName={firstName}
+        mood={mood}
+        moodLabel={moodLabel[mood] ?? ''}
+      />
 
       {/* ── Stat cards ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
