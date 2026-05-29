@@ -75,11 +75,12 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
       <ComposedChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
         <XAxis
-          dataKey="month"
+          dataKey="monthFull"
           tick={{ fill: '#64748b', fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           dy={6}
+          tickFormatter={(v: string) => v?.slice(0, 3) ?? ''}
         />
         {/* Left axis: BRL values */}
         <YAxis
