@@ -37,6 +37,9 @@ async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error((err as { error?: string }).error ?? `API error ${res.status}`)
   }
 
+  // 204 No Content (DELETE) — no body to parse
+  if (res.status === 204) return undefined as T
+
   const json = await res.json()
   return (json as { data: T }).data
 }
@@ -59,6 +62,9 @@ async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
     const err = await res.json().catch(() => ({}))
     throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`)
   }
+
+  // 204 No Content (DELETE) — no body to parse
+  if (res.status === 204) return undefined as T
 
   const json = await res.json()
   return (json as { data: T }).data
