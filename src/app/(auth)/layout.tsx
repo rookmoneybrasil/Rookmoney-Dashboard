@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,15 +23,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        {/* Logo — canto superior esquerdo */}
+        {/* Logo — canto superior esquerdo, clicável para LP */}
         <div className="relative z-10 p-8">
-          <Image
-            src="/SVG/logo branco.svg"
-            alt="Rook Money"
-            width={150}
-            height={44}
-            priority
-          />
+          <Link href="/">
+            <Image
+              src="/SVG/logo branco.svg"
+              alt="Rook Money — Voltar ao início"
+              width={150}
+              height={44}
+              priority
+              className="hover:opacity-80 transition-opacity"
+            />
+          </Link>
         </div>
 
         {/* Spacer */}
