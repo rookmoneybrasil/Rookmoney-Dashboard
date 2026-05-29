@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Upload,
   Users,
+  CalendarDays,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
@@ -85,6 +86,7 @@ const navItems = [
   { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',    color: 'cyan',   desc: 'Defina limites de gasto por categoria ao mês'               },
   { href: '/people',       icon: Users,           label: 'Pessoas',      color: 'amber',  desc: 'Controle dívidas, acertos e parcelamentos com pessoas'      },
   { href: '/categories',   icon: Tag,             label: 'Categorias',   color: 'indigo', desc: 'Crie e organize as categorias das suas transações'          },
+  { href: '/calendar',     icon: CalendarDays,    label: 'Calendário',   color: 'blue',   desc: 'Visualize contas, rendas e recorrências por dia no mês'     },
   { href: '/reports',      icon: BarChart3,       label: 'Relatórios',   color: 'purple', desc: 'Análises, gráficos e insights sobre seus gastos'            },
   { href: '/recurring',    icon: RefreshCw,       label: 'Recorrências', color: 'blue',   desc: 'Receitas e despesas que se repetem automaticamente'         },
   { href: '/import',       icon: Upload,          label: 'Importar',     color: 'green',  desc: 'Importe extratos bancários em CSV ou OFX'                   },

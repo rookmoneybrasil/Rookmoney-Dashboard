@@ -106,6 +106,9 @@ export const serverApi = {
   // Recurring
   recurring: () => serverFetch<RecurringTransaction[]>('/recurring'),
 
+  // Calendar
+  calendar: (month?: string) => serverFetch<CalendarData>(`/calendar${month ? `?month=${month}` : ''}`),
+
   // Notifications
   notifications: () => serverFetch<AppNotification[]>('/notifications'),
 
@@ -229,6 +232,9 @@ export const clientApi = {
   adminDeleteUser: (id: string) =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'DELETE' }),
 }
+
+export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected'; href: string; color: string }
+export interface CalendarData { month: string; daysInMonth: number; firstWeekday: number; events: CalendarEvent[]; byDay: Record<string, CalendarEvent[]> }
 
 export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget'; title: string; message: string; href: string; urgency: 'high' | 'medium' }
 

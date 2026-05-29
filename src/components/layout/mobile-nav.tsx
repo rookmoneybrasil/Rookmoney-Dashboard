@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, FileText, Banknote,
   Target, PiggyBank, BarChart3, Tag, Settings, LogOut,
-  X, Menu, RefreshCw, Upload, Users,
+  X, Menu, RefreshCw, Upload, Users, CalendarDays,
 } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 
@@ -22,7 +22,8 @@ const MORE_NAV = [
   { href: '/income',     icon: Banknote,  label: 'Rendas'       },
   { href: '/goals',      icon: Target,    label: 'Metas'        },
   { href: '/budget',     icon: PiggyBank, label: 'Orçamento'    },
-  { href: '/reports',    icon: BarChart3, label: 'Relatórios'   },
+  { href: '/calendar',   icon: CalendarDays, label: 'Calendário'  },
+  { href: '/reports',    icon: BarChart3,    label: 'Relatórios'  },
   { href: '/recurring',  icon: RefreshCw, label: 'Recorrências' },
   { href: '/import',     icon: Upload,    label: 'Importar'     },
   { href: '/categories', icon: Tag,       label: 'Categorias'   },
