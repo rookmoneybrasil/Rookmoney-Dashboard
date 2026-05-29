@@ -111,19 +111,23 @@ export default async function GoalsPage() {
                 <div className="mt-1 pt-3 border-t border-white/5">
                   <div className="flex items-center gap-1.5 mb-2">
                     <TrendingUp className="size-3 text-slate-600" />
-                    <span className="text-xs font-medium text-slate-600 uppercase tracking-wider">Aportes</span>
+                    <span className="text-xs font-medium text-slate-600 uppercase tracking-wider">Movimentações</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    {goal.contributions.map((c) => (
+                    {goal.contributions.map((c) => {
+                      const isWithdrawal = Number(c.amount) < 0
+                      return (
                       <div key={c.id} className="flex items-center justify-between">
                         <span className="text-xs text-slate-600">
+                          {isWithdrawal && <span className="text-danger mr-1">↓</span>}
                           {format(c.createdAt, "dd 'de' MMM, yyyy", { locale: ptBR })}
+                          {c.note && c.note !== 'Retirada' && <span className="text-slate-700 ml-1">· {c.note}</span>}
                         </span>
-                        <span className="text-xs text-success tabular-nums font-medium">
-                          +{formatCurrency(Number(c.amount), true)}
+                        <span className={`text-xs tabular-nums font-medium ${isWithdrawal ? 'text-danger' : 'text-success'}`}>
+                          {isWithdrawal ? '' : '+'}{formatCurrency(Math.abs(Number(c.amount)), true)}
                         </span>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </div>
               )}
