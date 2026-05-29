@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
 import { ProjectionsSection } from '@/components/dashboard/projections-section'
 import { FinancialHealthCard } from '@/components/dashboard/financial-health-card'
 import { DashboardGreeting } from '@/components/dashboard/greeting'
@@ -224,8 +224,42 @@ export default async function DashboardPage() {
       {/* ── Financial Health ───────────────────────────────────────── */}
       <FinancialHealthCard health={health as never} />
 
-      {/* ── Bottom grid: A Receber · Contas próximas · Insight ─────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* ── Bottom grid: A Pagar · A Receber · Contas próximas · Insight */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        {/* A Pagar */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ArrowUpFromLine className="size-4 text-danger" />
+              A Pagar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.pendingBillsAmount === 0 ? (
+              <p className="text-sm text-slate-600 py-2 text-center">Nenhuma conta pendente.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-400">{data.pendingBillsCount} conta{data.pendingBillsCount !== 1 ? 's' : ''}</span>
+                  <span className="text-sm font-semibold text-slate-400">pendente{data.pendingBillsCount !== 1 ? 's' : ''}</span>
+                </div>
+                {data.overdueCount > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-danger">⚠ {data.overdueCount} em atraso</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t border-white/6 pt-2 mt-1">
+                  <span className="text-sm font-semibold text-slate-300">Total</span>
+                  <span className="text-base font-bold text-danger">{formatCurrency(data.pendingBillsAmount)}</span>
+                </div>
+                <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors text-center mt-1">
+                  Ver contas →
+                </a>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* A Receber */}
         <Card>
