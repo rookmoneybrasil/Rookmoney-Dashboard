@@ -28,6 +28,7 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-xl font-semibold text-slate-100">Configurações</h1>
         <p className="text-sm text-slate-500 mt-0.5">Gerencie sua conta e preferências</p>
+        <p className="text-xs text-slate-600 mt-1 max-w-md">Atualize seus dados pessoais, altere a senha, configure o WhatsApp para notificações ou exclua sua conta.</p>
       </div>
 
       {/* ── Plan section ─────────────────────────────────────────────── */}

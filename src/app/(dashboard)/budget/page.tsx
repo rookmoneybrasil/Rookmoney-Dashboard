@@ -33,6 +33,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
         <div>
           <h1 className="text-xl font-semibold text-slate-100 capitalize">Orçamento</h1>
           <p className="text-sm text-slate-500 mt-0.5 capitalize">{monthLabel}</p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Defina um limite de gasto por categoria para cada mês. Você recebe alertas quando se aproximar ou ultrapassar o limite.</p>
         </div>
         <div className="flex items-center gap-2">
           <BudgetMonthPicker month={month} />
@@ -99,16 +100,19 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-sm font-medium text-slate-200 truncate">{b.category.name}</span>
                         <div className="flex items-center gap-2 shrink-0">
-                          {isOver && <Badge variant="danger" size="sm" dot>Acima</Badge>}
-                          {isWarning && <Badge variant="warning" size="sm" dot>Atenção</Badge>}
+                          {isOver && <Badge variant="danger" size="sm" dot>Acima do limite</Badge>}
+                          {isWarning && <Badge variant="warning" size="sm" dot>Atenção {pct}%</Badge>}
+                          {!isOver && !isWarning && (
+                            <span className="text-xs text-slate-600 tabular-nums">{pct}%</span>
+                          )}
                           <span className="text-xs text-slate-500 tabular-nums">
-                            {formatCurrency(b.spent, true)} / {formatCurrency(b.amount, true)}
+                            {formatCurrency(b.spent, true)} / {formatCurrency(Number(b.amount), true)}
                           </span>
                         </div>
                       </div>
                       <Progress
                         value={b.spent}
-                        max={b.amount}
+                        max={Number(b.amount)}
                         variant={isOver ? 'danger' : isWarning ? 'warning' : 'brand'}
                         size="sm"
                       />

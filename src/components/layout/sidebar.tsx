@@ -21,6 +21,7 @@ import {
   Upload,
   Users,
   CalendarDays,
+  TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
@@ -79,6 +80,7 @@ function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { ic
 
 const navItems = [
   { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',    color: 'blue',   desc: 'Visão geral do seu financeiro — saldo, metas e projeções'   },
+  { href: '/projection',   icon: TrendingUp,      label: 'Projeção',     color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses'   },
   { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações',   color: 'purple', desc: 'Histórico completo de todas as entradas e saídas'           },
   { href: '/income',       icon: Banknote,        label: 'Rendas',       color: 'green',  desc: 'Gerencie suas fontes de renda recorrentes e avulsas'        },
   { href: '/goals',        icon: Target,          label: 'Metas',        color: 'orange', desc: 'Acompanhe o progresso das suas metas financeiras'           },
@@ -88,7 +90,6 @@ const navItems = [
   { href: '/categories',   icon: Tag,             label: 'Categorias',   color: 'indigo', desc: 'Crie e organize as categorias das suas transações'          },
   { href: '/calendar',     icon: CalendarDays,    label: 'Calendário',   color: 'blue',   desc: 'Visualize contas, rendas e recorrências por dia no mês'     },
   { href: '/reports',      icon: BarChart3,       label: 'Relatórios',   color: 'purple', desc: 'Análises, gráficos e insights sobre seus gastos'            },
-  { href: '/recurring',    icon: RefreshCw,       label: 'Recorrências', color: 'blue',   desc: 'Receitas e despesas que se repetem automaticamente'         },
   { href: '/import',       icon: Upload,          label: 'Importar',     color: 'green',  desc: 'Importe extratos bancários em CSV ou OFX'                   },
 ]
 

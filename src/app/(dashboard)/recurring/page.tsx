@@ -30,6 +30,7 @@ export default async function RecurringPage() {
           <p className="text-sm text-slate-500 mt-0.5">
             {active.length} ativa{active.length !== 1 ? 's' : ''} · {inactive.length} inativa{inactive.length !== 1 ? 's' : ''}
           </p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Transações recorrentes são lançadas automaticamente todo mês na data configurada — despesas fixas como aluguel, internet ou assinaturas.</p>
         </div>
         <RecurringModal categories={categories} />
       </div>

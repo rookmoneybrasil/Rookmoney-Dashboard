@@ -17,9 +17,12 @@ import { serverApi } from '@/lib/api-client'
 import { Badge } from '@/components/ui/badge'
 
 export default async function DashboardPage() {
-  const data = await serverApi.dashboard()
-
-  const now       = new Date()
+  const now = new Date()
+  const currentMonth = format(now, 'yyyy-MM')
+  const [data, budgets] = await Promise.all([
+    serverApi.dashboard(),
+    serverApi.budget(currentMonth).catch(() => [] as Awaited<ReturnType<typeof serverApi.budget>>),
+  ])
   const hour      = now.getHours()
   const greeting  = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR })
@@ -218,82 +221,102 @@ export default async function DashboardPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Orçamento do mês */}
+          {budgets.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Orçamento do mês</CardTitle>
+                  <a href="/budget" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver tudo →</a>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-3">
+                  {budgets.map((b) => {
+                    const pct     = Number(b.amount) > 0 ? Math.min(Math.round((b.spent / Number(b.amount)) * 100), 100) : 0
+                    const isOver  = b.spent > Number(b.amount)
+                    const isWarn  = !isOver && pct >= 80
+                    return (
+                      <div key={b.id} className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs text-slate-400 flex items-center gap-1 truncate">
+                            <span>{b.category.icon}</span>{b.category.name}
+                          </span>
+                          <span className={`text-xs tabular-nums shrink-0 font-medium ${isOver ? 'text-danger' : isWarn ? 'text-warning' : 'text-slate-500'}`}>
+                            {pct}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={b.spent}
+                          max={Number(b.amount)}
+                          variant={isOver ? 'danger' : isWarn ? 'warning' : 'brand'}
+                          size="sm"
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
       {/* ── Financial Health ───────────────────────────────────────── */}
       <FinancialHealthCard health={health as never} />
 
-      {/* ── Bottom grid: A Pagar · A Receber · Contas próximas · Insight */}
+      {/* ── Bottom grid: A Pagar · Contas próximas · Compromissos · Insight */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* A Pagar */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ArrowUpFromLine className="size-4 text-danger" />
-              A Pagar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {data.pendingBillsAmount === 0 ? (
-              <p className="text-sm text-slate-600 py-2 text-center">Nenhuma conta pendente.</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">{data.pendingBillsCount} conta{data.pendingBillsCount !== 1 ? 's' : ''}</span>
-                  <span className="text-sm font-semibold text-slate-400">pendente{data.pendingBillsCount !== 1 ? 's' : ''}</span>
-                </div>
-                {data.overdueCount > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-danger">⚠ {data.overdueCount} em atraso</span>
+        <BorderGlow backgroundColor="#1A0505" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={24} glowIntensity={1.2} coneSpread={30} fillOpacity={0.6}>
+          <Card className="bg-transparent border-transparent h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ArrowUpFromLine className="size-4 text-danger" />
+                A Pagar
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {data.pendingBillsAmount === 0 && (data.personPayablesAmount ?? 0) === 0 ? (
+                <p className="text-sm text-slate-600 py-2 text-center">Nenhum compromisso pendente.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {data.pendingBillsCount > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-400">{data.pendingBillsCount} conta{data.pendingBillsCount !== 1 ? 's' : ''}</span>
+                      <span className="text-sm font-semibold tabular-nums text-slate-300">{formatCurrency(data.pendingBillsAmount)}</span>
+                    </div>
+                  )}
+                  {(data.personPayablesAmount ?? 0) > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-400">Dívidas com pessoas</span>
+                      <span className="text-sm font-semibold tabular-nums text-slate-300">{formatCurrency(data.personPayablesAmount)}</span>
+                    </div>
+                  )}
+                  {data.overdueCount > 0 && (
+                    <div className="flex flex-col gap-1 p-2 rounded-lg bg-danger/8 border border-danger/15">
+                      <span className="text-xs font-semibold text-danger">⚠ {data.overdueCount} conta{data.overdueCount > 1 ? 's' : ''} em atraso</span>
+                      <span className="text-[11px] text-danger/70 leading-snug">
+                        {data.overdueCount > 1
+                          ? 'Essas contas não foram pagas e continuam acumulando. Regularize o quanto antes.'
+                          : 'Essa conta não foi paga ainda. Regularize o quanto antes.'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between border-t border-white/6 pt-2 mt-1">
+                    <span className="text-sm font-semibold text-slate-300">Total</span>
+                    <span className="text-base font-bold text-danger">{formatCurrency((data.pendingBillsAmount ?? 0) + (data.personPayablesAmount ?? 0))}</span>
                   </div>
-                )}
-                <div className="flex items-center justify-between border-t border-white/6 pt-2 mt-1">
-                  <span className="text-sm font-semibold text-slate-300">Total</span>
-                  <span className="text-base font-bold text-danger">{formatCurrency(data.pendingBillsAmount)}</span>
+                  <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors text-center mt-1">
+                    Ver contas →
+                  </a>
                 </div>
-                <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors text-center mt-1">
-                  Ver contas →
-                </a>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* A Receber */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ArrowDownToLine className="size-4 text-gold-500" />
-              A Receber
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {data.totalReceivable === 0 ? (
-              <p className="text-sm text-slate-600 py-2 text-center">Nada a receber no momento.</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {data.totalPeopleReceivable > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">De pessoas</span>
-                    <span className="text-sm font-semibold text-success">{formatCurrency(data.totalPeopleReceivable)}</span>
-                  </div>
-                )}
-                {data.totalIncomeReceivable > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-400">Rendas eventuais</span>
-                    <span className="text-sm font-semibold text-success">{formatCurrency(data.totalIncomeReceivable)}</span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between border-t border-white/6 pt-2 mt-1">
-                  <span className="text-sm font-semibold text-slate-300">Total</span>
-                  <span className="text-base font-bold text-success">{formatCurrency(data.totalReceivable)}</span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        </BorderGlow>
 
         {/* Contas próximas */}
         <Card>
@@ -316,12 +339,41 @@ export default async function DashboardPage() {
                         <p className="text-sm text-slate-300 truncate">{bill.name}</p>
                         <p className="text-xs text-slate-600">{formatDate(new Date(bill.dueDate))}</p>
                       </div>
-                      <span className={`text-sm font-semibold shrink-0 ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-300'}`}>
+                      <span className={`text-sm font-semibold shrink-0 tabular-nums ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-300'}`}>
                         {formatCurrency(Number(bill.amount))}
                       </span>
                     </div>
                   )
                 })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Compromissos com pessoas */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Compromissos</CardTitle>
+              <a href="/people" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {(data.upcomingPersonPayables ?? []).length === 0 ? (
+              <p className="text-sm text-slate-600 py-2 text-center">Nenhum compromisso próximo.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {(data.upcomingPersonPayables ?? []).map((entry) => (
+                  <div key={entry.id} className="flex items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-300 truncate">{entry.person.name} / {entry.description}</p>
+                      <p className="text-xs text-slate-600">{formatDate(new Date(entry.date))}</p>
+                    </div>
+                    <span className="text-sm font-semibold shrink-0 tabular-nums text-danger">
+                      {formatCurrency(Number(entry.amount))}
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
@@ -339,15 +391,23 @@ export default async function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              {data.overdueCount > 0
-                ? `⚠️ Você tem ${data.overdueCount} conta${data.overdueCount > 1 ? 's' : ''} em atraso. Regularize o quanto antes!`
-                : data.monthBalance > 0
-                ? `✅ Você ficou no positivo este mês. Saldo: ${formatCurrency(data.monthBalance)}.`
-                : data.monthBalance < 0
-                ? `📉 Saldo negativo este mês (${formatCurrency(data.monthBalance)}). Revise seus gastos.`
-                : `💡 Sem movimentações ainda. Registre suas receitas e despesas para acompanhar.`}
-            </p>
+            <div className="flex flex-col gap-2 text-sm text-slate-300 leading-relaxed">
+              {data.overdueCount > 0 && (
+                <p>⚠️ Você tem {data.overdueCount} conta{data.overdueCount > 1 ? 's' : ''} em atraso. Regularize o quanto antes!</p>
+              )}
+              {(data.overBudgetCount ?? 0) > 0 && (
+                <p>📊 {data.overBudgetCount} categoria{data.overBudgetCount > 1 ? 's' : ''} atingiu 80%+ do orçamento. Fique de olho!</p>
+              )}
+              {data.overdueCount === 0 && (data.overBudgetCount ?? 0) === 0 && (
+                <p>
+                  {data.monthBalance > 0
+                    ? `✅ Você ficou no positivo este mês. Saldo: ${formatCurrency(data.monthBalance)}.`
+                    : data.monthBalance < 0
+                    ? `📉 Saldo negativo este mês (${formatCurrency(data.monthBalance)}). Revise seus gastos.`
+                    : `💡 Sem movimentações ainda. Registre suas receitas e despesas para acompanhar.`}
+                </p>
+              )}
+            </div>
           </CardContent>
         </Card>
 

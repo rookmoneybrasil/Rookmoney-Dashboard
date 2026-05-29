@@ -100,7 +100,7 @@ export const serverApi = {
     serverFetch<BudgetItem[]>(`/budget${month ? `?month=${month}` : ''}`),
 
   // Reports
-  reports: (months = 6) => serverFetch<ReportsData>(`/reports?months=${months}`),
+  reports: (months = 6, month?: string) => serverFetch<ReportsData>(`/reports?months=${months}${month ? `&month=${month}` : ''}`),
 
   // People
   people: () => serverFetch<Person[]>('/people'),
@@ -108,6 +108,7 @@ export const serverApi = {
 
   // Income
   incomeSources: () => serverFetch<IncomeSource[]>('/income-sources'),
+  incomeHistory: () => serverFetch<Record<string, { id: string; amount: number; date: string; category: { id: string; name: string; icon: string; color: string } | null }[]>>('/income-sources/history'),
 
   // Recurring
   recurring: () => serverFetch<RecurringTransaction[]>('/recurring'),
@@ -183,6 +184,8 @@ export const clientApi = {
     clientFetch<IncomeSource>('/income-sources', { method: 'POST', body: JSON.stringify(data) }),
   updateIncomeSource: (id: string, data: Partial<IncomeSourceInput>) =>
     clientFetch<IncomeSource>(`/income-sources/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  revertIncomeReceipt: (id: string) =>
+    clientFetch<IncomeSource>(`/income-sources/${id}?action=revert`, { method: 'POST' }),
   deleteIncomeSource: (id: string) =>
     clientFetch<void>(`/income-sources/${id}`, { method: 'DELETE' }),
 
@@ -209,8 +212,12 @@ export const clientApi = {
     clientFetch<PersonEntry>(`/people/entries/${id}?action=settle`, { method: 'POST' }),
   unsettleEntry: (id: string) =>
     clientFetch<PersonEntry>(`/people/entries/${id}?action=unsettle`, { method: 'POST' }),
+  editEntry: (id: string, data: Partial<EntryInput> & { applyToGroup?: boolean }) =>
+    clientFetch<PersonEntry>(`/people/entries/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteEntry: (id: string) =>
     clientFetch<void>(`/people/entries/${id}`, { method: 'DELETE' }),
+  deleteEntryGroup: (id: string) =>
+    clientFetch<void>(`/people/entries/${id}?applyToGroup=true`, { method: 'DELETE' }),
 
   // Settings
   getProfile: () => clientFetch<User>('/settings'),
@@ -244,7 +251,7 @@ export const clientApi = {
 export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected'; href: string; color: string }
 export interface CalendarData { month: string; daysInMonth: number; firstWeekday: number; events: CalendarEvent[]; byDay: Record<string, CalendarEvent[]> }
 
-export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget'; title: string; message: string; href: string; urgency: 'high' | 'medium' }
+export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low' }
 
 // ─── Types for dashboard components ──────────────────────────────────────────
 export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
@@ -289,7 +296,8 @@ export interface PersonEntry { id: string; type: 'THEY_OWE_ME' | 'I_OWE_THEM'; d
 export type PersonEntryRow = Omit<PersonEntry, 'date' | 'settledAt' | 'createdAt'> & { date: Date | string; settledAt: Date | string | null; createdAt: Date | string }
 export interface IncomeSource { id: string; name: string; type: string; amount: number; isRecurring: boolean; dayOfMonth: number | null; notes: string | null; lastAutoPayMonth: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
 export interface RecurringTransaction { id: string; name: string; amount: number; type: 'INCOME' | 'EXPENSE'; frequency: string; isActive: boolean; dayOfMonth: number | null; description: string | null; lastAutoMonth: string | null; category: Category; categoryId: string; createdAt: string; updatedAt: string; userId: string }
-export interface DashboardData { userName: string; monthBalance: number; monthIncome: number; monthExpense: number; incomeChange: number; expenseChange: number; totalReceivable: number; totalPeopleReceivable: number; totalIncomeReceivable: number; recentTransactions: Transaction[]; goals: Goal[]; upcomingBills: Bill[]; pendingBillsCount: number; pendingBillsAmount: number; overdueCount: number; healthScore: number; projections: ProjectionMonth[]; mood: string }
+export interface UpcomingPersonPayable { id: string; description: string; amount: number; date: string; person: { name: string } }
+export interface DashboardData { userName: string; monthBalance: number; monthIncome: number; monthExpense: number; incomeChange: number; expenseChange: number; totalReceivable: number; totalPeopleReceivable: number; totalIncomeReceivable: number; recentTransactions: Transaction[]; goals: Goal[]; upcomingBills: Bill[]; upcomingPersonPayables: UpcomingPersonPayable[]; pendingBillsCount: number; pendingBillsAmount: number; personPayablesAmount: number; overdueCount: number; overBudgetCount: number; healthScore: number; projections: ProjectionMonth[]; mood: string }
 export interface ProjectionMonth { month: string; projectedIncome: number; projectedExpense: number; projectedBalance: number }
 export interface ReportsData { monthly: MonthlyReport[]; period: PeriodReport; categoryTrend: CategoryTrend[]; topExpenses: TopExpense[]; spendingByDay: SpendingDay[]; incomeSources: IncomeSourceReport[] }
 export interface MonthlyReport { monthKey: string; monthFull: string; totalIncome: number; totalExpense: number; balance: number; savingsRate: number }

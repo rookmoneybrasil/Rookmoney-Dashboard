@@ -21,6 +21,7 @@ export default async function ImportPage() {
         <p className="text-sm text-slate-500 mt-0.5">
           Escaneie comprovantes com IA ou envie um CSV para importar em lote.
         </p>
+        <p className="text-xs text-slate-600 mt-1 max-w-md">Fotografe um comprovante ou extrato e a IA extrai os dados automaticamente. Também é possível importar um arquivo CSV com múltiplas transações de uma vez.</p>
       </div>
 
       <Tabs

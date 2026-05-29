@@ -2,96 +2,155 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, Receipt, Target, PieChart } from 'lucide-react'
+import { Bell, Receipt, Target, PieChart, Users, TrendingUp, CheckCheck } from 'lucide-react'
 import type { AppNotification } from '@/lib/api-client'
 
 interface Props {
   notifications: AppNotification[]
 }
 
-const typeIcon: Record<AppNotification['type'], React.ReactNode> = {
-  bill:   <Receipt className="size-4 shrink-0 text-warning" />,
-  goal:   <Target  className="size-4 shrink-0 text-brand-400" />,
-  budget: <PieChart className="size-4 shrink-0 text-danger" />,
+const TYPE_CONFIG: Record<AppNotification['type'], { icon: React.ReactNode; color: string }> = {
+  bill:   { icon: <Receipt   className="size-3.5" />, color: 'text-warning   bg-warning/10   border-warning/20'   },
+  goal:   { icon: <Target    className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
+  budget: { icon: <PieChart  className="size-3.5" />, color: 'text-danger    bg-danger/10    border-danger/20'    },
+  person: { icon: <Users     className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
+  income: { icon: <TrendingUp className="size-3.5" />, color: 'text-success  bg-success/10   border-success/20'  },
+}
+
+const URGENCY_DOT: Record<AppNotification['urgency'], string> = {
+  high:   'bg-danger',
+  medium: 'bg-warning',
+  low:    'bg-slate-500',
+}
+
+const GROUP_LABELS: Record<AppNotification['urgency'], string> = {
+  high:   '🔴 Urgente',
+  medium: '🟡 Atenção',
+  low:    '🔵 Informativo',
 }
 
 export function NotificationBell({ notifications }: Props) {
-  const [open, setOpen]       = useState(false)
-  const containerRef          = useRef<HTMLDivElement>(null)
-  const count                 = notifications.length
-  const countLabel            = count > 9 ? '9+' : String(count)
+  const [open, setOpen] = useState(false)
+  const ref             = useRef<HTMLDivElement>(null)
+  const count           = notifications.length
+  const highCount       = notifications.filter(n => n.urgency === 'high').length
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return
-    function handleClick(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  // Group by urgency
+  const groups = (['high', 'medium', 'low'] as const)
+    .map(u => ({ urgency: u, items: notifications.filter(n => n.urgency === u) }))
+    .filter(g => g.items.length > 0)
+
   return (
-    <div ref={containerRef} className="relative">
-      {/* Bell button */}
+    <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(v => !v)}
         aria-label={`Notificações${count > 0 ? ` — ${count} nova${count > 1 ? 's' : ''}` : ''}`}
         className="relative flex items-center justify-center size-9 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-ink-700 transition-colors"
       >
-        <Bell className="size-4" />
+        <Bell className={`size-4 ${open ? 'text-slate-300' : ''}`} />
         {count > 0 && (
-          <span className="absolute -top-1 -right-1 size-4 rounded-full bg-danger text-white text-[10px] flex items-center justify-center font-semibold leading-none">
-            {countLabel}
+          <span className={`absolute -top-1 -right-1 size-4 rounded-full text-white text-[10px] flex items-center justify-center font-semibold leading-none ${
+            highCount > 0 ? 'bg-danger animate-pulse' : 'bg-warning'
+          }`}>
+            {count > 9 ? '9+' : count}
           </span>
         )}
       </button>
 
-      {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 rounded-xl bg-ink-700 border border-white/8 shadow-[0_8px_32px_rgba(3,7,16,0.7)] z-50 overflow-hidden">
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-white/6">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Notificações
-            </p>
-          </div>
+        <div className="absolute right-0 top-full mt-2 w-88 rounded-xl bg-ink-800 border border-white/8 shadow-[0_8px_32px_rgba(3,7,16,0.8)] z-50 overflow-hidden animate-in slide-in-from-top-2 duration-150"
+          style={{ width: '360px' }}>
 
-          {/* Items */}
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-slate-500">
-                Nenhuma notificação no momento 🎉
-              </div>
-            ) : (
-              <ul>
-                {notifications.map((n) => (
-                  <li key={n.id}>
-                    <Link
-                      href={n.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-ink-600 transition-colors"
-                    >
-                      <span className="mt-0.5">{typeIcon[n.type]}</span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-200 truncate">
-                          {n.title}
-                        </p>
-                        <p className="text-xs text-slate-500 mt-0.5 truncate">
-                          {n.message}
-                        </p>
-                      </div>
-                      {n.urgency === 'high' && (
-                        <span className="mt-1 size-1.5 rounded-full bg-danger shrink-0" />
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/6">
+            <div className="flex items-center gap-2">
+              <Bell className="size-3.5 text-slate-500" />
+              <p className="text-xs font-semibold text-slate-300">Notificações</p>
+              {count > 0 && (
+                <span className="text-[10px] bg-ink-600 text-slate-400 px-1.5 py-0.5 rounded-full">{count}</span>
+              )}
+            </div>
+            {count > 0 && (
+              <button
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1 text-[10px] text-slate-600 hover:text-slate-400 transition-colors"
+              >
+                <CheckCheck className="size-3" /> marcar como lidas
+              </button>
             )}
           </div>
+
+          {/* Content */}
+          <div className="max-h-[420px] overflow-y-auto">
+            {count === 0 ? (
+              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+                <div className="size-10 rounded-full bg-success/10 flex items-center justify-center">
+                  <CheckCheck className="size-5 text-success" />
+                </div>
+                <p className="text-sm font-medium text-slate-400">Tudo em dia!</p>
+                <p className="text-xs text-slate-600">Nenhuma notificação no momento.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-white/[0.04]">
+                {groups.map(({ urgency, items }) => (
+                  <div key={urgency}>
+                    {/* Group label */}
+                    <p className="px-4 py-2 text-[10px] font-semibold text-slate-600 uppercase tracking-wider bg-ink-900/40">
+                      {GROUP_LABELS[urgency]}
+                    </p>
+                    {items.map(n => {
+                      const cfg = TYPE_CONFIG[n.type]
+                      return (
+                        <Link
+                          key={n.id}
+                          href={n.href}
+                          onClick={() => setOpen(false)}
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-ink-700/60 transition-colors group"
+                        >
+                          {/* Icon */}
+                          <div className={`size-7 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${cfg.color}`}>
+                            {cfg.icon}
+                          </div>
+
+                          {/* Text */}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-slate-200 truncate group-hover:text-white">
+                              {n.title}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                              {n.message}
+                            </p>
+                          </div>
+
+                          {/* Urgency dot */}
+                          <div className={`size-2 rounded-full mt-1.5 shrink-0 ${URGENCY_DOT[n.urgency]}`} />
+                        </Link>
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          {count > 0 && (
+            <div className="border-t border-white/6 px-4 py-2.5">
+              <p className="text-[10px] text-slate-600 text-center">
+                {highCount > 0 && `${highCount} urgente${highCount > 1 ? 's' : ''} · `}
+                {count} notificação{count > 1 ? 'ões' : ''}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

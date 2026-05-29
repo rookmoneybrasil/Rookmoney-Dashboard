@@ -1,14 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, CheckCircle2 } from 'lucide-react'
 import { EntryActions } from './entry-actions'
+import { EditEntryModal } from './edit-entry-modal'
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
+import { clientApi } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { PersonEntryRow } from '@/lib/api-client'
 
+type Category = { id: string; name: string; icon: string; color: string }
+
 interface Props {
-  personId: string
-  entries:  PersonEntryRow[]  // all entries for this installmentGroupId, sorted by installmentCurrent
+  personId:   string
+  entries:    PersonEntryRow[]
+  categories: Category[]
 }
 
 // Strip the " (X/Y)" suffix added automatically on creation
@@ -16,8 +23,9 @@ function baseDescription(description: string): string {
   return description.replace(/\s*\(\d+\/\d+\)$/, '')
 }
 
-export function InstallmentGroup({ personId, entries }: Props) {
+export function InstallmentGroup({ personId, entries, categories }: Props) {
   const [open, setOpen] = useState(false)
+  const router = useRouter()
 
   if (entries.length === 0) return null
 
@@ -27,7 +35,7 @@ export function InstallmentGroup({ personId, entries }: Props) {
   const settledCount = entries.filter((e) => e.isSettled).length
   const remaining    = entries.filter((e) => !e.isSettled).length
   const name         = baseDescription(first.description)
-  const perInst      = first.amount
+  const perInst      = Number(first.amount)
   const totalAmount  = perInst * total
   const paidAmount   = perInst * settledCount
   const leftAmount   = totalAmount - paidAmount
@@ -93,7 +101,7 @@ export function InstallmentGroup({ personId, entries }: Props) {
           </div>
         </div>
 
-        {/* Amount + chevron */}
+        {/* Amount + edit + chevron */}
         <div className="flex items-center gap-2 shrink-0">
           <div className="text-right">
             <p className={`font-bold text-sm ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
@@ -103,6 +111,16 @@ export function InstallmentGroup({ personId, entries }: Props) {
               {remaining} × {formatCurrency(perInst)}
             </p>
           </div>
+          {/* Stop propagation so edit/delete clicks don't toggle open */}
+          <span onClick={(e) => e.stopPropagation()} className="flex items-center gap-1">
+            <EditEntryModal entry={first} categories={categories} isGroup groupSize={total} />
+            <ConfirmDeleteButton
+              action={async () => { await clientApi.deleteEntryGroup(first.id); router.refresh() }}
+              icon="trash"
+              title={`Excluir grupo (${total} parcelas)`}
+              className="flex items-center justify-center size-7 rounded-lg text-slate-500 hover:text-danger hover:bg-danger/10 transition-colors"
+            />
+          </span>
           {open
             ? <ChevronDown className="size-4 text-slate-500 shrink-0" />
             : <ChevronRight className="size-4 text-slate-500 shrink-0" />}
@@ -143,6 +161,9 @@ export function InstallmentGroup({ personId, entries }: Props) {
                 {formatCurrency(entry.amount)}
               </span>
 
+              {!entry.isSettled && (
+                <EditEntryModal entry={entry} categories={categories} />
+              )}
               <EntryActions
                 entryId={entry.id}
                 personId={personId}

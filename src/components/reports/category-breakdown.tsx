@@ -51,16 +51,16 @@ export function CategoryBreakdown({ categories, totalExpense }: Props) {
 
             {/* Delta badge */}
             <div className="w-14 shrink-0 flex justify-end">
-              {cat.delta !== null ? (
+              {cat.change !== null && cat.change !== undefined ? (
                 <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold tabular-nums px-1.5 py-0.5 rounded-full ${
-                  cat.delta > 0
+                  cat.change > 0
                     ? 'bg-danger/15 text-danger'
-                    : cat.delta < 0
+                    : cat.change < 0
                     ? 'bg-success/15 text-success'
                     : 'bg-ink-600 text-slate-500'
                 }`}>
-                  {cat.delta > 0 ? <TrendingUp className="size-2.5" /> : cat.delta < 0 ? <TrendingDown className="size-2.5" /> : <Minus className="size-2.5" />}
-                  {cat.delta > 0 ? '+' : ''}{cat.delta}%
+                  {cat.change > 0 ? <TrendingUp className="size-2.5" /> : cat.change < 0 ? <TrendingDown className="size-2.5" /> : <Minus className="size-2.5" />}
+                  {cat.change > 0 ? '+' : ''}{cat.change}%
                 </span>
               ) : (
                 <span className="text-[10px] text-slate-600">—</span>

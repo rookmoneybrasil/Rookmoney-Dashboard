@@ -27,6 +27,7 @@ export default async function GoalsPage() {
             {active.length} ativa{active.length !== 1 ? 's' : ''} ·{' '}
             {completed.length} concluída{completed.length !== 1 ? 's' : ''}
           </p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Defina objetivos financeiros e acompanhe o progresso. Cada aporte registrado vira uma despesa e alimenta o saldo da meta.</p>
         </div>
         <GoalModal />
       </div>

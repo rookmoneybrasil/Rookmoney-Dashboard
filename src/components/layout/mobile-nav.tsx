@@ -24,7 +24,6 @@ const MORE_NAV = [
   { href: '/budget',     icon: PiggyBank, label: 'Orçamento'    },
   { href: '/calendar',   icon: CalendarDays, label: 'Calendário'  },
   { href: '/reports',    icon: BarChart3,    label: 'Relatórios'  },
-  { href: '/recurring',  icon: RefreshCw, label: 'Recorrências' },
   { href: '/import',     icon: Upload,    label: 'Importar'     },
   { href: '/categories', icon: Tag,       label: 'Categorias'   },
   { href: '/settings',   icon: Settings,  label: 'Configurações'},

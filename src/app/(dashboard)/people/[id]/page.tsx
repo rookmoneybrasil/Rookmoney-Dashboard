@@ -4,6 +4,7 @@ import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock } from 'lucide
 import { serverApi } from '@/lib/api-client'
 import { EntryModal } from '@/components/people/entry-modal'
 import { EntryActions } from '@/components/people/entry-actions'
+import { EditEntryModal } from '@/components/people/edit-entry-modal'
 import { InstallmentGroup } from '@/components/people/installment-group'
 import { EditPersonButton } from '@/components/people/person-modal'
 import { DeletePersonButton } from '@/components/people/delete-person-button'
@@ -50,7 +51,9 @@ function groupEntries(entries: PersonEntryRow[]) {
 
 // ─── Single entry card ────────────────────────────────────────────────────────
 
-function EntryCard({ entry, personId, settled = false }: { entry: PersonEntryRow; personId: string; settled?: boolean }) {
+type Category = { id: string; name: string; icon: string; color: string }
+
+function EntryCard({ entry, personId, categories, settled = false }: { entry: PersonEntryRow; personId: string; categories: Category[]; settled?: boolean }) {
   const isTheyOwe = entry.type === 'THEY_OWE_ME'
 
   if (settled) {
@@ -70,6 +73,7 @@ function EntryCard({ entry, personId, settled = false }: { entry: PersonEntryRow
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <span className="font-semibold text-sm text-slate-500">{formatCurrency(entry.amount)}</span>
+          <EditEntryModal entry={entry} categories={categories} />
           <EntryActions entryId={entry.id} personId={personId} isSettled={true} />
         </div>
       </div>
@@ -106,6 +110,7 @@ function EntryCard({ entry, personId, settled = false }: { entry: PersonEntryRow
         <span className={`font-bold text-sm ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
           {isTheyOwe ? '+' : '-'}{formatCurrency(entry.amount)}
         </span>
+        <EditEntryModal entry={entry} categories={categories} />
         <EntryActions entryId={entry.id} personId={personId} isSettled={false} />
       </div>
     </div>
@@ -130,7 +135,7 @@ export default async function PersonPage({ params }: Props) {
   const settledEntries = allEntries.filter((e) =>  e.isSettled)
 
   let balance = 0
-  for (const e of openEntries) balance += e.type === 'THEY_OWE_ME' ? e.amount : -e.amount
+  for (const e of openEntries) balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
 
   const theyOweTotal = openEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + Number(e.amount), 0)
   const iOweTotal    = openEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + Number(e.amount), 0)
@@ -243,11 +248,12 @@ export default async function PersonPage({ params }: Props) {
                 key={grp[0].installmentGroupId}
                 personId={person.id}
                 entries={grp}
+                categories={categories}
               />
             ))}
             {/* Single entries */}
             {singleOpen.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} personId={person.id} />
+              <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} />
             ))}
           </div>
         )}
@@ -266,10 +272,11 @@ export default async function PersonPage({ params }: Props) {
                 key={grp[0].installmentGroupId}
                 personId={person.id}
                 entries={grp}
+                categories={categories}
               />
             ))}
             {singleSettled.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} personId={person.id} settled />
+              <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} settled />
             ))}
           </div>
         </div>

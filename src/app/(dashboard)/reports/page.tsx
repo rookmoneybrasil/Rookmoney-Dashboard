@@ -21,7 +21,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
   const months = Math.min(Math.max(Number(sp.months ?? '6'), 1), 24)
   const month  = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
 
-  const data = await serverApi.reports(months)
+  const data = await serverApi.reports(months, month)
   const { monthly, period, topExpenses, spendingByDay, categoryTrend, incomeSources } = data
 
   const periodExpense = period.totalExpense
@@ -39,6 +39,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
               {monthly[0].monthFull} – {monthly[monthly.length - 1].monthFull}
             </p>
           )}
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Visualize a evolução das suas finanças ao longo dos meses — receitas, despesas, saldo e gastos por categoria.</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <Suspense>

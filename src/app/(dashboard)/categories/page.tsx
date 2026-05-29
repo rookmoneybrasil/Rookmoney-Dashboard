@@ -19,6 +19,7 @@ export default async function CategoriesPage() {
           <p className="text-sm text-slate-500 mt-0.5">
             {custom.length} personalizada{custom.length !== 1 ? 's' : ''} · {defaults.length} padrão
           </p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Crie categorias com nome, emoji e cor para organizar suas transações. As categorias padrão não podem ser removidas.</p>
         </div>
         <CategoryModal />
       </div>

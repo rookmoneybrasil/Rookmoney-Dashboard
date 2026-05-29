@@ -110,24 +110,42 @@ export async function registerReceipt(
   const session = await getSession()
   if (!session) redirect('/login')
 
-  const amount     = Number(formData.get('amount'))
-  const date       = formData.get('date') as string
-  const categoryId = formData.get('categoryId') as string
+  const amount      = Number(formData.get('amount'))
+  const date        = formData.get('date') as string
+  const categoryId  = formData.get('categoryId') as string
   const description = formData.get('description') as string
+  const sourceId    = formData.get('sourceId') as string | null
 
   if (!amount || amount <= 0) return { error: 'Valor inválido.' }
   if (!categoryId) return { error: 'Selecione uma categoria.' }
 
-  await db.transaction.create({
-    data: {
-      amount,
-      type:        'INCOME',
-      description: description || null,
-      date:        new Date(date),
-      userId:      session.userId,
-      categoryId,
-    },
-  })
+  const now       = new Date()
+  const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+
+  const ops: Promise<unknown>[] = [
+    db.transaction.create({
+      data: {
+        amount,
+        type:        'INCOME',
+        description: description || null,
+        date:        new Date(date),
+        userId:      session.userId,
+        categoryId,
+      },
+    }),
+  ]
+
+  // Mark income source as received this month so it moves to Histórico
+  if (sourceId) {
+    ops.push(
+      db.incomeSource.update({
+        where: { id: sourceId, userId: session.userId },
+        data:  { lastAutoPayMonth: yearMonth },
+      })
+    )
+  }
+
+  await Promise.all(ops)
 
   revalidatePath('/income')
   revalidatePath('/transactions')

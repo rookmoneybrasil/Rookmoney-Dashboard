@@ -9,8 +9,7 @@ import { ptBR } from 'date-fns/locale'
 import { formatCurrency } from '@/lib/utils'
 import type { CalendarEvent, CalendarData } from '@/lib/api-client'
 
-// Use relative URL — goes through Next.js proxy rewrite → API
-const API = ''
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -42,7 +41,7 @@ export default function CalendarPage() {
   useEffect(() => {
     setLoading(true)
     setSelectedDay(null)
-    fetch(`${API}/api/proxy/calendar?month=${monthStr}`, { credentials: 'include' })
+    fetch(`${API}/api/v1/calendar?month=${monthStr}`, { credentials: 'include' })
       .then(r => r.json())
       .then(json => { setData(json.data); setLoading(false) })
       .catch(() => setLoading(false))

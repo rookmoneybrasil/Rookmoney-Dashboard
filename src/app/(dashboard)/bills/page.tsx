@@ -65,6 +65,7 @@ export default async function BillsPage() {
             {pending.length + activeGroups.length} pendente{pending.length + activeGroups.length !== 1 ? 's' : ''} ·{' '}
             {paid.length} paga{paid.length !== 1 ? 's' : ''}
           </p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Cadastre boletos, parcelas e contas fixas. Ao marcar como paga, uma despesa é gerada automaticamente. Contas recorrentes criam o próximo mês sozinhas.</p>
         </div>
         <BillModal categories={categories} />
       </div>

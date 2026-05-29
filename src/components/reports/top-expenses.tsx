@@ -1,5 +1,7 @@
 'use client'
 
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { formatCurrency } from '@/lib/utils'
 import type { TopExpense } from '@/lib/api-client'
 
@@ -36,7 +38,9 @@ export function TopExpenses({ expenses, periodExpense }: { expenses: TopExpense[
                     style={{ width: `${barW}%` }}
                   />
                 </div>
-                <span className="text-[10px] text-slate-600 shrink-0">{exp.date}</span>
+                <span className="text-[10px] text-slate-600 shrink-0">
+                  {format(new Date(exp.date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                </span>
               </div>
             </div>
 

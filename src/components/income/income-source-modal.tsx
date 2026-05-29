@@ -24,9 +24,9 @@ interface Source {
   isRecurring: boolean; dayOfMonth: number | null; categoryId: string | null; notes: string | null
 }
 
-interface Props { source?: Source; categories?: Category[] }
+interface Props { source?: Source; categories?: Category[]; className?: string; title?: string; disabled?: boolean }
 
-export function IncomeSourceModal({ source, categories = [] }: Props) {
+export function IncomeSourceModal({ source, categories = [], className, title, disabled }: Props) {
   const isEdit = !!source
   const [open, setOpen]           = useState(false)
   const [type, setType]           = useState(source?.type ?? 'EMPLOYMENT')
@@ -49,9 +49,12 @@ export function IncomeSourceModal({ source, categories = [] }: Props) {
   return (
     <Modal open={open} onOpenChange={setOpen}>
       {isEdit ? (
-        <button onClick={() => setOpen(true)}
-          className="size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10 transition-colors"
-          title="Editar">
+        <button
+          onClick={() => !disabled && setOpen(true)}
+          className={className ?? "size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10 transition-colors"}
+          title={title ?? "Editar"}
+          style={disabled ? { cursor: 'not-allowed' } : undefined}
+        >
           <Pencil className="size-3.5" />
         </button>
       ) : (

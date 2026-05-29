@@ -11,7 +11,7 @@ import { registerReceipt } from '@/app/actions/income-sources'
 import { triggerMascot } from '@/lib/mascot'
 
 interface Category { id: string; name: string; icon: string; color: string }
-interface Source { name: string; amount: number }
+interface Source { id: string; name: string; amount: number }
 interface Props { source: Source; categories: Category[]; label?: string }
 
 function getNthBusinessDay(n: number, ref = new Date()): string {
@@ -83,6 +83,7 @@ export function RegisterReceiptModal({ source, categories, label = 'Recebi' }: P
           </div>
 
           <input type="hidden" name="description" value={source.name} />
+          <input type="hidden" name="sourceId" value={source.id} />
 
           <FormField label="Valor (R$)" htmlFor="amount" required>
             <Input id="amount" name="amount" type="number" step="0.01" min="0.01"

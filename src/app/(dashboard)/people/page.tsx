@@ -67,6 +67,7 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
           <p className="text-sm text-slate-500 mt-0.5">
             Controle quem te deve e a quem você deve
           </p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Registre lançamentos avulsos, parcelados ou recorrentes. Ao acertar uma dívida, a transação correspondente é criada automaticamente.</p>
         </div>
         <PersonModal />
       </div>

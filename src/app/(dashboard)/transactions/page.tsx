@@ -54,6 +54,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
         <div>
           <h1 className="text-xl font-semibold text-slate-100 capitalize">Transações</h1>
           <p className="text-sm text-slate-500 mt-0.5 capitalize">{monthLabel}</p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Registre todas as entradas e saídas de dinheiro. Use os filtros para buscar por período, tipo ou categoria.</p>
         </div>
         <TransactionModal categories={categories} />
       </div>

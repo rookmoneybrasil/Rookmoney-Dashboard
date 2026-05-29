@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { CheckCircle2, RotateCcw } from 'lucide-react'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -12,8 +13,11 @@ interface Props {
 }
 
 export function EntryActions({ entryId, isSettled }: Props) {
+  const router = useRouter()
+
   const { mutate: settle, pending } = useMutation<void>(
     () => isSettled ? clientApi.unsettleEntry(entryId) : clientApi.settleEntry(entryId),
+    { onSuccess: () => router.refresh() },
   )
 
   return (
@@ -41,7 +45,7 @@ export function EntryActions({ entryId, isSettled }: Props) {
       )}
 
       <ConfirmDeleteButton
-        action={() => clientApi.deleteEntry(entryId)}
+        action={async () => { await clientApi.deleteEntry(entryId); router.refresh() }}
         icon="trash"
         title="Excluir lançamento"
         className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-slate-500 hover:text-danger hover:bg-danger/10 transition-colors"
