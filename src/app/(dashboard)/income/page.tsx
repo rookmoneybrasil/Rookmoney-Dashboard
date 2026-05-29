@@ -19,7 +19,7 @@ export default async function IncomePage() {
 
   const recurring    = sources.filter((s) => s.isRecurring)
   const nonRecurring = sources.filter((s) => !s.isRecurring)
-  const monthlyTotal = recurring.reduce((s, r) => s + r.amount, 0)
+  const monthlyTotal = recurring.reduce((s, r) => s + Number(r.amount), 0)
 
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto">

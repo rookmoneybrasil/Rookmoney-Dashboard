@@ -23,7 +23,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
 
   const monthLabel = format(new Date(month + '-02'), 'MMMM yyyy', { locale: ptBR })
 
-  const totalBudget = budgets.reduce((s, b) => s + b.amount, 0)
+  const totalBudget = budgets.reduce((s, b) => s + Number(b.amount), 0)
   const totalSpent  = budgets.reduce((s, b) => s + b.spent,  0)
   const overBudget  = budgets.filter((b) => b.spent > b.amount)
 

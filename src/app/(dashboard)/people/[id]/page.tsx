@@ -132,8 +132,8 @@ export default async function PersonPage({ params }: Props) {
   let balance = 0
   for (const e of openEntries) balance += e.type === 'THEY_OWE_ME' ? e.amount : -e.amount
 
-  const theyOweTotal = openEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + e.amount, 0)
-  const iOweTotal    = openEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + e.amount, 0)
+  const theyOweTotal = openEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + Number(e.amount), 0)
+  const iOweTotal    = openEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + Number(e.amount), 0)
 
   // For display: group ALL entries (open + settled) by installmentGroupId so we render each
   // group once. A group is "pending" if any entry is unsettled; "settled" if all settled.

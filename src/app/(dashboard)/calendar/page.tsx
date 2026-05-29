@@ -9,7 +9,8 @@ import { ptBR } from 'date-fns/locale'
 import { formatCurrency } from '@/lib/utils'
 import type { CalendarEvent, CalendarData } from '@/lib/api-client'
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? ''
+// Use relative URL — goes through Next.js proxy rewrite → API
+const API = ''
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -58,8 +59,8 @@ export default function CalendarPage() {
 
   const selectedEvents: CalendarEvent[] = selectedDay && data ? (data.byDay[selectedDay] ?? []) : []
 
-  const totalPending = data?.events.filter(e => e.status === 'pending' || e.status === 'overdue').reduce((s, e) => s + e.amount, 0) ?? 0
-  const totalExpected = data?.events.filter(e => e.status === 'expected').reduce((s, e) => s + e.amount, 0) ?? 0
+  const totalPending = data?.events.filter(e => e.status === 'pending' || e.status === 'overdue').reduce((s, e) => s + Number(e.amount), 0) ?? 0
+  const totalExpected = data?.events.filter(e => e.status === 'expected').reduce((s, e) => s + Number(e.amount), 0) ?? 0
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">

@@ -50,9 +50,9 @@ export default async function BillsPage() {
   const pending = regular.filter((b) => !b.isPaid)
   const paid    = regular.filter((b) =>  b.isPaid)
 
-  const totalPending = pending.reduce((s, b) => s + b.amount, 0)
+  const totalPending = pending.reduce((s, b) => s + Number(b.amount), 0)
     + activeGroups.reduce((s, g) => s + (g.total - g.paidCount) * g.amount, 0)
-  const totalPaid = paid.reduce((s, b) => s + b.amount, 0)
+  const totalPaid = paid.reduce((s, b) => s + Number(b.amount), 0)
     + allGroups.reduce((s, g) => s + g.paidCount * g.amount, 0)
 
   return (
