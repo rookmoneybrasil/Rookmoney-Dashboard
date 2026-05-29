@@ -240,7 +240,10 @@ export default async function BillsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-slate-400 truncate">{bill.name}</p>
-                      <p className="text-xs text-slate-600">{bill.category?.name ?? 'Sem categoria'}</p>
+                      <p className="text-xs text-slate-600">
+                        {bill.category?.name ?? 'Sem categoria'} · {formatDate(bill.dueDate)}
+                        {bill.isRecurring && <span className="ml-1 text-brand-500">↻ mensal</span>}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(bill.amount)}</span>
