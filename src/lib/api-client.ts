@@ -149,8 +149,10 @@ export const clientApi = {
     clientFetch<Goal>(`/goals/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteGoal:   (id: string) =>
     clientFetch<void>(`/goals/${id}`, { method: 'DELETE' }),
-  contributeToGoal: (id: string, amount: number, note?: string) =>
-    clientFetch<void>(`/goals/${id}?action=contribute`, { method: 'POST', body: JSON.stringify({ amount, note }) }),
+  contributeToGoal: (id: string, amount: number, categoryId?: string, note?: string) =>
+    clientFetch<void>(`/goals/${id}?action=contribute`, { method: 'POST', body: JSON.stringify({ amount, categoryId, note }) }),
+  withdrawFromGoal: (id: string, amount: number, categoryId?: string) =>
+    clientFetch<void>(`/goals/${id}?action=withdraw`, { method: 'POST', body: JSON.stringify({ amount, categoryId }) }),
 
   // Bills
   createBill: (data: BillInput) =>

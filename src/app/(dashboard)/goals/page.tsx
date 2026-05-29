@@ -12,7 +12,7 @@ import { EditGoalModal } from '@/components/goals/edit-goal-modal'
 import { ContributeButton } from '@/components/goals/contribute-button'
 
 export default async function GoalsPage() {
-  const allGoals = await serverApi.goals(true)
+  const [allGoals, categories] = await Promise.all([serverApi.goals(true), serverApi.categories()])
 
   const active    = allGoals.filter((g) => !g.isCompleted)
   const completed = allGoals.filter((g) =>  g.isCompleted)
@@ -98,6 +98,8 @@ export default async function GoalsPage() {
                     goalId={goal.id}
                     goalName={goal.name}
                     remaining={remaining}
+                    current={current}
+                    categories={categories}
                   />
                   <EditGoalModal goal={{ id: goal.id, name: goal.name, targetAmount: Number(goal.targetAmount), currentAmount: Number(goal.currentAmount), deadline: goal.deadline, description: goal.description, icon: goal.icon, color: goal.color }} />
                   <DeleteGoalButton id={goal.id} />
