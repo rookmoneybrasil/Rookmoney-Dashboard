@@ -7,7 +7,8 @@ export async function GET(req: NextRequest) {
   const isMobile = searchParams.get('mobile') === '1'
 
   const clientId    = process.env.GOOGLE_CLIENT_ID
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback`
+  const origin      = new URL(req.url).origin
+  const redirectUri = `${origin}/api/auth/google/callback`
 
   if (!clientId) {
     return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 })

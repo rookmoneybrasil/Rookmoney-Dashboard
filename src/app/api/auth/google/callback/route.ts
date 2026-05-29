@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get('state')
   const error = searchParams.get('error')
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl = new URL(req.url).origin
 
   // Google cancelled or denied
   if (error || !code) {
