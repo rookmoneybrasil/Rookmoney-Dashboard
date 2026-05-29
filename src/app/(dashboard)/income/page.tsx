@@ -33,7 +33,7 @@ export default async function IncomePage() {
   const [sources, categories, history] = await Promise.all([
     serverApi.incomeSources(),
     serverApi.categories(),
-    serverApi.incomeHistory().catch(() => ({} as Record<string, { id: string; amount: number; date: string }[]>)),
+    serverApi.incomeHistory().catch(() => ({} as Awaited<ReturnType<typeof serverApi.incomeHistory>>)),
   ])
 
   const currentMonth = format(new Date(), 'yyyy-MM')
