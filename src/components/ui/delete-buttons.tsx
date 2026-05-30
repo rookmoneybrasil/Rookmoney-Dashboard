@@ -6,18 +6,18 @@
  * can render them by passing only the id (serializable prop).
  */
 
-import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDeleteButton } from './confirm-delete-button'
 import { clientApi } from '@/lib/api-client'
 
+const reload = () => window.location.reload()
+
 // ─── Transactions ─────────────────────────────────────────────────────────────
 
 export function DeleteTransactionButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteTransaction(id); router.refresh() }}
+      action={async () => { await clientApi.deleteTransaction(id); reload() }}
       icon="trash" label="Excluir transação?"
     />
   )
@@ -26,10 +26,9 @@ export function DeleteTransactionButton({ id }: { id: string }) {
 // ─── Goals ────────────────────────────────────────────────────────────────────
 
 export function DeleteGoalButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteGoal(id); router.refresh() }}
+      action={async () => { await clientApi.deleteGoal(id); reload() }}
       icon="trash" label="Excluir meta?"
     />
   )
@@ -38,20 +37,18 @@ export function DeleteGoalButton({ id }: { id: string }) {
 // ─── Bills ────────────────────────────────────────────────────────────────────
 
 export function DeleteBillButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteBill(id); router.refresh() }}
+      action={async () => { await clientApi.deleteBill(id); reload() }}
       icon="trash" label="Excluir conta?"
     />
   )
 }
 
 export function DeleteBillGroupButton({ groupId }: { groupId: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteBillGroup(groupId); router.refresh() }}
+      action={async () => { await clientApi.deleteBillGroup(groupId); reload() }}
       label="Cancelar parcelamento? Todas as parcelas serão excluídas."
       className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-danger transition-colors py-1 px-2 rounded-lg hover:bg-danger/10 mt-1"
     >
@@ -62,20 +59,18 @@ export function DeleteBillGroupButton({ groupId }: { groupId: string }) {
 }
 
 export function DeleteInstallmentGroupButton({ groupId }: { groupId: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteInstallmentGroup(groupId); router.refresh() }}
+      action={async () => { await clientApi.deleteInstallmentGroup(groupId); reload() }}
       icon="trash" label="Excluir parcelamento?"
     />
   )
 }
 
 export function MarkBillPaidButton({ id, isPaid }: { id: string; isPaid: boolean }) {
-  const router = useRouter()
   return (
     <button
-      onClick={async () => { await clientApi.markBillPaid(id, !isPaid); router.refresh() }}
+      onClick={async () => { await clientApi.markBillPaid(id, !isPaid); reload() }}
       className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-success hover:bg-success/10 transition-colors"
       title={isPaid ? 'Marcar como pendente' : 'Marcar como paga'}
     >
@@ -91,10 +86,9 @@ export function MarkBillPaidButton({ id, isPaid }: { id: string; isPaid: boolean
 // ─── Budget ───────────────────────────────────────────────────────────────────
 
 export function DeleteBudgetButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteBudget(id); router.refresh() }}
+      action={async () => { await clientApi.deleteBudget(id); reload() }}
       icon="trash" label="Excluir orçamento?"
     />
   )
@@ -103,10 +97,9 @@ export function DeleteBudgetButton({ id }: { id: string }) {
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 export function DeleteCategoryButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteCategory(id); router.refresh() }}
+      action={async () => { await clientApi.deleteCategory(id); reload() }}
       icon="trash" label="Excluir categoria?"
     />
   )
@@ -115,10 +108,9 @@ export function DeleteCategoryButton({ id }: { id: string }) {
 // ─── Income Sources ───────────────────────────────────────────────────────────
 
 export function DeleteIncomeSourceButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteIncomeSource(id); router.refresh() }}
+      action={async () => { await clientApi.deleteIncomeSource(id); reload() }}
       icon="trash" label="Excluir renda?"
     />
   )
@@ -127,20 +119,18 @@ export function DeleteIncomeSourceButton({ id }: { id: string }) {
 // ─── Recurring Transactions ───────────────────────────────────────────────────
 
 export function DeleteRecurringButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteRecurring(id); router.refresh() }}
+      action={async () => { await clientApi.deleteRecurring(id); reload() }}
       icon="trash" label="Excluir recorrência?"
     />
   )
 }
 
 export function ToggleRecurringButton({ id, isActive }: { id: string; isActive: boolean }) {
-  const router = useRouter()
   return (
     <button
-      onClick={async () => { await clientApi.toggleRecurring(id); router.refresh() }}
+      onClick={async () => { await clientApi.toggleRecurring(id); reload() }}
       className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${
         isActive
           ? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
@@ -156,10 +146,9 @@ export function ToggleRecurringButton({ id, isActive }: { id: string; isActive: 
 // ─── People ───────────────────────────────────────────────────────────────────
 
 export function DeletePersonClientButton({ id }: { id: string }) {
-  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deletePerson(id); router.refresh() }}
+      action={async () => { await clientApi.deletePerson(id); reload() }}
       icon="trash" label="Excluir pessoa e todos os lançamentos?"
       title="Excluir pessoa"
     />
