@@ -243,14 +243,8 @@ export default async function PersonPage({ params }: Props) {
         </div>
       </div>
 
-      {/* ── Migração de recorrentes antigos ─────────── */}
-      {hasOldRecurring && (
-        <div className="flex flex-col gap-2 p-3 rounded-xl bg-amber-400/8 border border-amber-400/20">
-          <p className="text-xs text-amber-300 font-medium">⚠️ Pagamentos no formato antigo detectados</p>
-          <p className="text-xs text-slate-500">Estes pagamentos foram cadastrados como parcelas fixas. Converta para o novo sistema recorrente para que o saldo fique correto.</p>
-          <MigrateRecurringButton />
-        </div>
-      )}
+      {/* ── Auto-migração silenciosa de recorrentes antigos ── */}
+      {hasOldRecurring && <MigrateRecurringButton />}
 
       {/* ── Recorrentes ativos ──────────────────────── */}
       {recurring.length > 0 && (
