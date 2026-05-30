@@ -119,6 +119,24 @@ export function EntryModal({ personId, personName, categories }: Props) {
           </div>
           <input type="hidden" name="type" value={entryType} />
 
+          {/* Mode selector — before description */}
+          <div className="flex gap-2">
+            {([
+              { key: 'single',     label: 'Avulso',     icon: '💰' },
+              { key: 'parcelado',  label: 'Parcelado',  icon: '📅' },
+              { key: 'recorrente', label: 'Recorrente', icon: '🔁' },
+            ] as { key: Mode; label: string; icon: string }[]).map((m) => (
+              <button key={m.key} type="button" onClick={() => setMode(m.key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
+                  mode === m.key
+                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                }`}>
+                <span>{m.icon}</span>{m.label}
+              </button>
+            ))}
+          </div>
+
           <FormField label="Descrição" htmlFor="description" required>
             <Input id="description" name="description"
               placeholder="Ex: Almoço, empréstimo, pensão..." required />
@@ -132,24 +150,6 @@ export function EntryModal({ personId, personName, categories }: Props) {
             <FormField label={mode === 'parcelado' ? 'Próxima parcela' : '1ª data'} htmlFor="date" required>
               <Input id="date" name="date" type="date" defaultValue={today} required />
             </FormField>
-          </div>
-
-          {/* Mode selector */}
-          <div className="flex gap-2">
-            {([
-              { key: 'single',     label: 'Avulso',    icon: '💰' },
-              { key: 'parcelado',  label: 'Parcelado', icon: '📅' },
-              { key: 'recorrente', label: 'Recorrente', icon: '🔁' },
-            ] as { key: Mode; label: string; icon: string }[]).map((m) => (
-              <button key={m.key} type="button" onClick={() => setMode(m.key)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
-                  mode === m.key
-                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
-                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
-                }`}>
-                <span>{m.icon}</span>{m.label}
-              </button>
-            ))}
           </div>
 
           {/* Parcelado options */}
