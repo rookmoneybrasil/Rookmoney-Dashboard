@@ -109,11 +109,20 @@ export default async function DashboardPage() {
               </BorderGlow>
             </div>
           </WithTooltip>
-          <WithTooltip content="Total gasto no mês" side="bottom">
+          <WithTooltip content={`Contas ainda não pagas este mês · Já pago: ${formatCurrency(data.monthExpense)}`} side="bottom">
             <div>
               <BorderGlow backgroundColor="#450A0A" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
                 <div className="relative">
-                  <StatCard label="Despesas" value={formatCurrency(data.monthExpense)} variant="expense" icon={<TrendingDown className="size-4" />} trend={data.expenseChange !== 0 ? { value: data.expenseChange, label: 'vs mês ant.' } : undefined} sub="Total gasto" className="bg-transparent border-transparent" />
+                  <StatCard
+                    label="A Pagar"
+                    value={formatCurrency(data.pendingBillsAmount + (data.personPayablesAmount ?? 0))}
+                    variant="expense"
+                    icon={<TrendingDown className="size-4" />}
+                    sub={data.overdueCount > 0
+                      ? `${data.overdueCount} em atraso · ${data.pendingBillsCount} conta${data.pendingBillsCount !== 1 ? 's' : ''}`
+                      : `${data.pendingBillsCount} conta${data.pendingBillsCount !== 1 ? 's' : ''} pendente${data.pendingBillsCount !== 1 ? 's' : ''}`}
+                    className="bg-transparent border-transparent"
+                  />
                   <div className="absolute bottom-3 right-3 opacity-50">
                     <Sparkline data={(data.monthlyHistory ?? []).map(h => h.expense)} color="#ef4444" />
                   </div>
@@ -121,11 +130,11 @@ export default async function DashboardPage() {
               </BorderGlow>
             </div>
           </WithTooltip>
-          <WithTooltip content="Receitas menos despesas" side="bottom">
+          <WithTooltip content={`Receitas (${formatCurrency(data.monthIncome)}) − já pago (${formatCurrency(data.monthExpense)})`} side="bottom">
             <div>
               <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
                 <div className="relative">
-                  <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Receitas − despesas de ${format(now, 'MMM', { locale: ptBR })}`} className="bg-transparent border-transparent" />
+                  <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Já pago: ${formatCurrency(data.monthExpense)}`} className="bg-transparent border-transparent" />
                   <div className="absolute bottom-3 right-3 opacity-50">
                     <Sparkline data={(data.monthlyHistory ?? []).map(h => h.income - h.expense)} color="#6366f1" />
                   </div>
