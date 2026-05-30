@@ -25,13 +25,14 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const [entryType, setEntryType] = useState<EntryType>('THEY_OWE_ME')
   const [mode, setMode]           = useState<Mode>('single')
   const [installments, setInst]   = useState(2)
+  const [alreadyPaid, setAlready] = useState(0)
   const [dayOfMonth, setDay]      = useState(1)
   const [amount, setAmount]       = useState('')
   const [categoryId, setCatId]    = useState('')
 
   function reset() {
     setOpen(false); setEntryType('THEY_OWE_ME'); setMode('single')
-    setInst(2); setDay(1); setAmount(''); setCatId('')
+    setInst(2); setAlready(0); setDay(1); setAmount(''); setCatId('')
   }
 
   const { mutate: mutateEntry, pending: pendingEntry, error: errorEntry } = useMutation(
@@ -88,12 +89,13 @@ export function EntryModal({ personId, personName, categories }: Props) {
             mutate({
               type:         fd.get('type') as EntryType,
               description:  fd.get('description') as string,
-              amount:       mode === 'parcelado' ? amountNum : amountNum,
+              amount:       amountNum, // always per-installment value
               date:         fd.get('date') as string,
               notes:        (fd.get('notes') as string) || null,
               categoryId:   (fd.get('categoryId') as string) || null,
               installments: mode === 'parcelado' ? installments : 1,
-            })
+              alreadyPaid:  mode === 'parcelado' ? alreadyPaid : 0,
+            } as Parameters<typeof clientApi.createEntry>[1] & { installments?: number; alreadyPaid?: number })
           }}
           className="flex flex-col gap-4"
         >
@@ -123,7 +125,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
           </FormField>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField label={mode === 'recorrente' ? 'Valor/mês (R$)' : mode === 'parcelado' ? 'Valor total (R$)' : 'Valor (R$)'} htmlFor="amount" required>
+            <FormField label={mode === 'recorrente' ? 'Valor/mês (R$)' : mode === 'parcelado' ? 'Valor por parcela (R$)' : 'Valor (R$)'} htmlFor="amount" required>
               <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
                 placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </FormField>
@@ -153,18 +155,36 @@ export function EntryModal({ personId, personName, categories }: Props) {
           {/* Parcelado options */}
           {mode === 'parcelado' && (
             <div className="flex flex-col gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-600">
-              <FormField label="Número de parcelas" htmlFor="installments">
-                <div className="flex items-center gap-3">
-                  <input type="range" min={2} max={48} value={installments}
-                    onChange={(e) => setInst(Number(e.target.value))} className="flex-1 accent-brand-500" />
-                  <span className="text-sm font-semibold text-brand-400 w-12 text-center tabular-nums">{installments}x</span>
-                </div>
-              </FormField>
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="Total de parcelas" htmlFor="installments">
+                  <div className="flex items-center gap-2">
+                    <input type="number" min={2} max={120} value={installments}
+                      onChange={(e) => { const v = Number(e.target.value); setInst(v); if (alreadyPaid >= v) setAlready(v - 1) }}
+                      className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50 tabular-nums" />
+                    <span className="text-xs text-slate-500 shrink-0">parcelas</span>
+                  </div>
+                </FormField>
+                <FormField label="Já pagas" htmlFor="alreadyPaid">
+                  <div className="flex items-center gap-2">
+                    <input type="number" min={0} max={installments - 1} value={alreadyPaid}
+                      onChange={(e) => setAlready(Math.min(Number(e.target.value), installments - 1))}
+                      className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50 tabular-nums" />
+                    <span className="text-xs text-slate-500 shrink-0">pagas</span>
+                  </div>
+                </FormField>
+              </div>
               {amountNum > 0 && (
-                <p className="text-xs text-slate-500">
-                  {installments}× <span className="text-slate-300 font-medium">{formatCurrency(perMonth)}</span>
-                  {' '}= {formatCurrency(amountNum)} total · datas mensais automáticas
-                </p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-medium text-slate-200">{installments - alreadyPaid} parcelas restantes</span>
+                    {' '}× {formatCurrency(amountNum)} = <span className="font-medium text-brand-300">{formatCurrency(amountNum * (installments - alreadyPaid))}</span>
+                  </p>
+                  {alreadyPaid > 0 && (
+                    <p className="text-[11px] text-slate-600">
+                      {alreadyPaid} parcela{alreadyPaid > 1 ? 's' : ''} já paga{alreadyPaid > 1 ? 's' : ''} não serão cadastradas
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           )}
