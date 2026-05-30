@@ -129,7 +129,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
               <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
                 placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </FormField>
-            <FormField label="1ª data" htmlFor="date" required>
+            <FormField label={mode === 'parcelado' ? 'Próxima parcela' : '1ª data'} htmlFor="date" required>
               <Input id="date" name="date" type="date" defaultValue={today} required />
             </FormField>
           </div>
