@@ -23,20 +23,26 @@ export function formatCurrency(value: number, compact = false): string {
   }).format(value)
 }
 
+// Extract UTC date to avoid timezone day-shift (server UTC vs Brazil UTC-3)
+function utcDate(date: Date | string): Date {
+  const d = typeof date === 'string' ? new Date(date) : date
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+}
+
 export function formatDate(date: Date | string, pattern = 'dd/MM/yyyy'): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
+  const d = utcDate(date)
   if (!isValid(d)) return '-'
   return format(d, pattern, { locale: ptBR })
 }
 
 export function formatDateRelative(date: Date | string): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
+  const d = utcDate(date)
   if (!isValid(d)) return '-'
   return format(d, "d 'de' MMMM", { locale: ptBR })
 }
 
 export function formatMonthYear(date: Date | string): string {
-  const d = typeof date === 'string' ? parseISO(date) : date
+  const d = utcDate(date)
   if (!isValid(d)) return '-'
   return format(d, 'MMMM yyyy', { locale: ptBR })
 }
