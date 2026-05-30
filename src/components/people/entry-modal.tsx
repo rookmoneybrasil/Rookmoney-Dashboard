@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CategorySelect } from '@/components/ui/category-select'
 import { Plus, RefreshCw, Calendar } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,

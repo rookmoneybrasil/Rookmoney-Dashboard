@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CategorySelect } from '@/components/ui/category-select'
 import { Plus } from 'lucide-react'
 import {
   Modal,
