@@ -22,6 +22,7 @@ import {
   Users,
   CalendarDays,
   TrendingUp,
+  Crown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
@@ -186,6 +187,26 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }
 
       {/* Footer */}
       <div className="border-t border-white/6 p-2 flex flex-col gap-1">
+        {/* Billing / upgrade */}
+        {!isPro && (
+          collapsed ? (
+            <WithTooltip content="Assinar PRO" side="right">
+              <Link href="/billing" className="flex justify-center">
+                <GlassNavIcon icon={<Crown size={16} />} color="amber" active={pathname === '/billing'} />
+              </Link>
+            </WithTooltip>
+          ) : (
+            <Link
+              href="/billing"
+              className="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-medium bg-amber-400/8 border border-amber-400/20 text-amber-400 hover:bg-amber-400/15 transition-colors"
+            >
+              <Crown className="size-4 shrink-0 fill-amber-400/20" />
+              <span className="flex-1">Assinar PRO</span>
+              <span className="text-[10px] font-bold">R$19,90</span>
+            </Link>
+          )
+        )}
+
         {/* Settings */}
         {collapsed ? (
           <WithTooltip content="Configurações" side="right">
