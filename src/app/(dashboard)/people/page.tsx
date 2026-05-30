@@ -142,38 +142,44 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
                 <Link
                   key={person.id}
                   href={`/people/${person.id}`}
-                  className="group flex items-center gap-4 p-4 bg-ink-800 rounded-xl border border-ink-700 hover:border-ink-600 hover:bg-ink-750 transition-all"
+                  className="group flex items-center gap-4 p-4 bg-ink-800 rounded-xl border border-ink-700 hover:border-brand-600/40 hover:bg-ink-750 hover:shadow-sm transition-all"
                 >
                   <PersonAvatar name={person.name} color={person.color} />
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-white truncate">{person.name}</p>
+                    <p className="font-semibold text-white truncate group-hover:text-brand-200 transition-colors">{person.name}</p>
                     <p className="text-xs text-slate-500 mt-0.5">
                       {person.openEntriesCount === 0
-                        ? 'Sem lançamentos pendentes'
+                        ? <span className="text-slate-600">Clique para adicionar lançamentos</span>
                         : `${person.openEntriesCount} lançamento${person.openEntriesCount !== 1 ? 's' : ''} pendente${person.openEntriesCount !== 1 ? 's' : ''}`}
                     </p>
                   </div>
 
                   <div className="text-right shrink-0">
                     {person.balance === 0 ? (
-                      <span className="text-xs text-slate-500 bg-ink-700 px-2 py-1 rounded-full">
+                      <span className="text-xs text-slate-500 bg-ink-700 group-hover:bg-ink-600 px-2 py-1 rounded-full transition-colors">
                         Quitado
                       </span>
                     ) : person.balance > 0 ? (
                       <div>
                         <p className="text-sm font-bold text-success">{formatCurrency(person.balance)}</p>
-                        <p className="text-xs text-slate-500">te deve</p>
+                        <p className="text-xs text-slate-500">te deve/mês</p>
                       </div>
                     ) : (
                       <div>
                         <p className="text-sm font-bold text-danger">{formatCurrency(-person.balance)}</p>
-                        <p className="text-xs text-slate-500">você deve</p>
+                        <p className="text-xs text-slate-500">você deve/mês</p>
                       </div>
                     )}
                   </div>
 
-                  <ArrowRight className="size-4 text-slate-600 group-hover:text-slate-400 transition-colors shrink-0" />
+                  {/* Botão explícito de entrar */}
+                  <div className="flex items-center gap-1 shrink-0 bg-ink-700 group-hover:bg-brand-600 border border-ink-600 group-hover:border-brand-500 px-3 py-1.5 rounded-lg transition-all">
+                    <span className="text-xs text-slate-400 group-hover:text-white font-medium transition-colors whitespace-nowrap hidden sm:block">
+                      {person.openEntriesCount === 0 ? 'Abrir' : 'Ver'}
+                    </span>
+                    <ArrowRight className="size-3.5 text-slate-400 group-hover:text-white transition-colors" />
+                  </div>
                 </Link>
               ))}
             </div>
