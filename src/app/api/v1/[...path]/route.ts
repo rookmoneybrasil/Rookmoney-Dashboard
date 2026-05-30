@@ -34,8 +34,12 @@ async function proxy(req: NextRequest, params: { path: string[] }) {
   const resHeaders: Record<string, string> = {}
   if (setCookie) resHeaders['set-cookie'] = setCookie
 
-  const data = res.status === 204 ? null : await res.json().catch(() => null)
+  // 204 No Content — must not have a body (NextResponse.json with 204 throws in Edge Runtime)
+  if (res.status === 204) {
+    return new NextResponse(null, { status: 204, headers: resHeaders })
+  }
 
+  const data = await res.json().catch(() => null)
   return NextResponse.json(data, { status: res.status, headers: resHeaders })
 }
 
