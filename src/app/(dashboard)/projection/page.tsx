@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Sparkles, X, Receipt, RefreshCw, Users, Crown, Lock } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Sparkles, X, Receipt, RefreshCw, Users, Crown } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
