@@ -26,6 +26,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
 import { WithTooltip } from '@/components/ui/tooltip'
+import { ProBadge } from '@/components/ui/pro-badge'
 import { logout } from '@/app/actions/auth'
 
 // ─── Glass nav icon — inline styles, zero CSS-class dependency ───────────────
@@ -79,18 +80,18 @@ function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { ic
 }
 
 const navItems = [
-  { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',    color: 'blue',   desc: 'Visão geral do seu financeiro — saldo, metas e projeções'   },
-  { href: '/projection',   icon: TrendingUp,      label: 'Projeção',     color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses'   },
-  { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações',   color: 'purple', desc: 'Histórico completo de todas as entradas e saídas'           },
-  { href: '/income',       icon: Banknote,        label: 'Rendas',       color: 'green',  desc: 'Gerencie suas fontes de renda recorrentes e avulsas'        },
-  { href: '/goals',        icon: Target,          label: 'Metas',        color: 'orange', desc: 'Acompanhe o progresso das suas metas financeiras'           },
-  { href: '/bills',        icon: FileText,        label: 'Contas',       color: 'red',    desc: 'Contas a pagar, parcelas e próximos vencimentos'            },
-  { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',    color: 'cyan',   desc: 'Defina limites de gasto por categoria ao mês'               },
-  { href: '/people',       icon: Users,           label: 'Pessoas',      color: 'amber',  desc: 'Controle dívidas, acertos e parcelamentos com pessoas'      },
-  { href: '/categories',   icon: Tag,             label: 'Categorias',   color: 'indigo', desc: 'Crie e organize as categorias das suas transações'          },
-  { href: '/calendar',     icon: CalendarDays,    label: 'Calendário',   color: 'blue',   desc: 'Visualize contas, rendas e recorrências por dia no mês'     },
-  { href: '/reports',      icon: BarChart3,       label: 'Relatórios',   color: 'purple', desc: 'Análises, gráficos e insights sobre seus gastos'            },
-  { href: '/import',       icon: Upload,          label: 'Importar',     color: 'green',  desc: 'Importe extratos bancários em CSV ou OFX'                   },
+  { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',    color: 'blue',   desc: 'Visão geral do seu financeiro — saldo, metas e projeções',   pro: false },
+  { href: '/projection',   icon: TrendingUp,      label: 'Projeção',     color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses',   pro: true  },
+  { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações',   color: 'purple', desc: 'Histórico completo de todas as entradas e saídas',           pro: false },
+  { href: '/income',       icon: Banknote,        label: 'Rendas',       color: 'green',  desc: 'Gerencie suas fontes de renda recorrentes e avulsas',        pro: false },
+  { href: '/goals',        icon: Target,          label: 'Metas',        color: 'orange', desc: 'Acompanhe o progresso das suas metas financeiras',           pro: false },
+  { href: '/bills',        icon: FileText,        label: 'Contas',       color: 'red',    desc: 'Contas a pagar, parcelas e próximos vencimentos',            pro: false },
+  { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',    color: 'cyan',   desc: 'Defina limites de gasto por categoria ao mês',               pro: true  },
+  { href: '/people',       icon: Users,           label: 'Pessoas',      color: 'amber',  desc: 'Controle dívidas, acertos e parcelamentos com pessoas',      pro: false },
+  { href: '/categories',   icon: Tag,             label: 'Categorias',   color: 'indigo', desc: 'Crie e organize as categorias das suas transações',          pro: false },
+  { href: '/calendar',     icon: CalendarDays,    label: 'Calendário',   color: 'blue',   desc: 'Visualize contas, rendas e recorrências por dia no mês',     pro: false },
+  { href: '/reports',      icon: BarChart3,       label: 'Relatórios',   color: 'purple', desc: 'Análises, gráficos e insights sobre seus gastos',            pro: true  },
+  { href: '/import',       icon: Upload,          label: 'Importar',     color: 'green',  desc: 'Importe extratos bancários em CSV ou OFX',                   pro: true  },
 ]
 
 interface SidebarProps {
@@ -98,10 +99,12 @@ interface SidebarProps {
   collapsed?: boolean
   onToggle?:  () => void
   badges?:    Record<string, number>
+  plan?:      string
 }
 
-export function Sidebar({ user, collapsed = false, onToggle, badges = {} }: SidebarProps) {
+export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }: SidebarProps) {
   const pathname = usePathname()
+  const isPro    = plan === 'PRO'
 
   return (
     <aside
@@ -125,9 +128,10 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {} }: Side
 
       {/* Nav */}
       <nav className={cn('flex-1 py-4 flex flex-col', collapsed ? 'overflow-visible gap-3 px-1 items-center' : 'overflow-y-auto gap-1 px-2')}>
-        {navItems.map(({ href, icon: Icon, label, color, desc }) => {
-          const isActive = pathname === href || pathname.startsWith(href + '/')
-          const count    = badges[href] ?? 0
+        {navItems.map(({ href, icon: Icon, label, color, desc, pro }) => {
+          const isActive  = pathname === href || pathname.startsWith(href + '/')
+          const count     = badges[href] ?? 0
+          const showBadge = pro && !isPro
 
           const tooltipContent = (
             <div className="flex flex-col gap-0.5 max-w-[200px]">
@@ -160,12 +164,13 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {} }: Side
             >
               <GlassNavIcon icon={<Icon size={13} />} color="slate" active={isActive} size={32} />
               <span className="flex-1">{label}</span>
-              {count > 0 && (
+              {showBadge && <ProBadge />}
+              {count > 0 && !showBadge && (
                 <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold flex items-center justify-center px-1 leading-none tabular-nums">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
-              {count === 0 && isActive && (
+              {count === 0 && !showBadge && isActive && (
                 <span className="ml-auto size-1.5 rounded-full bg-brand-400" />
               )}
             </Link>

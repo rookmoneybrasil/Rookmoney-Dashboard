@@ -10,9 +10,10 @@ interface Props {
   header:   React.ReactNode
   children: React.ReactNode
   badges?:  Record<string, number>
+  plan?:    string
 }
 
-export function DashboardShell({ user, header, children, badges }: Props) {
+export function DashboardShell({ user, header, children, badges, plan }: Props) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -24,6 +25,7 @@ export function DashboardShell({ user, header, children, badges }: Props) {
           collapsed={collapsed}
           onToggle={() => setCollapsed(!collapsed)}
           badges={badges}
+          plan={plan}
         />
       </div>
 

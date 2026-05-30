@@ -2,8 +2,18 @@ import { serverApi } from '@/lib/api-client'
 import { CSVImporter } from '@/components/import/csv-importer'
 import { ReceiptScanner } from '@/components/import/receipt-scanner'
 import { Tabs } from '@/components/import/import-tabs'
+import { ProGate } from '@/components/ui/pro-gate'
 
 export default async function ImportPage() {
+  const user = await serverApi.me()
+  if (user.plan !== 'PRO') {
+    return (
+      <ProGate feature="Importação de dados e Scanner de recibo" locked>
+        <div className="h-64 rounded-xl bg-ink-800 border border-white/6" />
+      </ProGate>
+    )
+  }
+
   const categories = await serverApi.categories()
 
   const cats = categories.map((c) => ({

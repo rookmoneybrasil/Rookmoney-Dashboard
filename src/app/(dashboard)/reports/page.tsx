@@ -13,6 +13,7 @@ import { SpendingPattern } from '@/components/reports/spending-pattern'
 import { IncomeSourcesChart } from '@/components/reports/income-sources-chart'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { ProGate } from '@/components/ui/pro-gate'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -20,6 +21,15 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
   const sp     = await searchParams
   const months = Math.min(Math.max(Number(sp.months ?? '6'), 1), 24)
   const month  = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
+
+  const user = await serverApi.me()
+  if (user.plan !== 'PRO') {
+    return (
+      <ProGate feature="Relatórios avançados" locked>
+        <div className="h-96 rounded-xl bg-ink-800 border border-white/6" />
+      </ProGate>
+    )
+  }
 
   const data = await serverApi.reports(months, month)
   const { monthly, period, topExpenses, spendingByDay, categoryTrend, incomeSources } = data

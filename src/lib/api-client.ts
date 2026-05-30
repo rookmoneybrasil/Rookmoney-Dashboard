@@ -268,7 +268,9 @@ function toQs(params?: Record<string, string>): string {
 
 // ─── Types (mirror API responses) ────────────────────────────────────────────
 
-export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number> }
+export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number; recurring: number }
+export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; recurring: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
+export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits }
 export interface AuthResponse { token: string; user: User }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }
