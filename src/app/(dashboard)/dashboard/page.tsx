@@ -7,7 +7,7 @@ import { MonthPace } from '@/components/dashboard/month-pace'
 import { NextBillHighlight } from '@/components/dashboard/next-bill-highlight'
 import { CategoryDonut } from '@/components/dashboard/category-donut'
 import { RookinhoInsight } from '@/components/dashboard/rookinho-insight'
-import { ClickableCard, AReceberModal, ReceitasModal, APagarModal, SaldoModal } from '@/components/dashboard/stat-card-modals'
+import { DashboardKPIs } from '@/components/dashboard/stat-card-modals'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Card, CardHeader, CardTitle, CardContent, StatCard } from '@/components/ui/card'
@@ -90,52 +90,25 @@ export default async function DashboardPage() {
       {/* ── KPIs ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
         <SectionLabel>Visão do mês — {monthLabel}</SectionLabel>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <ClickableCard modal={<AReceberModal onClose={() => {}} upcomingPayables={data.upcomingPersonPayables ?? []} totalIncomeReceivable={data.totalIncomeReceivable} totalPeopleReceivable={data.totalPeopleReceivable} />}>
-            <BorderGlow backgroundColor="#062828" glowColor="187 80 50" colors={['#22d3ee', '#67e8f9', '#0891b2']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="A Receber" value={formatCurrency(data.totalReceivable)} variant="info" icon={<ArrowDownToLine className="size-4" />} sub={data.totalReceivable === 0 ? 'Toque para detalhes' : [data.totalPeopleReceivable > 0 && `${formatCurrency(data.totalPeopleReceivable, true)} de pessoas`, data.totalIncomeReceivable > 0 && `${formatCurrency(data.totalIncomeReceivable, true)} de rendas`].filter(Boolean).join(' · ')} className="bg-transparent border-transparent" />
-            </BorderGlow>
-          </ClickableCard>
-          <ClickableCard modal={<ReceitasModal onClose={() => {}} transactions={data.recentTransactions} />}>
-            <BorderGlow backgroundColor="#052E16" glowColor="142 71 45" colors={['#22c55e', '#4ade80', '#16a34a']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <div className="relative">
-                <StatCard label="Receitas" value={formatCurrency(data.monthIncome)} variant="income" icon={<TrendingUp className="size-4" />} trend={data.incomeChange !== 0 ? { value: data.incomeChange, label: 'vs mês ant.' } : undefined} sub="Total recebido" className="bg-transparent border-transparent" />
-                <div className="absolute bottom-3 right-3 opacity-50">
-                  <Sparkline data={(data.monthlyHistory ?? []).map(h => h.income)} color="#22c55e" />
-                </div>
-              </div>
-            </BorderGlow>
-          </ClickableCard>
-          <ClickableCard modal={<APagarModal onClose={() => {}} bills={data.upcomingBills} personPayables={data.upcomingPersonPayables ?? []} />}>
-            <BorderGlow backgroundColor="#450A0A" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <div className="relative">
-                <StatCard
-                  label="A Pagar"
-                  value={formatCurrency(data.pendingBillsAmount + (data.personPayablesAmount ?? 0))}
-                  variant="expense"
-                  icon={<TrendingDown className="size-4" />}
-                  sub={data.overdueCount > 0
-                    ? `${data.overdueCount} em atraso · ${data.pendingBillsCount} conta${data.pendingBillsCount !== 1 ? 's' : ''}`
-                    : `${data.pendingBillsCount} conta${data.pendingBillsCount !== 1 ? 's' : ''} pendente${data.pendingBillsCount !== 1 ? 's' : ''}`}
-                  className="bg-transparent border-transparent"
-                />
-                <div className="absolute bottom-3 right-3 opacity-50">
-                  <Sparkline data={(data.monthlyHistory ?? []).map(h => h.expense)} color="#ef4444" />
-                </div>
-              </div>
-            </BorderGlow>
-          </ClickableCard>
-          <ClickableCard modal={<SaldoModal onClose={() => {}} income={data.monthIncome} expense={data.monthExpense} balance={data.monthBalance} month={monthLabel} />}>
-            <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <div className="relative">
-                <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Já pago: ${formatCurrency(data.monthExpense)}`} className="bg-transparent border-transparent" />
-                  <div className="absolute bottom-3 right-3 opacity-50">
-                    <Sparkline data={(data.monthlyHistory ?? []).map(h => h.income - h.expense)} color="#6366f1" />
-                  </div>
-                </div>
-              </BorderGlow>
-          </ClickableCard>
-        </div>
+        <DashboardKPIs
+          totalReceivable={data.totalReceivable}
+          totalPeopleReceivable={data.totalPeopleReceivable}
+          totalIncomeReceivable={data.totalIncomeReceivable}
+          monthIncome={data.monthIncome}
+          monthExpense={data.monthExpense}
+          monthBalance={data.monthBalance}
+          pendingBillsAmount={data.pendingBillsAmount}
+          personPayablesAmount={data.personPayablesAmount ?? 0}
+          overdueCount={data.overdueCount}
+          pendingBillsCount={data.pendingBillsCount}
+          incomeChange={data.incomeChange}
+          expenseChange={data.expenseChange}
+          upcomingBills={data.upcomingBills}
+          upcomingPersonPayables={data.upcomingPersonPayables ?? []}
+          recentTransactions={data.recentTransactions}
+          monthLabel={monthLabel}
+          monthlyHistory={data.monthlyHistory ?? []}
+        />
       </div>
 
       {/* ── Atenção ──────────────────────────────────────────────────── */}
