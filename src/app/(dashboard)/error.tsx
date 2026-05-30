@@ -24,12 +24,12 @@ export default function DashboardError({
         <p className="text-sm text-slate-500 leading-relaxed">
           Ocorreu um erro ao carregar esta página. Tente novamente.
         </p>
-        {error.digest && (
-          <p className="text-xs text-slate-700 font-mono mt-1">ref: {error.digest}</p>
-        )}
+        <p className="text-xs text-slate-700 font-mono mt-1 break-all">
+          {error.message || error.digest || 'Erro desconhecido'}
+        </p>
       </div>
       <button
-        onClick={reset}
+        onClick={() => window.location.reload()}
         className="inline-flex items-center gap-2 bg-ink-700 hover:bg-ink-600 border border-ink-500 text-slate-300 font-medium px-5 py-2.5 rounded-xl transition-colors text-sm"
       >
         <RefreshCw className="size-4" />
