@@ -124,13 +124,34 @@ html[data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.15) !imp
 html[data-theme="light"] .hover\:bg-ink-700\/60:hover { background-color: rgba(203,213,225,0.5) !important; }
 html[data-theme="light"] .hover\:bg-ink-700:hover     { background-color: #CBD5E1 !important; }
 html[data-theme="light"] .hover\:bg-ink-600:hover     { background-color: #B8C5D4 !important; }
+html[data-theme="light"] .hover\:bg-ink-750:hover     { background-color: #D8E4EF !important; }
 
-/* ── Sidebar specific ── */
-html[data-theme="light"] .bg-brand-800\/60 { background-color: rgba(37,99,235,0.12) !important; }
+/* ── Brand colors in light ── */
+html[data-theme="light"] .bg-brand-800\/60  { background-color: rgba(37,99,235,0.12) !important; }
+html[data-theme="light"] .bg-brand-900\/60  { background-color: rgba(37,99,235,0.08) !important; }
+html[data-theme="light"] .bg-brand-900\/30  { background-color: rgba(37,99,235,0.06) !important; }
+html[data-theme="light"] .text-brand-300    { color: #1D4ED8 !important; }
+html[data-theme="light"] .text-brand-400    { color: #2563EB !important; }
+html[data-theme="light"] .border-brand-700\/40 { border-color: rgba(37,99,235,0.25) !important; }
+
+/* ── Opacity backgrounds ── */
 html[data-theme="light"] .bg-ink-800\/20   { background-color: rgba(241,245,249,0.6) !important; }
+html[data-theme="light"] .bg-ink-800\/50   { background-color: rgba(241,245,249,0.9) !important; }
+html[data-theme="light"] .bg-ink-800\/30   { background-color: rgba(241,245,249,0.6) !important; }
+html[data-theme="light"] .bg-ink-700\/80   { background-color: rgba(226,232,240,0.9) !important; }
+html[data-theme="light"] .bg-ink-700\/50   { background-color: rgba(226,232,240,0.7) !important; }
+html[data-theme="light"] .bg-ink-900\/20   { background-color: rgba(248,250,252,0.5) !important; }
+html[data-theme="light"] .bg-ink-900\/60   { background-color: rgba(248,250,252,0.85) !important; }
 
-/* ── Modal overlay ── */
-html[data-theme="light"] .backdrop-blur-sm { backdrop-filter: blur(4px); }
+/* ── Dividers ── */
+html[data-theme="light"] .divide-white\/5 > * + *  { border-color: rgba(0,0,0,0.07) !important; }
+html[data-theme="light"] .divide-white\/6 > * + *  { border-color: rgba(0,0,0,0.08) !important; }
+
+/* ── Section labels ── */
+html[data-theme="light"] .uppercase.tracking-widest { color: #94A3B8 !important; }
+
+/* ── CardSwap ── */
+html[data-theme="light"] .card-swap-card { background: #F1F5F9 !important; border-color: rgba(0,0,0,0.08) !important; }
 
 /* ── Scrollbar light ── */
 html[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
