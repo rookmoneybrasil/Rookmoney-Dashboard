@@ -54,6 +54,28 @@
   --radius-3xl: 2rem;
 }
 
+/* ─── Light mode — redefine ink scale ─────────────────────────────── */
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --color-ink-950: #FFFFFF;
+  --color-ink-900: #F8FAFC;
+  --color-ink-800: #F1F5F9;
+  --color-ink-750: #E8EEF4;
+  --color-ink-700: #E2E8F0;
+  --color-ink-600: #CBD5E1;
+  --color-ink-500: #94A3B8;
+  --color-ink-400: #64748B;
+  --color-ink-300: #475569;
+  --color-ink-200: #334155;
+  --color-ink-100: #1E293B;
+  --color-ink-50:  #0F172A;
+
+  --color-success-subtle: #F0FDF4;
+  --color-danger-subtle:  #FFF1F2;
+  --color-warning-subtle: #FFF7ED;
+}
+
 /* ─── Base ────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -69,6 +91,33 @@ body {
   font-family: var(--font-sans);
   min-height: 100dvh;
 }
+
+/* Light mode adjustments */
+html[data-theme="light"] body { color: #0F172A; }
+
+/* Slate text becomes darker */
+html[data-theme="light"] .text-slate-100 { color: #0F172A !important; }
+html[data-theme="light"] .text-slate-200 { color: #1E293B !important; }
+html[data-theme="light"] .text-slate-300 { color: #334155 !important; }
+html[data-theme="light"] .text-slate-400 { color: #475569 !important; }
+html[data-theme="light"] .text-slate-500 { color: #64748B !important; }
+html[data-theme="light"] .text-slate-600 { color: #94A3B8 !important; }
+html[data-theme="light"] .text-white     { color: #0F172A !important; }
+
+/* Border opacity adapts */
+html[data-theme="light"] .border-white\/6  { border-color: rgba(0,0,0,0.08) !important; }
+html[data-theme="light"] .border-white\/8  { border-color: rgba(0,0,0,0.10) !important; }
+html[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
+html[data-theme="light"] .border-white\/4  { border-color: rgba(0,0,0,0.06) !important; }
+html[data-theme="light"] .border-white\/5  { border-color: rgba(0,0,0,0.07) !important; }
+
+html[data-theme="light"] ::selection {
+  background-color: rgba(37, 99, 235, 0.2);
+  color: #0F172A;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink-500); }
 
 /* ─── Scrollbar ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
