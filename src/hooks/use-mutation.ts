@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface UseMutationOptions {
   onSuccess?: () => void
   onError?: (error: string) => void
-  refresh?: boolean  // call router.refresh() on success
+  refresh?: boolean  // reload page on success
 }
 
 export function useMutation<T = void>(
@@ -15,15 +14,14 @@ export function useMutation<T = void>(
 ) {
   const [pending, setPending] = useState(false)
   const [error, setError]     = useState<string | null>(null)
-  const router = useRouter()
 
   const mutate = useCallback(async (data: T) => {
     setPending(true)
     setError(null)
     try {
       await fn(data)
-      if (options.refresh !== false) router.refresh()
       options.onSuccess?.()
+      if (options.refresh !== false) window.location.reload()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro desconhecido'
       setError(msg)
@@ -31,7 +29,7 @@ export function useMutation<T = void>(
     } finally {
       setPending(false)
     }
-  }, [fn, options, router])
+  }, [fn, options])
 
   return { mutate, pending, error, clearError: () => setError(null) }
 }
