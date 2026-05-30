@@ -9,11 +9,12 @@ interface Props {
   user:     { name: string; email: string }
   header:   React.ReactNode
   children: React.ReactNode
+  banner?:  React.ReactNode
   badges?:  Record<string, number>
   plan?:    string
 }
 
-export function DashboardShell({ user, header, children, badges, plan }: Props) {
+export function DashboardShell({ user, header, children, banner, badges, plan }: Props) {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -31,6 +32,7 @@ export function DashboardShell({ user, header, children, badges, plan }: Props) 
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {header}
+        {banner && <div className="px-4 lg:px-6 pt-3 shrink-0">{banner}</div>}
         {/* pb-20 on mobile to clear the fixed bottom nav */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-24 lg:pb-6">
           {children}

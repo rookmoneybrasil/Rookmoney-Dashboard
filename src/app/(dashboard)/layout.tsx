@@ -29,12 +29,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
       badges={badges}
       plan={user.plan}
       header={<Header />}
+      banner={showLimitBanner && user.usage && user.limits
+        ? <LimitBanner usage={user.usage} limits={user.limits} />
+        : undefined
+      }
     >
-      {showLimitBanner && user.usage && user.limits && (
-        <div className="px-4 lg:px-6 pt-4">
-          <LimitBanner usage={user.usage} limits={user.limits} />
-        </div>
-      )}
       {children}
     </DashboardShell>
   )
