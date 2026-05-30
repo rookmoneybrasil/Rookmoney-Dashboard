@@ -9,6 +9,7 @@ interface Props {
   icon?:     'x' | 'trash'
   title?:    string
   className?: string
+  children?:  React.ReactNode
 }
 
 export function ConfirmDeleteButton({
@@ -17,6 +18,7 @@ export function ConfirmDeleteButton({
   icon      = 'x',
   title     = 'Excluir',
   className,
+  children,
 }: Props) {
   const [confirming, setConfirming]   = useState(false)
   const [isPending, startTransition]  = useTransition()
@@ -54,9 +56,9 @@ export function ConfirmDeleteButton({
       className={triggerClass}
       title={title}
     >
-      {icon === 'trash'
+      {children ?? (icon === 'trash'
         ? <Trash2 className="size-3.5" />
-        : <X className="size-3.5" />}
+        : <X className="size-3.5" />)}
     </button>
   )
 }

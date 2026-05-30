@@ -7,6 +7,7 @@
  */
 
 import { useRouter } from 'next/navigation'
+import { Trash2 } from 'lucide-react'
 import { ConfirmDeleteButton } from './confirm-delete-button'
 import { clientApi } from '@/lib/api-client'
 
@@ -51,8 +52,12 @@ export function DeleteBillGroupButton({ groupId }: { groupId: string }) {
   return (
     <ConfirmDeleteButton
       action={async () => { await clientApi.deleteBillGroup(groupId); router.refresh() }}
-      icon="trash" label="Excluir grupo de contas?"
-    />
+      label="Cancelar parcelamento? Todas as parcelas serão excluídas."
+      className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-danger transition-colors py-1 px-2 rounded-lg hover:bg-danger/10 mt-1"
+    >
+      <Trash2 className="size-3" />
+      Cancelar parcelamento
+    </ConfirmDeleteButton>
   )
 }
 

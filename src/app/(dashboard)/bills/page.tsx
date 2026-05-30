@@ -163,6 +163,7 @@ export default async function BillsPage() {
                                   >
                                     {inst.isPaid ? 'Pago' : s === 'overdue' ? 'Atrasado' : s === 'urgent' ? 'Urgente' : 'Pendente'}
                                   </Badge>
+                                  <EditBillModal bill={inst} categories={categories} />
                                   <MarkBillPaidButton id={inst.id} isPaid={inst.isPaid} />
                                 </div>
                               </div>
