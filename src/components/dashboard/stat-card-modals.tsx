@@ -135,18 +135,22 @@ export function DashboardKPIs(p: Props) {
       {/* ── Modals ── */}
       {modal === 'receber' && (
         <StatModal title="A Receber" icon={<ArrowDownToLine className="size-4 text-cyan-400" />} onClose={() => setModal(null)}>
-          {p.upcomingPeopleReceivable.length > 0 && <>
-            <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1">Pessoas que te devem</p>
-            {p.upcomingPeopleReceivable.map(up => (
-              <div key={up.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-200 font-medium truncate">{up.person.name}</p>
-                  <p className="text-xs text-slate-500 truncate">{up.description} · {formatDate(new Date(up.date))}</p>
+          {p.upcomingPeopleReceivable.length > 0 && (() => {
+            // Group by person name and sum amounts
+            const byPerson = p.upcomingPeopleReceivable.reduce<Record<string, number>>((acc, up) => {
+              acc[up.person.name] = (acc[up.person.name] ?? 0) + Number(up.amount)
+              return acc
+            }, {})
+            return <>
+              <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1">Pessoas que te devem</p>
+              {Object.entries(byPerson).map(([name, total]) => (
+                <div key={name} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
+                  <p className="text-sm text-slate-200 font-medium truncate">{name}</p>
+                  <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(total)}</span>
                 </div>
-                <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(Number(up.amount))}</span>
-              </div>
-            ))}
-          </>}
+              ))}
+            </>
+          })()}
           {p.pendingIncomeSources.length > 0 && <>
             <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1 mt-2">Fontes de renda pendentes</p>
             {p.pendingIncomeSources.map(src => (
