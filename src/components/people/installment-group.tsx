@@ -102,11 +102,13 @@ export function InstallmentGroup({ personId, entries, categories }: Props) {
         {/* Amount + edit + chevron */}
         <div className="flex items-center gap-2 shrink-0">
           <div className="text-right">
+            {/* Monthly value in highlight */}
             <p className={`font-bold text-sm ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
-              {isTheyOwe ? '+' : '-'}{formatCurrency(leftAmount)}
+              {isTheyOwe ? '+' : '-'}{formatCurrency(perInst)}<span className="text-xs font-normal opacity-70">/mês</span>
             </p>
+            {/* Total remaining as secondary */}
             <p className="text-xs text-slate-500">
-              {remaining} × {formatCurrency(perInst)}
+              {remaining} restantes · {formatCurrency(leftAmount)} total
             </p>
           </div>
           {/* Stop propagation so edit/delete clicks don't toggle open */}

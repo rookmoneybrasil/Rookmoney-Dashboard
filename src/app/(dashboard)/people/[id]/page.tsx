@@ -142,30 +142,32 @@ export default async function PersonPage({ params }: Props) {
   const openEntries    = allEntries.filter((e) => !e.isSettled)
   const settledEntries = allEntries.filter((e) =>  e.isSettled)
 
-  // Real installments (< 24x) → count all. Old recurring (>= 24x, not yet migrated) → only within 45 days
-  let balance = 0
+  // Balance: for installment groups, count only ONE installment (monthly value, not total debt)
+  // For old recurring (>= 24x not migrated): only within 45 days
+  const groupSeen = new Set<string>()
+  let theyOweTotal = 0
+  let iOweTotal    = 0
+
   for (const e of openEntries) {
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     if (isOldRecurring && new Date(e.date) > cutoff) continue
-    balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
+
+    // For installment groups: count only the first pending entry (monthly installment)
+    if (e.installmentGroupId) {
+      if (groupSeen.has(e.installmentGroupId)) continue
+      groupSeen.add(e.installmentGroupId)
+    }
+
+    if (e.type === 'THEY_OWE_ME') theyOweTotal += Number(e.amount)
+    else                           iOweTotal    += Number(e.amount)
   }
 
-  // Include active recurring templates in balance (cron generates entries monthly,
-  // but between cron runs the user should still see what's expected)
+  // Include active recurring templates (monthly expected amounts)
   const recurringTheyOwe = recurring.filter(r => r.type === 'THEY_OWE_ME').reduce((s, r) => s + Number(r.amount), 0)
   const recurringIOwe    = recurring.filter(r => r.type === 'I_OWE_THEM').reduce((s, r) => s + Number(r.amount), 0)
-
-  const theyOweTotal = openEntries.filter(e => {
-    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
-    return e.type === 'THEY_OWE_ME' && !(isOldRecurring && new Date(e.date) > cutoff)
-  }).reduce((s, e) => s + Number(e.amount), 0) + recurringTheyOwe
-
-  const iOweTotal = openEntries.filter(e => {
-    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
-    return e.type === 'I_OWE_THEM' && !(isOldRecurring && new Date(e.date) > cutoff)
-  }).reduce((s, e) => s + Number(e.amount), 0) + recurringIOwe
-
-  balance += recurringTheyOwe - recurringIOwe
+  theyOweTotal += recurringTheyOwe
+  iOweTotal    += recurringIOwe
+  const balance = theyOweTotal - iOweTotal
 
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
   const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
