@@ -30,15 +30,17 @@ export function InstallmentGroup({ personId, entries, categories }: Props) {
   const first        = entries[0]
   const total        = first.installmentTotal ?? entries.length
   const isTheyOwe    = first.type === 'THEY_OWE_ME'
-  const settledCount = entries.filter((e) => e.isSettled).length
+  // Infer already-paid from the first installmentCurrent (e.g. if first entry is 2/4, already paid = 1)
+  const alreadyPaid  = Math.max(0, (first.installmentCurrent ?? 1) - 1)
+  const settledInApp = entries.filter((e) => e.isSettled).length
+  const settledCount = alreadyPaid + settledInApp  // total paid = pre-app + settled in app
   const remaining    = entries.filter((e) => !e.isSettled).length
   const name         = baseDescription(first.description)
   const perInst      = Number(first.amount)
   const totalAmount  = perInst * total
-  const paidAmount   = perInst * settledCount
-  const leftAmount   = totalAmount - paidAmount
+  const leftAmount   = perInst * remaining
   const nextDue      = entries.find((e) => !e.isSettled)
-  const allSettled   = settledCount === total
+  const allSettled   = remaining === 0
   const pct          = Math.round((settledCount / total) * 100)
 
   return (
