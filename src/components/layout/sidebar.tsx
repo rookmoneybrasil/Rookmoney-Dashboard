@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
-  ArrowLeftRight,
   Target,
   FileText,
   BarChart3,
@@ -89,10 +88,9 @@ const navGroups = [
   {
     label: 'Dinheiro',
     items: [
-      { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações', color: 'purple', desc: 'Histórico de todas as entradas e saídas',              pro: false },
-      { href: '/income',       icon: Banknote,        label: 'Rendas',     color: 'green',  desc: 'Fontes de renda recorrentes e avulsas',                pro: false },
-      { href: '/bills',        icon: FileText,        label: 'Contas',     color: 'red',    desc: 'Contas a pagar, parcelas e vencimentos',               pro: false },
-      { href: '/people',       icon: Users,           label: 'Pessoas',    color: 'amber',  desc: 'Dívidas, acertos e parcelamentos com pessoas',         pro: false },
+      { href: '/income',       icon: Banknote,        label: 'Rendas',     color: 'green',  desc: 'Contas a receber — fontes de renda recorrentes e avulsas', pro: false },
+      { href: '/bills',        icon: FileText,        label: 'Contas',     color: 'red',    desc: 'Contas a pagar, parcelas e vencimentos',                   pro: false },
+      { href: '/people',       icon: Users,           label: 'Pessoas',    color: 'amber',  desc: 'Dívidas, acertos e parcelamentos com pessoas',             pro: false },
     ],
   },
   {
