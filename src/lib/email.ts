@@ -9,7 +9,7 @@ export async function sendPasswordResetEmail(
   const from      = process.env.FROM_EMAIL ?? 'Rook Money <noreply@rook.money>'
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
-  const mascotUrl = `${appUrl}/ROOKINHO%20FLUTUANDO.png`
+  const mascotUrl = `${appUrl}/rookinho.png`
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
