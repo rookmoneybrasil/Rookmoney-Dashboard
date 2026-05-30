@@ -53,8 +53,9 @@ interface Props {
   incomeChange:          number
   expenseChange:         number
   upcomingBills:            Bill[]
-  upcomingPersonPayables:   UpcomingPersonPayable[]  // I owe them (for A Pagar modal)
-  upcomingPeopleReceivable: UpcomingPersonPayable[]  // they owe me (for A Receber modal)
+  upcomingPersonPayables:   UpcomingPersonPayable[]
+  upcomingPeopleReceivable: UpcomingPersonPayable[]
+  pendingIncomeSources:     { id: string; name: string; amount: number; isRecurring: boolean; dayOfMonth: number | null }[]
   recentTransactions:       Transaction[]
   monthLabel:            string
   monthlyHistory:        { month: string; income: number; expense: number }[]
@@ -146,12 +147,19 @@ export function DashboardKPIs(p: Props) {
               </div>
             ))}
           </>}
-          {p.totalIncomeReceivable > 0 && <>
-            <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1 mt-2">Rendas pendentes</p>
-            <div className="p-3 bg-ink-700/60 rounded-xl flex items-center justify-between">
-              <p className="text-sm text-slate-300">Rendas recorrentes não processadas</p>
-              <span className="text-sm font-semibold text-cyan-400">+{formatCurrency(p.totalIncomeReceivable)}</span>
-            </div>
+          {p.pendingIncomeSources.length > 0 && <>
+            <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1 mt-2">Fontes de renda pendentes</p>
+            {p.pendingIncomeSources.map(src => (
+              <div key={src.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
+                <div className="min-w-0">
+                  <p className="text-sm text-slate-200 font-medium truncate">{src.name}</p>
+                  <p className="text-xs text-slate-500">
+                    {src.isRecurring ? `Recorrente · dia ${src.dayOfMonth ?? 1}` : 'Eventual · pendente'}
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-cyan-400 shrink-0">+{formatCurrency(src.amount)}</span>
+              </div>
+            ))}
           </>}
           {p.totalReceivable === 0 && <Empty text="Nada a receber no momento." />}
         </StatModal>
