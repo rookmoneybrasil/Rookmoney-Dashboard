@@ -2,6 +2,11 @@ import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine, ArrowUpFromLine } fr
 import { ProjectionsSection } from '@/components/dashboard/projections-section'
 import { FinancialHealthCard } from '@/components/dashboard/financial-health-card'
 import { DashboardGreeting } from '@/components/dashboard/greeting'
+import { Sparkline } from '@/components/dashboard/sparkline'
+import { MonthPace } from '@/components/dashboard/month-pace'
+import { NextBillHighlight } from '@/components/dashboard/next-bill-highlight'
+import { CategoryDonut } from '@/components/dashboard/category-donut'
+import { RookinhoInsight } from '@/components/dashboard/rookinho-insight'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Image from 'next/image'
@@ -115,36 +120,66 @@ export default async function DashboardPage() {
         moodLabel={moodLabel[mood] ?? ''}
       />
 
-      {/* ── Stat cards — ordem: A Receber → Receitas → Despesas → Saldo ── */}
+      {/* ── Rookinho Insight ────────────────────────────────────────────── */}
+      {data.insight && <RookinhoInsight insight={data.insight} mood={mood} />}
+
+      {/* ── Stat cards — A Receber → Receitas → Despesas → Saldo ─────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <WithTooltip content="Pessoas que te devem + rendas pendentes a receber" side="bottom">
-          <div>
+          <div className="relative">
             <BorderGlow backgroundColor="#062828" glowColor="187 80 50" colors={['#22d3ee', '#67e8f9', '#0891b2']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
               <StatCard label="A Receber" value={formatCurrency(data.totalReceivable)} variant="info" icon={<ArrowDownToLine className="size-4" />} sub={data.totalReceivable === 0 ? 'Nada pendente' : [data.totalPeopleReceivable > 0 && `${formatCurrency(data.totalPeopleReceivable, true)} de pessoas`, data.totalIncomeReceivable > 0 && `${formatCurrency(data.totalIncomeReceivable, true)} de rendas`].filter(Boolean).join(' · ')} className="bg-transparent border-transparent" />
             </BorderGlow>
           </div>
         </WithTooltip>
         <WithTooltip content="Soma de todas as entradas registradas no mês" side="bottom">
-          <div>
+          <div className="relative">
             <BorderGlow backgroundColor="#052E16" glowColor="142 71 45" colors={['#22c55e', '#4ade80', '#16a34a']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="Receitas" value={formatCurrency(data.monthIncome)} variant="income" icon={<TrendingUp className="size-4" />} trend={data.incomeChange !== 0 ? { value: data.incomeChange, label: 'vs mês ant.' } : undefined} sub="Total recebido" className="bg-transparent border-transparent" />
+              <div className="relative">
+                <StatCard label="Receitas" value={formatCurrency(data.monthIncome)} variant="income" icon={<TrendingUp className="size-4" />} trend={data.incomeChange !== 0 ? { value: data.incomeChange, label: 'vs mês ant.' } : undefined} sub="Total recebido" className="bg-transparent border-transparent" />
+                <div className="absolute bottom-3 right-3 opacity-60">
+                  <Sparkline data={(data.monthlyHistory ?? []).map(h => h.income)} color="#22c55e" />
+                </div>
+              </div>
             </BorderGlow>
           </div>
         </WithTooltip>
         <WithTooltip content="Soma de todas as saídas registradas no mês" side="bottom">
-          <div>
+          <div className="relative">
             <BorderGlow backgroundColor="#450A0A" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="Despesas" value={formatCurrency(data.monthExpense)} variant="expense" icon={<TrendingDown className="size-4" />} trend={data.expenseChange !== 0 ? { value: data.expenseChange, label: 'vs mês ant.' } : undefined} sub="Total gasto" className="bg-transparent border-transparent" />
+              <div className="relative">
+                <StatCard label="Despesas" value={formatCurrency(data.monthExpense)} variant="expense" icon={<TrendingDown className="size-4" />} trend={data.expenseChange !== 0 ? { value: data.expenseChange, label: 'vs mês ant.' } : undefined} sub="Total gasto" className="bg-transparent border-transparent" />
+                <div className="absolute bottom-3 right-3 opacity-60">
+                  <Sparkline data={(data.monthlyHistory ?? []).map(h => h.expense)} color="#ef4444" />
+                </div>
+              </div>
             </BorderGlow>
           </div>
         </WithTooltip>
         <WithTooltip content="Total de receitas menos despesas no mês atual" side="bottom">
-          <div>
+          <div className="relative">
             <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Receitas − despesas de ${format(now, 'MMM', { locale: ptBR })}`} className="bg-transparent border-transparent" />
+              <div className="relative">
+                <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Receitas − despesas de ${format(now, 'MMM', { locale: ptBR })}`} className="bg-transparent border-transparent" />
+                <div className="absolute bottom-3 right-3 opacity-60">
+                  <Sparkline data={(data.monthlyHistory ?? []).map(h => h.income - h.expense)} color="#6366f1" />
+                </div>
+              </div>
             </BorderGlow>
           </div>
         </WithTooltip>
+      </div>
+
+      {/* ── Widgets row: Próx. conta · Ritmo · Donut ─────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <NextBillHighlight bills={data.upcomingBills} />
+        <MonthPace
+          income={data.monthIncome}
+          expense={data.monthExpense}
+          dayOfMonth={now.getDate()}
+          daysInMonth={new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}
+        />
+        <CategoryDonut categories={data.topCategories ?? []} total={data.monthExpense} />
       </div>
 
       {/* ── Main grid ──────────────────────────────────────────────── */}
