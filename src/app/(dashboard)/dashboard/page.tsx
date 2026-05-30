@@ -105,6 +105,7 @@ export default async function DashboardPage() {
           expenseChange={data.expenseChange}
           upcomingBills={data.upcomingBills}
           upcomingPersonPayables={data.upcomingPersonPayables ?? []}
+          upcomingPeopleReceivable={data.upcomingPeopleReceivable ?? []}
           recentTransactions={data.recentTransactions}
           monthLabel={monthLabel}
           monthlyHistory={data.monthlyHistory ?? []}

@@ -52,9 +52,10 @@ interface Props {
   pendingBillsCount:     number
   incomeChange:          number
   expenseChange:         number
-  upcomingBills:         Bill[]
-  upcomingPersonPayables: UpcomingPersonPayable[]
-  recentTransactions:    Transaction[]
+  upcomingBills:            Bill[]
+  upcomingPersonPayables:   UpcomingPersonPayable[]  // I owe them (for A Pagar modal)
+  upcomingPeopleReceivable: UpcomingPersonPayable[]  // they owe me (for A Receber modal)
+  recentTransactions:       Transaction[]
   monthLabel:            string
   monthlyHistory:        { month: string; income: number; expense: number }[]
 }
@@ -133,9 +134,9 @@ export function DashboardKPIs(p: Props) {
       {/* ── Modals ── */}
       {modal === 'receber' && (
         <StatModal title="A Receber" icon={<ArrowDownToLine className="size-4 text-cyan-400" />} onClose={() => setModal(null)}>
-          {p.totalPeopleReceivable > 0 && <>
+          {p.upcomingPeopleReceivable.length > 0 && <>
             <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1">Pessoas que te devem</p>
-            {p.upcomingPersonPayables.map(up => (
+            {p.upcomingPeopleReceivable.map(up => (
               <div key={up.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
                 <div className="min-w-0">
                   <p className="text-sm text-slate-200 font-medium truncate">{up.person.name}</p>
