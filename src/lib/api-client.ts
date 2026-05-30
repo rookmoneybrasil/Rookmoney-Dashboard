@@ -47,9 +47,7 @@ async function serverFetch<T>(path: string, init?: RequestInit): Promise<T> {
 // ─── Client-side (browser fetch) ─────────────────────────────────────────────
 
 async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? ''
-
-  const res = await fetch(`${base}/api/v1${path}`, {
+  const res = await fetch(`/api/v1${path}`, {
     ...init,
     credentials: 'include',
     headers: {
