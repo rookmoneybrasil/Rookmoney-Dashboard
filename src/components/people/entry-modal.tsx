@@ -24,7 +24,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const [entryType, setEntryType] = useState<EntryType>('THEY_OWE_ME')
   const [mode, setMode]           = useState<Mode>('single')
   const [installments, setInst]   = useState(2)
-  const [recurMonths, setRecur]   = useState(12)
+  const [recurMonths]             = useState(120) // 10 anos — oculto do usuário, pode cancelar quando quiser
   const [amount, setAmount]       = useState('')
   const [categoryId, setCatId]    = useState('')
 
@@ -53,7 +53,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
     : amountNum
 
   const submitLabel = mode === 'parcelado' ? `Criar ${installments} parcelas`
-    : mode === 'recorrente' ? `Criar ${recurMonths} meses`
+    : mode === 'recorrente' ? 'Criar recorrente'
     : 'Registrar'
 
   return (
@@ -161,27 +161,20 @@ export function EntryModal({ personId, personName, categories }: Props) {
 
           {/* Recorrente options */}
           {mode === 'recorrente' && (
-            <div className="flex flex-col gap-3 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
+            <div className="flex flex-col gap-2 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
               <div className="flex items-center gap-2">
                 <RefreshCw className="size-4 text-brand-400 shrink-0" />
                 <p className="text-sm text-brand-300 font-medium">Pagamento mensal recorrente</p>
               </div>
-              <FormField label="Por quantos meses?" htmlFor="recurMonths">
-                <div className="flex items-center gap-3">
-                  <input type="range" min={2} max={120} value={recurMonths}
-                    onChange={(e) => setRecur(Number(e.target.value))} className="flex-1 accent-brand-500" />
-                  <span className="text-sm font-semibold text-brand-400 w-20 text-center tabular-nums">
-                    {recurMonths === 120 ? '10 anos' : recurMonths >= 12 ? `${Math.round(recurMonths/12*10)/10}a` : `${recurMonths}m`}
-                  </span>
-                </div>
-              </FormField>
               {amountNum > 0 && (
-                <p className="text-xs text-slate-500">
-                  {recurMonths}× <span className="text-slate-300 font-medium">{formatCurrency(amountNum)}/mês</span>
-                  {' '}= {formatCurrency(amountNum * recurMonths)} total · 1 entrada por mês
+                <p className="text-xs text-slate-400">
+                  <span className="font-medium">{formatCurrency(amountNum)}/mês</span>
+                  {' '}· repete todo mês automaticamente
                 </p>
               )}
-              <p className="text-[11px] text-slate-600">Ideal para pensão, mensalidade, aluguel entre pessoas.</p>
+              <p className="text-[11px] text-slate-500">
+                Ideal para pensão, aluguel e mensalidades. Para quando quiser nas entradas pendentes.
+              </p>
             </div>
           )}
 
