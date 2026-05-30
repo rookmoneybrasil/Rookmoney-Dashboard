@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, RefreshCw } from 'lucide-react'
+import { Plus, RefreshCw, Calendar } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
@@ -24,20 +24,33 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const [entryType, setEntryType] = useState<EntryType>('THEY_OWE_ME')
   const [mode, setMode]           = useState<Mode>('single')
   const [installments, setInst]   = useState(2)
-  const [recurMonths]             = useState(120) // 10 anos — oculto do usuário, pode cancelar quando quiser
+  const [dayOfMonth, setDay]      = useState(1)
   const [amount, setAmount]       = useState('')
   const [categoryId, setCatId]    = useState('')
 
-  const { mutate, pending, error } = useMutation(
+  function reset() {
+    setOpen(false); setEntryType('THEY_OWE_ME'); setMode('single')
+    setInst(2); setDay(1); setAmount(''); setCatId('')
+  }
+
+  const { mutate: mutateEntry, pending: pendingEntry, error: errorEntry } = useMutation(
     (data: Parameters<typeof clientApi.createEntry>[1] & { installments?: number }) =>
       clientApi.createEntry(personId, data),
-    {
-      onSuccess: () => {
-        setOpen(false); setEntryType('THEY_OWE_ME'); setMode('single')
-        setInst(2); setRecur(12); setAmount(''); setCatId('')
-      },
-    },
+    { onSuccess: reset },
   )
+
+  const { mutate: mutateRecurring, pending: pendingRecurring, error: errorRecurring } = useMutation(
+    (data: Parameters<typeof clientApi.createPersonRecurring>[0]) =>
+      clientApi.createPersonRecurring(data),
+    { onSuccess: reset },
+  )
+
+  const pending = pendingEntry || pendingRecurring
+  const error   = errorEntry || errorRecurring
+  const mutate  = mode === 'recorrente'
+    ? (data: Parameters<typeof clientApi.createEntry>[1] & { installments?: number }) =>
+        mutateRecurring({ personId, type: data.type, description: data.description, amount: parseFloat(String(data.amount)), dayOfMonth, notes: data.notes, categoryId: data.categoryId ?? null })
+    : mutateEntry
 
   const today     = new Date().toISOString().split('T')[0]
   const amountNum = parseFloat(amount) || 0
@@ -78,11 +91,11 @@ export function EntryModal({ personId, personName, categories }: Props) {
             mutate({
               type:         fd.get('type') as EntryType,
               description:  fd.get('description') as string,
-              amount:       mode === 'recorrente' ? amountNum * effectiveInstallments : amountNum,
+              amount:       mode === 'parcelado' ? amountNum : amountNum,
               date:         fd.get('date') as string,
               notes:        (fd.get('notes') as string) || null,
               categoryId:   (fd.get('categoryId') as string) || null,
-              installments: effectiveInstallments,
+              installments: mode === 'parcelado' ? installments : 1,
             })
           }}
           className="flex flex-col gap-4"
@@ -161,19 +174,28 @@ export function EntryModal({ personId, personName, categories }: Props) {
 
           {/* Recorrente options */}
           {mode === 'recorrente' && (
-            <div className="flex flex-col gap-2 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
+            <div className="flex flex-col gap-3 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
               <div className="flex items-center gap-2">
                 <RefreshCw className="size-4 text-brand-400 shrink-0" />
                 <p className="text-sm text-brand-300 font-medium">Pagamento mensal recorrente</p>
               </div>
+              <div className="flex items-center gap-3">
+                <Calendar className="size-3.5 text-slate-500 shrink-0" />
+                <label className="text-xs text-slate-400 shrink-0">Todo dia</label>
+                <input
+                  type="number" min={1} max={28} value={dayOfMonth}
+                  onChange={e => setDay(Math.min(28, Math.max(1, parseInt(e.target.value) || 1)))}
+                  className="w-16 bg-ink-700 border border-white/8 rounded-lg px-2 py-1 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50"
+                />
+                <span className="text-xs text-slate-500">de cada mês</span>
+              </div>
               {amountNum > 0 && (
-                <p className="text-xs text-slate-400">
-                  <span className="font-medium">{formatCurrency(amountNum)}/mês</span>
-                  {' '}· repete todo mês automaticamente
+                <p className="text-xs text-success">
+                  ✓ {formatCurrency(amountNum)}/mês — cria automaticamente todo dia {dayOfMonth}
                 </p>
               )}
               <p className="text-[11px] text-slate-500">
-                Ideal para pensão, aluguel e mensalidades. Para quando quiser nas entradas pendentes.
+                Repete indefinidamente. Para a qualquer momento na página da pessoa.
               </p>
             </div>
           )}

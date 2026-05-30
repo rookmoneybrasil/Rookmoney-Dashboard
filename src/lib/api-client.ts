@@ -114,6 +114,9 @@ export const serverApi = {
   // Calendar
   calendar: (month?: string) => serverFetch<CalendarData>(`/calendar${month ? `?month=${month}` : ''}`),
 
+  // Person recurring
+  personRecurring: (personId: string) => serverFetch<PersonEntryRecurringItem[]>(`/people/recurring?personId=${personId}`),
+
   // Notifications
   notifications: () => serverFetch<AppNotification[]>('/notifications'),
 
@@ -217,6 +220,12 @@ export const clientApi = {
   deleteEntryGroup: (id: string) =>
     clientFetch<void>(`/people/entries/${id}?applyToGroup=true`, { method: 'DELETE' }),
 
+  // Person Entry Recurring
+  createPersonRecurring: (data: { personId: string; type: string; description: string; amount: number; dayOfMonth?: number; notes?: string | null; categoryId?: string | null }) =>
+    clientFetch<PersonEntryRecurringItem>('/people/recurring', { method: 'POST', body: JSON.stringify(data) }),
+  stopPersonRecurring: (id: string) =>
+    clientFetch<void>(`/people/recurring/${id}`, { method: 'DELETE' }),
+
   // Settings
   getProfile: () => clientFetch<User>('/settings'),
   updateProfile: (data: { name?: string; whatsappPhone?: string; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null }) =>
@@ -291,6 +300,7 @@ export interface EntryInput { type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: s
 export interface BudgetItem extends Budget { spent: number }
 export interface Person { id: string; name: string; color: string | null; notes: string | null; createdAt: string; updatedAt: string; userId: string; balance: number; openEntriesCount: number; openCount?: number; entries?: PersonEntry[] }
 export interface PersonDetail extends Person { entries: PersonEntry[] }
+export interface PersonEntryRecurringItem { id: string; type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; dayOfMonth: number; isActive: boolean; notes: string | null; lastMonth: string | null; personId: string; person: { id: string; name: string; color: string | null }; categoryId: string | null; category: { id: string; name: string; icon: string; color: string } | null; createdAt: string }
 export interface PersonEntry { id: string; type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; isSettled: boolean; settledAt: string | null; notes: string | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; settledTransactionId: string | null; category: { id: string; name: string; icon: string; color: string } | null; categoryId: string | null; personId: string; userId: string; createdAt: string; updatedAt: string }
 // PersonEntryRow with date as Date — used by components that expect Prisma types
 export type PersonEntryRow = Omit<PersonEntry, 'date' | 'settledAt' | 'createdAt'> & { date: Date | string; settledAt: Date | string | null; createdAt: Date | string }

@@ -10,6 +10,7 @@ import { EditPersonButton } from '@/components/people/person-modal'
 import { DeletePersonButton } from '@/components/people/delete-person-button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { PersonEntryRow } from '@/lib/api-client'
+import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -125,7 +126,11 @@ interface Props {
 
 export default async function PersonPage({ params }: Props) {
   const { id } = await params
-  const [person, categories] = await Promise.all([serverApi.person(id), serverApi.categories()])
+  const [person, categories, recurring] = await Promise.all([
+    serverApi.person(id),
+    serverApi.categories(),
+    serverApi.personRecurring(id).catch(() => [] as Awaited<ReturnType<typeof serverApi.personRecurring>>),
+  ])
   if (!person) notFound()
 
   const allEntries   = person.entries
@@ -228,6 +233,18 @@ export default async function PersonPage({ params }: Props) {
           </p>
         </div>
       </div>
+
+      {/* ── Recorrentes ativos ──────────────────────── */}
+      {recurring.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
+            Recorrentes ativos
+          </h2>
+          {recurring.map(item => (
+            <RecurringEntryCard key={item.id} item={item} />
+          ))}
+        </div>
+      )}
 
       {/* ── Pending ─────────────────────────────────── */}
       <div className="flex flex-col gap-3">
