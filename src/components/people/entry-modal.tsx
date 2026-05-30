@@ -63,7 +63,8 @@ export function EntryModal({ personId, personName, categories }: Props) {
     ? Math.round((amountNum / effectiveInstallments) * 100) / 100
     : amountNum
 
-  const submitLabel = mode === 'parcelado' ? `Criar ${installments} parcelas`
+  const remaining   = mode === 'parcelado' ? installments - alreadyPaid : installments
+  const submitLabel = mode === 'parcelado' ? `Criar ${remaining} parcela${remaining !== 1 ? 's' : ''}`
     : mode === 'recorrente' ? 'Criar recorrente'
     : 'Registrar'
 
