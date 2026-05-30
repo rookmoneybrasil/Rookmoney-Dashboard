@@ -8,29 +8,43 @@ import {
 import { clientApi } from '@/lib/api-client'
 import Link from 'next/link'
 
-interface Category { id: string; name: string; icon: string; color: string }
+interface Category { id: string; name: string; icon: string; color: string; isDefault?: boolean; userId?: string | null }
 
 interface Props {
   categories:  Category[]
   value:       string
   onChange:    (id: string) => void
   placeholder?: string
-  isPro?:      boolean
   maxFree?:    number
 }
 
 const EMOJI_PRESETS = ['🍔','🚗','🏠','💊','🎮','👕','📚','✈️','💰','🎁','💡','📱','🏋️','🎵','🐾']
 
-export function CategorySelect({ categories, value, onChange, placeholder = 'Selecione', isPro = true, maxFree = 3 }: Props) {
+export function CategorySelect({ categories, value, onChange, placeholder = 'Selecione', maxFree = 3 }: Props) {
   const [creating, setCreating] = useState(false)
   const [name,     setName]     = useState('')
   const [icon,     setIcon]     = useState('📂')
   const [color,    setColor]    = useState('#6366f1')
   const [pending,  setPending]  = useState(false)
   const [error,    setError]    = useState('')
+  const [isPro,    setIsPro]    = useState<boolean | null>(null)
 
-  const customCount    = categories.filter(c => !c.id.startsWith('default')).length
-  const atLimit        = !isPro && customCount >= maxFree
+  // Fetch plan lazily when user opens the create form
+  async function checkPlanAndCreate() {
+    if (isPro === null) {
+      const user = await clientApi.me().catch(() => null)
+      const pro  = user?.plan === 'PRO'
+      setIsPro(pro)
+      const customCount = categories.filter(c => !c.isDefault && c.userId !== null).length
+      if (!pro && customCount >= maxFree) { setCreating(true); return }
+      setCreating(true)
+    } else {
+      setCreating(true)
+    }
+  }
+
+  const customCount = categories.filter(c => !c.isDefault && c.userId !== null).length
+  const atLimit     = isPro === false && customCount >= maxFree
 
   const selected = categories.find(c => c.id === value)
 
@@ -73,7 +87,7 @@ export function CategorySelect({ categories, value, onChange, placeholder = 'Sel
             </SelectItem>
           ))}
           <SelectSeparator />
-          <SelectItem value="__create__">
+          <SelectItem value="__create__" onMouseDown={e => { e.preventDefault(); checkPlanAndCreate() }}>
             <span className="flex items-center gap-1.5 text-brand-400">
               <Plus className="size-3.5" />
               Nova categoria
