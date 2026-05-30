@@ -11,13 +11,11 @@ import {
   FileText,
   BarChart3,
   Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight,
   Tag,
   PiggyBank,
   Banknote,
-  RefreshCw,
   Upload,
   Users,
   CalendarDays,
@@ -25,10 +23,8 @@ import {
   Crown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Avatar } from '@/components/ui/avatar'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { ProBadge } from '@/components/ui/pro-badge'
-import { logout } from '@/app/actions/auth'
 
 // ─── Glass nav icon — inline styles, zero CSS-class dependency ───────────────
 
@@ -255,46 +251,13 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }
           )
         )}
 
-        {/* Settings */}
-        {collapsed ? (
+        {/* Settings — only in collapsed mode (expanded is in header) */}
+        {collapsed && (
           <WithTooltip content="Configurações" side="right">
             <Link href="/settings" className="flex justify-center">
               <GlassNavIcon icon={<Settings size={16} />} color="slate" active={pathname === '/settings'} />
             </Link>
           </WithTooltip>
-        ) : (
-          <Link
-            href="/settings"
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-ink-700 hover:text-slate-300 transition-colors',
-              pathname === '/settings' && 'bg-brand-800 text-brand-300 border border-brand-700/50'
-            )}
-          >
-            <Settings className="size-4 shrink-0" />
-            <span>Configurações</span>
-          </Link>
-        )}
-
-        {/* User */}
-        {user && (
-          <div className={cn('flex items-center gap-3 rounded-lg px-3 py-2.5 mt-1', collapsed && 'justify-center px-0')}>
-            <Avatar src={user.image} name={user.name} size="sm" />
-            {!collapsed && (
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-medium text-slate-300 truncate">{user.name}</span>
-                <span className="text-xs text-slate-600 truncate">{user.email}</span>
-              </div>
-            )}
-            {!collapsed && (
-              <button
-                onClick={() => logout()}
-                className="text-slate-600 hover:text-slate-400 transition-colors p-1 rounded"
-                title="Sair"
-              >
-                <LogOut className="size-3.5" />
-              </button>
-            )}
-          </div>
         )}
 
         {/* Collapse toggle */}
