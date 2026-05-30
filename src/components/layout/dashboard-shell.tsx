@@ -6,7 +6,7 @@ import { MobileNav } from './mobile-nav'
 import { Mascot } from '@/components/mascot/mascot'
 
 interface Props {
-  user:     { name: string; email: string }
+  user:     { name: string; email: string; image?: string }
   header:   React.ReactNode
   children: React.ReactNode
   banner?:  React.ReactNode
@@ -22,7 +22,7 @@ export function DashboardShell({ user, header, children, banner, badges, plan }:
       {/* Sidebar — desktop only */}
       <div className="hidden lg:flex">
         <Sidebar
-          user={user}
+          user={{ name: user.name, email: user.email, image: user.image }}
           collapsed={collapsed}
           onToggle={() => setCollapsed(!collapsed)}
           badges={badges}

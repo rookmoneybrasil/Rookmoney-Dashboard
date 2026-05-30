@@ -75,7 +75,15 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <ProfileForm name={user.name} email={user.email} />
+      <ProfileForm
+        name={user.name}
+        email={user.email}
+        profileImage={user.profileImage}
+        bio={user.bio}
+        city={user.city}
+        occupation={user.occupation}
+        birthdate={user.birthdate}
+      />
 
       <PasswordForm />
 

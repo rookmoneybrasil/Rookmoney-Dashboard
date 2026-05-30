@@ -90,19 +90,20 @@ export async function GET(req: NextRequest) {
     user = await db.user.findUnique({ where: { email: googleUser.email } })
 
     if (user) {
-      // Link Google to existing account
+      // Link Google to existing account + update photo
       user = await db.user.update({
         where: { id: user.id },
-        data:  { googleId: googleUser.id },
+        data:  { googleId: googleUser.id, profileImage: googleUser.picture || null },
       })
     } else {
       // Create new user
       user = await db.user.create({
         data: {
-          name:     googleUser.name,
-          email:    googleUser.email,
-          googleId: googleUser.id,
-          password: null, // OAuth user — no password
+          name:         googleUser.name,
+          email:        googleUser.email,
+          googleId:     googleUser.id,
+          password:     null,
+          profileImage: googleUser.picture || null,
         },
       })
     }

@@ -125,7 +125,7 @@ const navGroups = [
 const navItems = navGroups.flatMap(g => g.items)
 
 interface SidebarProps {
-  user?:     { name: string; email: string }
+  user?:     { name: string; email: string; image?: string }
   collapsed?: boolean
   onToggle?:  () => void
   badges?:    Record<string, number>
@@ -278,7 +278,7 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }
         {/* User */}
         {user && (
           <div className={cn('flex items-center gap-3 rounded-lg px-3 py-2.5 mt-1', collapsed && 'justify-center px-0')}>
-            <Avatar name={user.name} size="sm" />
+            <Avatar src={user.image} name={user.name} size="sm" />
             {!collapsed && (
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-xs font-medium text-slate-300 truncate">{user.name}</span>

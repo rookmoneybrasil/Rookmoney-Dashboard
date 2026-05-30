@@ -25,7 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <DashboardShell
-      user={{ name: user.name, email: user.email }}
+      user={{ name: user.name, email: user.email, image: user.profileImage ?? undefined }}
       badges={badges}
       plan={user.plan}
       header={<Header />}

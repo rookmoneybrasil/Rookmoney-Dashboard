@@ -219,7 +219,7 @@ export const clientApi = {
 
   // Settings
   getProfile: () => clientFetch<User>('/settings'),
-  updateProfile: (data: { name?: string; whatsappPhone?: string }) =>
+  updateProfile: (data: { name?: string; whatsappPhone?: string; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null }) =>
     clientFetch<User>('/settings', { method: 'PATCH', body: JSON.stringify(data) }),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     clientFetch<void>('/settings?action=password', { method: 'PATCH', body: JSON.stringify(data) }),
@@ -270,7 +270,7 @@ function toQs(params?: Record<string, string>): string {
 
 export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number; recurring: number }
 export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; recurring: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
-export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits }
+export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits }
 export interface AuthResponse { token: string; user: User }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }
