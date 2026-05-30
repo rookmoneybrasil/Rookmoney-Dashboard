@@ -2,50 +2,40 @@
 
 import { useState } from 'react'
 import { CategorySelect } from '@/components/ui/category-select'
-import { Plus } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalTitle,
-  ModalFooter,
+  Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
 import { triggerMascot } from '@/lib/mascot'
 import { formatCurrency } from '@/lib/utils'
 import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
-interface Category {
-  id: string
-  name: string
-  icon: string
-  color: string
-}
+interface Category { id: string; name: string; icon: string; color: string }
+interface Props { categories: Category[] }
 
-interface Props {
-  categories: Category[]
-}
+type Mode = 'avulso' | 'parcelado' | 'recorrente'
 
 export function BillModal({ categories }: Props) {
-  const [open, setOpen]             = useState(false)
-  const [isRecurring, setRec]       = useState(false)
-  const [categoryId, setCatId]      = useState('')
-  const [isParcelado, setParcelado] = useState(false)
-  const [installments, setInst]     = useState(2)
-  const [amount, setAmount]         = useState('')
-  const [name, setName]             = useState('')
+  const [open,         setOpen]       = useState(false)
+  const [mode,         setMode]       = useState<Mode>('avulso')
+  const [categoryId,   setCatId]      = useState('')
+  const [installments, setInst]       = useState(2)
+  const [alreadyPaid,  setAlready]    = useState(0)
+  const [amount,       setAmount]     = useState('')
+  const [name,         setName]       = useState('')
+  const [showServices, setShowSvc]    = useState(false)
 
   const detectedBrand = getServiceBrand(name, undefined)
+  const amountNum     = parseFloat(amount) || 0
+
+  function reset() {
+    setOpen(false); setMode('avulso'); setCatId('')
+    setInst(2); setAlready(0); setAmount(''); setName(''); setShowSvc(false)
+  }
 
   const { mutate, pending, error } = useMutation(
     (data: { name: string; amount: string; dueDate: string; isRecurring: boolean; categoryId: string; installments?: number; notes: string }) =>
@@ -60,35 +50,38 @@ export function BillModal({ categories }: Props) {
       }),
     {
       onSuccess: () => {
-        setOpen(false)
-        setRec(false)
-        setCatId('')
-        setParcelado(false)
-        setInst(2)
-        setAmount('')
-        setName('')
+        reset()
         triggerMascot('determined', 'Conta registrada! Não esqueça de pagar no prazo. 📅')
       },
     },
   )
 
-  const today          = new Date().toISOString().split('T')[0]
-  const amountNum      = parseFloat(amount) || 0
-  const perInstallment = isParcelado && installments > 1 ? amountNum / installments : amountNum
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
+    const totalInstallments = mode === 'parcelado' ? installments : undefined
+    const skipInstallments  = mode === 'parcelado' ? alreadyPaid : 0
+
+    // For parcelado with already-paid: adjust amount to total and let API handle skip
     mutate({
       name,
-      amount,
+      amount: mode === 'parcelado'
+        ? String(amountNum * installments) // total = per-installment × total
+        : amount,
       dueDate: fd.get('dueDate') as string,
-      isRecurring,
+      isRecurring: mode === 'recorrente',
       categoryId,
-      installments: isParcelado ? installments : undefined,
+      installments: totalInstallments,
       notes: fd.get('notes') as string,
     })
   }
+
+  const submitLabel = mode === 'parcelado'
+    ? `Criar ${installments - alreadyPaid} parcelas`
+    : mode === 'recorrente' ? 'Criar recorrente' : 'Adicionar'
+
+  const dateLabel = mode === 'parcelado' ? 'Próximo vencimento' : '1º vencimento'
+  const amountLabel = mode === 'parcelado' ? 'Valor por parcela (R$)' : 'Valor (R$)'
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -107,59 +100,75 @@ export function BillModal({ categories }: Props) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">
-              {error}
-            </p>
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
-          {/* Name field with quick-pick chips */}
+          {/* Mode selector */}
+          <div className="flex gap-2">
+            {([
+              { key: 'avulso',     label: 'Avulso',     icon: '💸' },
+              { key: 'parcelado',  label: 'Parcelado',  icon: '📅' },
+              { key: 'recorrente', label: 'Recorrente', icon: '🔁' },
+            ] as { key: Mode; label: string; icon: string }[]).map((m) => (
+              <button key={m.key} type="button" onClick={() => setMode(m.key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
+                  mode === m.key
+                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                }`}>
+                <span>{m.icon}</span>{m.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Name field */}
           <FormField label="Nome da conta" htmlFor="name" required>
             <div className="flex flex-col gap-2">
-              {/* Service chips */}
-              <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
-                {QUICK_BILL_SERVICES.map(({ key, label, brand }) => {
-                  const active = name.toLowerCase() === label.toLowerCase()
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setName(active ? '' : label)}
-                      className="flex items-center gap-1.5 h-7 px-2 rounded-lg text-xs font-medium transition-all border shrink-0"
-                      style={
-                        active
-                          ? { backgroundColor: brand.color, color: brand.text, borderColor: brand.color }
-                          : { backgroundColor: brand.color + '18', color: brand.color, borderColor: brand.color + '40' }
-                      }
-                    >
-                      <span
-                        className="size-4 rounded flex items-center justify-center text-[9px] font-bold shrink-0"
-                        style={{ backgroundColor: brand.color, color: brand.text }}
-                      >
-                        {brand.short}
-                      </span>
-                      {label}
-                    </button>
-                  )
-                })}
-              </div>
+              {/* Dropdown de serviços */}
+              <button
+                type="button"
+                onClick={() => setShowSvc(!showServices)}
+                className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:border-ink-500 text-xs text-slate-400 transition-colors"
+              >
+                <span>{name ? `Serviço: ${name}` : 'Selecionar serviço rápido...'}</span>
+                {showServices ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+              </button>
 
-              {/* Manual input */}
+              {showServices && (
+                <div className="flex flex-wrap gap-1.5 p-2 bg-ink-800/60 border border-ink-600 rounded-xl max-h-32 overflow-y-auto">
+                  {QUICK_BILL_SERVICES.map(({ key, label, brand }) => {
+                    const active = name.toLowerCase() === label.toLowerCase()
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => { setName(active ? '' : label); setShowSvc(false) }}
+                        className="flex items-center gap-1.5 h-7 px-2 rounded-lg text-xs font-medium transition-all border shrink-0"
+                        style={
+                          active
+                            ? { backgroundColor: brand.color, color: brand.text, borderColor: brand.color }
+                            : { backgroundColor: brand.color + '18', color: brand.color, borderColor: brand.color + '40' }
+                        }
+                      >
+                        <span className="size-4 rounded flex items-center justify-center text-[9px] font-bold shrink-0"
+                          style={{ backgroundColor: brand.color, color: brand.text }}>
+                          {brand.short}
+                        </span>
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
               <div className="relative">
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
+                <Input id="name" name="name" type="text"
                   placeholder="Ou digite o nome da conta..."
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
+                  value={name} onChange={(e) => setName(e.target.value)} required />
                 {detectedBrand && (
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
-                    <div
-                      className="size-5 rounded-md flex items-center justify-center text-[10px] font-bold"
-                      style={{ backgroundColor: detectedBrand.color, color: detectedBrand.text }}
-                    >
+                    <div className="size-5 rounded-md flex items-center justify-center text-[10px] font-bold"
+                      style={{ backgroundColor: detectedBrand.color, color: detectedBrand.text }}>
                       {detectedBrand.short}
                     </div>
                   </div>
@@ -169,92 +178,59 @@ export function BillModal({ categories }: Props) {
           </FormField>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField label={isParcelado ? 'Valor total (R$)' : 'Valor (R$)'} htmlFor="amount" required>
-              <Input
-                id="amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder="0,00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-              />
+            <FormField label={amountLabel} htmlFor="amount" required>
+              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
+                placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </FormField>
-
-            <FormField label="1º vencimento" htmlFor="dueDate" required>
-              <Input
-                id="dueDate"
-                name="dueDate"
-                type="date"
-                defaultValue={today}
-                required
-              />
+            <FormField label={dateLabel} htmlFor="dueDate" required>
+              <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />
             </FormField>
           </div>
 
-          {/* Parcelado toggle */}
-          <label className="flex items-center gap-3 cursor-pointer">
-            <div
-              onClick={() => { setParcelado(!isParcelado); setRec(false) }}
-              className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus:outline-none ${
-                isParcelado ? 'bg-brand-600' : 'bg-ink-600'
-              }`}
-            >
-              <span
-                className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${
-                  isParcelado ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'
-                }`}
-              />
-            </div>
-            <span className="text-sm text-slate-300">Parcelado</span>
-          </label>
-
-          {isParcelado && (
+          {/* Parcelado options */}
+          {mode === 'parcelado' && (
             <div className="flex flex-col gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-600">
-              <FormField label="Número de parcelas" htmlFor="installments">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    id="installments"
-                    min={2}
-                    max={48}
-                    value={installments}
-                    onChange={(e) => setInst(Number(e.target.value))}
-                    className="flex-1 accent-brand-500"
-                  />
-                  <span className="text-sm font-semibold text-brand-400 w-12 text-center tabular-nums">
-                    {installments}x
-                  </span>
-                </div>
-              </FormField>
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="Total de parcelas" htmlFor="installments">
+                  <div className="flex items-center gap-2">
+                    <input type="number" min={2} max={120} value={installments}
+                      onChange={(e) => { const v = Number(e.target.value); setInst(v); if (alreadyPaid >= v) setAlready(v - 1) }}
+                      className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
+                    <span className="text-xs text-slate-500 shrink-0">parcelas</span>
+                  </div>
+                </FormField>
+                <FormField label="Já pagas" htmlFor="alreadyPaid">
+                  <div className="flex items-center gap-2">
+                    <input type="number" min={0} max={installments - 1} value={alreadyPaid}
+                      onChange={(e) => setAlready(Math.min(Number(e.target.value), installments - 1))}
+                      className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
+                    <span className="text-xs text-slate-500 shrink-0">pagas</span>
+                  </div>
+                </FormField>
+              </div>
               {amountNum > 0 && (
-                <p className="text-xs text-slate-500">
-                  {installments}× <span className="text-slate-300 font-medium">{formatCurrency(perInstallment)}</span> ={' '}
-                  {formatCurrency(amountNum)} total
-                </p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-slate-400">
+                    <span className="font-medium text-slate-200">{installments - alreadyPaid} parcelas restantes</span>
+                    {' '}× {formatCurrency(amountNum)} = <span className="font-medium text-brand-300">{formatCurrency(amountNum * (installments - alreadyPaid))}</span>
+                  </p>
+                  {alreadyPaid > 0 && (
+                    <p className="text-[11px] text-slate-600">{alreadyPaid} parcela{alreadyPaid > 1 ? 's' : ''} já paga{alreadyPaid > 1 ? 's' : ''} não serão cadastradas</p>
+                  )}
+                </div>
               )}
             </div>
           )}
 
-          {/* Recorrente toggle */}
-          {!isParcelado && (
-            <label className="flex items-center gap-3 cursor-pointer">
-              <div
-                onClick={() => setRec(!isRecurring)}
-                className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors focus:outline-none ${
-                  isRecurring ? 'bg-brand-600' : 'bg-ink-600'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${
-                    isRecurring ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'
-                  }`}
-                />
-              </div>
-              <span className="text-sm text-slate-300">Recorrente (mensal)</span>
-            </label>
+          {/* Recorrente info */}
+          {mode === 'recorrente' && (
+            <div className="flex flex-col gap-1 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
+              <p className="text-sm text-brand-300 font-medium">🔁 Pagamento mensal recorrente</p>
+              {amountNum > 0 && (
+                <p className="text-xs text-slate-400">{formatCurrency(amountNum)}/mês · repete todo mês na data informada</p>
+              )}
+              <p className="text-[11px] text-slate-500">Para quando quiser nas contas ativas.</p>
+            </div>
           )}
 
           <FormField label="Categoria" htmlFor="categoryId">
@@ -262,21 +238,12 @@ export function BillModal({ categories }: Props) {
           </FormField>
 
           <FormField label="Observações" htmlFor="notes">
-            <Textarea
-              id="notes"
-              name="notes"
-              placeholder="Opcional"
-              className="min-h-[60px]"
-            />
+            <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[56px]" />
           </FormField>
 
           <ModalFooter>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" loading={pending} disabled={!name.trim()}>
-              {isParcelado ? `Criar ${installments} parcelas` : 'Adicionar'}
-            </Button>
+            <Button type="button" variant="secondary" onClick={reset}>Cancelar</Button>
+            <Button type="submit" loading={pending} disabled={!name.trim()}>{submitLabel}</Button>
           </ModalFooter>
         </form>
       </ModalContent>
