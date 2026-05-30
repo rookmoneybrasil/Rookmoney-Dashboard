@@ -150,15 +150,22 @@ export default async function PersonPage({ params }: Props) {
     balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
   }
 
+  // Include active recurring templates in balance (cron generates entries monthly,
+  // but between cron runs the user should still see what's expected)
+  const recurringTheyOwe = recurring.filter(r => r.type === 'THEY_OWE_ME').reduce((s, r) => s + Number(r.amount), 0)
+  const recurringIOwe    = recurring.filter(r => r.type === 'I_OWE_THEM').reduce((s, r) => s + Number(r.amount), 0)
+
   const theyOweTotal = openEntries.filter(e => {
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     return e.type === 'THEY_OWE_ME' && !(isOldRecurring && new Date(e.date) > cutoff)
-  }).reduce((s, e) => s + Number(e.amount), 0)
+  }).reduce((s, e) => s + Number(e.amount), 0) + recurringTheyOwe
 
   const iOweTotal = openEntries.filter(e => {
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     return e.type === 'I_OWE_THEM' && !(isOldRecurring && new Date(e.date) > cutoff)
-  }).reduce((s, e) => s + Number(e.amount), 0)
+  }).reduce((s, e) => s + Number(e.amount), 0) + recurringIOwe
+
+  balance += recurringTheyOwe - recurringIOwe
 
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
   const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
