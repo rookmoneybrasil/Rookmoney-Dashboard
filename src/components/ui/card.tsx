@@ -80,7 +80,7 @@ export interface StatCardProps {
   sub?: string
   icon?: React.ReactNode
   trend?: { value: number; label?: string }
-  variant?: 'default' | 'income' | 'expense' | 'gold'
+  variant?: 'default' | 'income' | 'expense' | 'gold' | 'info'
   className?: string
 }
 
@@ -92,6 +92,7 @@ export function StatCard({ label, value, sub, icon, trend, variant = 'default', 
     income:  'bg-success-subtle border-success/20',
     expense: 'bg-danger-subtle border-danger/20',
     gold:    'bg-gold-900 border-gold-500/20',
+    info:    'bg-cyan-950/40 border-cyan-500/20',
   }
 
   const valueStyles = {
@@ -99,6 +100,7 @@ export function StatCard({ label, value, sub, icon, trend, variant = 'default', 
     income:  'text-success',
     expense: 'text-danger',
     gold:    'text-gold-400',
+    info:    'text-cyan-300',
   }
 
   return (

@@ -115,12 +115,12 @@ export default async function DashboardPage() {
         moodLabel={moodLabel[mood] ?? ''}
       />
 
-      {/* ── Stat cards ─────────────────────────────────────────────── */}
+      {/* ── Stat cards — ordem: A Receber → Receitas → Despesas → Saldo ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <WithTooltip content="Total de receitas menos despesas no mês atual" side="bottom">
+        <WithTooltip content="Pessoas que te devem + rendas pendentes a receber" side="bottom">
           <div>
-            <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Receitas − despesas de ${format(now, 'MMM', { locale: ptBR })}`} className="bg-transparent border-transparent" />
+            <BorderGlow backgroundColor="#062828" glowColor="187 80 50" colors={['#22d3ee', '#67e8f9', '#0891b2']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+              <StatCard label="A Receber" value={formatCurrency(data.totalReceivable)} variant="info" icon={<ArrowDownToLine className="size-4" />} sub={data.totalReceivable === 0 ? 'Nada pendente' : [data.totalPeopleReceivable > 0 && `${formatCurrency(data.totalPeopleReceivable, true)} de pessoas`, data.totalIncomeReceivable > 0 && `${formatCurrency(data.totalIncomeReceivable, true)} de rendas`].filter(Boolean).join(' · ')} className="bg-transparent border-transparent" />
             </BorderGlow>
           </div>
         </WithTooltip>
@@ -138,10 +138,10 @@ export default async function DashboardPage() {
             </BorderGlow>
           </div>
         </WithTooltip>
-        <WithTooltip content="Pessoas que te devem + rendas eventuais pendentes" side="bottom">
+        <WithTooltip content="Total de receitas menos despesas no mês atual" side="bottom">
           <div>
-            <BorderGlow backgroundColor="#1C0D00" glowColor="38 92 50" colors={['#f59e0b', '#fbbf24', '#d97706']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
-              <StatCard label="A Receber" value={formatCurrency(data.totalReceivable)} variant="gold" icon={<ArrowDownToLine className="size-4" />} sub={data.totalReceivable === 0 ? 'Nada pendente' : [data.totalPeopleReceivable > 0 && `${formatCurrency(data.totalPeopleReceivable, true)} de pessoas`, data.totalIncomeReceivable > 0 && `${formatCurrency(data.totalIncomeReceivable, true)} de rendas`].filter(Boolean).join(' · ')} className="bg-transparent border-transparent" />
+            <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+              <StatCard label="Saldo do mês" value={formatCurrency(data.monthBalance)} variant="default" icon={<Wallet className="size-4" />} sub={`Receitas − despesas de ${format(now, 'MMM', { locale: ptBR })}`} className="bg-transparent border-transparent" />
             </BorderGlow>
           </div>
         </WithTooltip>
