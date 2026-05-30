@@ -161,6 +161,13 @@ export function DashboardKPIs(p: Props) {
               </div>
             ))}
           </>}
+          {/* Fallback: API ainda sem pendingIncomeSources mas há valor a receber */}
+          {p.pendingIncomeSources.length === 0 && p.totalIncomeReceivable > 0 && (
+            <div className="p-3 bg-ink-700/60 rounded-xl flex items-center justify-between">
+              <p className="text-sm text-slate-300">Fontes de renda pendentes este mês</p>
+              <span className="text-sm font-semibold text-cyan-400">+{formatCurrency(p.totalIncomeReceivable)}</span>
+            </div>
+          )}
           {p.totalReceivable === 0 && <Empty text="Nada a receber no momento." />}
         </StatModal>
       )}
