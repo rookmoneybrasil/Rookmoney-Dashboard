@@ -55,14 +55,10 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const today     = new Date().toISOString().split('T')[0]
   const amountNum = parseFloat(amount) || 0
 
-  const effectiveInstallments = mode === 'parcelado' ? installments
-    : mode === 'recorrente' ? recurMonths
-    : 1
+  const effectiveInstallments = mode === 'parcelado' ? installments : 1
 
-  const perMonth = effectiveInstallments > 1
-    ? mode === 'recorrente'
-      ? amountNum  // each month pays the full amount
-      : Math.round((amountNum / effectiveInstallments) * 100) / 100
+  const perMonth = mode === 'parcelado' && effectiveInstallments > 1
+    ? Math.round((amountNum / effectiveInstallments) * 100) / 100
     : amountNum
 
   const submitLabel = mode === 'parcelado' ? `Criar ${installments} parcelas`
