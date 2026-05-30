@@ -92,24 +92,49 @@ body {
   min-height: 100dvh;
 }
 
-/* Light mode adjustments */
+/* ─── Light mode adjustments ──────────────────────────────────────── */
 html[data-theme="light"] body { color: #0F172A; }
 
-/* Slate text becomes darker */
+/* ── Text colors: inverted hierarchy for light bg ── */
+html[data-theme="light"] .text-white     { color: #0F172A !important; }
 html[data-theme="light"] .text-slate-100 { color: #0F172A !important; }
 html[data-theme="light"] .text-slate-200 { color: #1E293B !important; }
 html[data-theme="light"] .text-slate-300 { color: #334155 !important; }
 html[data-theme="light"] .text-slate-400 { color: #475569 !important; }
 html[data-theme="light"] .text-slate-500 { color: #64748B !important; }
 html[data-theme="light"] .text-slate-600 { color: #94A3B8 !important; }
-html[data-theme="light"] .text-white     { color: #0F172A !important; }
+html[data-theme="light"] .text-slate-700 { color: #94A3B8 !important; }
 
-/* Border opacity adapts */
+/* ── Backgrounds that need inversion ── */
+html[data-theme="light"] .bg-ink-900\/60  { background-color: rgba(248,250,252,0.8) !important; }
+html[data-theme="light"] .bg-ink-700\/60  { background-color: rgba(226,232,240,0.7) !important; }
+html[data-theme="light"] .bg-ink-700\/40  { background-color: rgba(226,232,240,0.5) !important; }
+html[data-theme="light"] .bg-ink-800\/60  { background-color: rgba(241,245,249,0.8) !important; }
+html[data-theme="light"] .bg-ink-750      { background-color: #E8EEF4 !important; }
+
+/* ── Border opacity adapts ── */
 html[data-theme="light"] .border-white\/6  { border-color: rgba(0,0,0,0.08) !important; }
 html[data-theme="light"] .border-white\/8  { border-color: rgba(0,0,0,0.10) !important; }
 html[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
 html[data-theme="light"] .border-white\/4  { border-color: rgba(0,0,0,0.06) !important; }
 html[data-theme="light"] .border-white\/5  { border-color: rgba(0,0,0,0.07) !important; }
+html[data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.15) !important; }
+
+/* ── Hover backgrounds ── */
+html[data-theme="light"] .hover\:bg-ink-700\/60:hover { background-color: rgba(203,213,225,0.5) !important; }
+html[data-theme="light"] .hover\:bg-ink-700:hover     { background-color: #CBD5E1 !important; }
+html[data-theme="light"] .hover\:bg-ink-600:hover     { background-color: #B8C5D4 !important; }
+
+/* ── Sidebar specific ── */
+html[data-theme="light"] .bg-brand-800\/60 { background-color: rgba(37,99,235,0.12) !important; }
+html[data-theme="light"] .bg-ink-800\/20   { background-color: rgba(241,245,249,0.6) !important; }
+
+/* ── Modal overlay ── */
+html[data-theme="light"] .backdrop-blur-sm { backdrop-filter: blur(4px); }
+
+/* ── Scrollbar light ── */
+html[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink-500); }
 
 html[data-theme="light"] ::selection {
   background-color: rgba(37, 99, 235, 0.2);
