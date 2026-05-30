@@ -136,20 +136,29 @@ export default async function PersonPage({ params }: Props) {
 
   const allEntries   = person.entries
   const today        = new Date()
-  // Count entries as "due" only if date is within next 45 days (avoids inflating balance with distant future installments)
-  const dueSoon      = (e: PersonEntryRow) => new Date(e.date) <= new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
+  const cutoff       = new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
 
   // For balance: only unsettled entries
   const openEntries    = allEntries.filter((e) => !e.isSettled)
   const settledEntries = allEntries.filter((e) =>  e.isSettled)
 
-  // Balance uses only entries due within 45 days (prevents 120x installments inflating the balance)
-  const balanceEntries = openEntries.filter(dueSoon)
+  // Real installments (< 24x) → count all. Old recurring (>= 24x, not yet migrated) → only within 45 days
   let balance = 0
-  for (const e of balanceEntries) balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
+  for (const e of openEntries) {
+    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
+    if (isOldRecurring && new Date(e.date) > cutoff) continue
+    balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
+  }
 
-  const theyOweTotal = balanceEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + Number(e.amount), 0)
-  const iOweTotal    = balanceEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + Number(e.amount), 0)
+  const theyOweTotal = openEntries.filter(e => {
+    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
+    return e.type === 'THEY_OWE_ME' && !(isOldRecurring && new Date(e.date) > cutoff)
+  }).reduce((s, e) => s + Number(e.amount), 0)
+
+  const iOweTotal = openEntries.filter(e => {
+    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
+    return e.type === 'I_OWE_THEM' && !(isOldRecurring && new Date(e.date) > cutoff)
+  }).reduce((s, e) => s + Number(e.amount), 0)
 
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
   const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
