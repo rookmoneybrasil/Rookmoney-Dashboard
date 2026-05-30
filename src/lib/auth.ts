@@ -23,7 +23,7 @@ export async function createSession(userId: string, name: string, email: string,
   store.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     // Without maxAge = session cookie (expires on browser close)
     ...(rememberMe ? { maxAge: 60 * 60 * 24 * 30 } : {}),
     path:     '/',
