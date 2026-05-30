@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronRight, TrendingUp, TrendingDown, CheckCircle2 } from 'lucide-react'
 import { EntryActions } from './entry-actions'
 import { EditEntryModal } from './edit-entry-modal'
@@ -25,7 +24,6 @@ function baseDescription(description: string): string {
 
 export function InstallmentGroup({ personId, entries, categories }: Props) {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
 
   if (entries.length === 0) return null
 
@@ -115,7 +113,7 @@ export function InstallmentGroup({ personId, entries, categories }: Props) {
           <span onClick={(e) => e.stopPropagation()} className="flex items-center gap-1">
             <EditEntryModal entry={first} categories={categories} isGroup groupSize={total} />
             <ConfirmDeleteButton
-              action={async () => { await clientApi.deleteEntryGroup(first.id); router.refresh() }}
+              action={async () => { await clientApi.deleteEntryGroup(first.id); window.location.reload() }}
               icon="trash"
               title={`Excluir grupo (${total} parcelas)`}
               className="flex items-center justify-center size-7 rounded-lg text-slate-500 hover:text-danger hover:bg-danger/10 transition-colors"
