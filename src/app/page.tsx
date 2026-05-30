@@ -7,7 +7,6 @@ import {
   Banknote,
   PiggyBank,
   BarChart3,
-  Check,
   ArrowRight,
   Zap,
   Shield,
@@ -21,6 +20,7 @@ import DarkVeil from '@/components/ui/dark-veil'
 import CardSwap, { Card } from '@/components/ui/card-swap'
 import LaserFlow from '@/components/ui/laser-flow'
 import { FadeIn } from '@/components/ui/fade-in'
+import { PricingSection } from '@/components/landing/pricing-section'
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
@@ -60,26 +60,7 @@ const features = [
   },
 ]
 
-const freePlan = [
-  'Dashboard completo',
-  'Até 50 transações/mês',
-  '3 metas financeiras',
-  'Contas a pagar',
-  'Categorias padrão',
-  'Relatório básico',
-]
 
-const proPlan = [
-  'Tudo do plano gratuito',
-  'Transações ilimitadas',
-  'Metas ilimitadas',
-  'Rendas automáticas',
-  'Orçamento por categoria',
-  'Relatórios avançados',
-  'Exportação CSV',
-  'Categorias personalizadas',
-  'Suporte prioritário',
-]
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -592,107 +573,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-24 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-100">Planos simples e transparentes</h2>
-            <p className="mt-3 text-slate-400">Comece grátis. Faça upgrade quando precisar.</p>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            {/* Free */}
-            <FadeIn from="left">
-            <BorderGlow
-              glowColor="215 20 55"
-              colors={['#334155', '#475569', '#1e293b']}
-              borderRadius={20}
-              glowIntensity={0.7}
-              fillOpacity={0.12}
-              backgroundColor="#0C1628"
-            >
-              <div className="p-8 flex flex-col gap-6">
-                <div>
-                  <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Gratuito</p>
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-bold text-slate-100">R$&nbsp;0</span>
-                    <span className="text-slate-500 mb-1">/mês</span>
-                  </div>
-                  <p className="text-sm text-slate-500 mt-2">Para quem está começando a organizar as finanças.</p>
-                </div>
-
-                <ul className="flex flex-col gap-3">
-                  {freePlan.map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-sm text-slate-300">
-                      <Check className="size-4 text-slate-500 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/register"
-                  className="block text-center border border-white/10 hover:border-white/20 text-slate-300 hover:text-slate-100 font-medium py-3 rounded-xl transition-colors"
-                >
-                  Criar conta grátis
-                </Link>
-              </div>
-            </BorderGlow>
-            </FadeIn>
-
-            {/* Pro */}
-            <FadeIn from="right" delay={100}>
-            <BorderGlow
-              glowColor="234 80 65"
-              colors={['#6366f1', '#818cf8', '#4f46e5']}
-              borderRadius={20}
-              glowIntensity={1.0}
-              fillOpacity={0.22}
-              backgroundColor="#0D2460"
-              animated
-            >
-              <div className="relative p-8 flex flex-col gap-6 overflow-hidden">
-                {/* Glow backdrop */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ background: 'radial-gradient(ellipse 100% 60% at 50% -20%, rgba(99,102,241,0.18) 0%, transparent 70%)' }}
-                />
-
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-semibold text-brand-400 uppercase tracking-wider">Pro</p>
-                    <span className="text-xs font-medium bg-brand-600/30 text-brand-300 border border-brand-600/30 px-2 py-0.5 rounded-full">
-                      Recomendado
-                    </span>
-                  </div>
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-bold text-slate-100">R$&nbsp;14,90</span>
-                    <span className="text-slate-400 mb-1">/mês</span>
-                  </div>
-                  <p className="text-sm text-slate-400 mt-2">Para quem quer controle total das finanças.</p>
-                </div>
-
-                <ul className="relative flex flex-col gap-3">
-                  {proPlan.map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-sm text-slate-200">
-                      <Check className="size-4 text-brand-400 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/register"
-                  className="relative block text-center bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-500/30"
-                >
-                  Começar com Pro
-                </Link>
-              </div>
-            </BorderGlow>
-            </FadeIn>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ── FAQ ─────────────────────────────────────────────────────── */}
       <section className="py-20 px-4 sm:px-6">
@@ -718,7 +599,7 @@ export default function LandingPage() {
               },
               {
                 q: 'Como funciona o plano gratuito?',
-                a: 'Você tem acesso ao dashboard completo, contas a pagar, até 3 metas financeiras e 50 transações por mês. Para uso mais intenso — transações ilimitadas, rendas automáticas, orçamento por categoria e relatórios avançados — existe o Pro por R$ 14,90/mês.',
+                a: 'Você tem acesso ao dashboard completo, calendário, contas a pagar (até 5), até 2 metas e 50 transações/mês. Para uso intenso — transações ilimitadas, projeção financeira, orçamento, relatórios avançados, chat com IA e importação CSV — existe o PRO por R$19,90/mês (ou R$15,90/mês no anual).',
               },
               {
                 q: 'Funciona no celular?',
