@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Pencil } from 'lucide-react'
+import { Pencil, TrendingUp, TrendingDown } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import type { PersonEntryRow } from '@/lib/api-client'
@@ -14,32 +13,32 @@ import type { PersonEntryRow } from '@/lib/api-client'
 interface Category { id: string; name: string; icon: string; color: string }
 
 interface Props {
-  entry:        PersonEntryRow
-  categories:   Category[]
-  isGroup?:     boolean   // true when editing all installments in a group
-  groupSize?:   number
+  entry:      PersonEntryRow
+  categories: Category[]
+  isGroup?:   boolean
+  groupSize?: number
 }
 
 export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props) {
-  const [open, setOpen]         = useState(false)
-  const [categoryId, setCatId]  = useState(entry.categoryId ?? '')
-  const router = useRouter()
+  const [open,       setOpen]    = useState(false)
+  const [categoryId, setCatId]   = useState(entry.categoryId ?? '')
+  const [entryType,  setType]    = useState(entry.type)
 
-  const dateStr = entry.date
-    ? new Date(entry.date).toISOString().split('T')[0]
-    : new Date().toISOString().split('T')[0]
+  const dateStr  = entry.date ? new Date(entry.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+  const baseDesc = entry.description.replace(/\s*\(\d+\/\d+\)$/, '')
 
   const { mutate, pending, error } = useMutation(
     (data: Record<string, string>) =>
       clientApi.editEntry(entry.id, {
+        type:         entryType,
         description:  data.description,
         amount:       parseFloat(data.amount),
-        date:         isGroup ? undefined : data.date,
+        date:         data.date || undefined,
         categoryId:   categoryId || null,
         notes:        data.notes || null,
         applyToGroup: isGroup,
       }),
-    { onSuccess: () => { setOpen(false); router.refresh() } },
+    { onSuccess: () => { setOpen(false); window.location.reload() } },
   )
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -53,16 +52,12 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
     })
   }
 
-  // Strip "(X/Y)" suffix from description for editing
-  const baseDesc = entry.description.replace(/\s*\(\d+\/\d+\)$/, '')
+  const personName = entry.description // fallback — idealmente viria do parent
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
-      <button
-        onClick={() => setOpen(true)}
-        title="Editar"
-        className="flex items-center justify-center size-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-ink-600 transition-colors shrink-0"
-      >
+      <button onClick={() => setOpen(true)} title="Editar"
+        className="flex items-center justify-center size-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-ink-600 transition-colors shrink-0">
         <Pencil className="size-3.5" />
       </button>
 
@@ -80,9 +75,31 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
 
           {isGroup && (
             <p className="text-xs text-slate-500 bg-ink-700/60 border border-white/6 rounded-lg px-3 py-2">
-              💡 Alterações de descrição, categoria e valor serão aplicadas a todas as {groupSize} parcelas.
+              💡 Alterações serão aplicadas a todas as {groupSize} parcelas pendentes.
             </p>
           )}
+
+          {/* Direção: quem deve a quem */}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setType('THEY_OWE_ME')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                entryType === 'THEY_OWE_ME'
+                  ? 'bg-success/10 border-success/40 text-success'
+                  : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+              }`}>
+              <TrendingUp className="size-4" />
+              Me deve
+            </button>
+            <button type="button" onClick={() => setType('I_OWE_THEM')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                entryType === 'I_OWE_THEM'
+                  ? 'bg-danger/10 border-danger/40 text-danger'
+                  : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+              }`}>
+              <TrendingDown className="size-4" />
+              Eu devo
+            </button>
+          </div>
 
           <FormField label="Descrição" htmlFor="description" required>
             <Input id="description" name="description" defaultValue={baseDesc} required />
@@ -93,29 +110,18 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
               <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
                 defaultValue={Number(entry.amount).toFixed(2)} required />
             </FormField>
-            {!isGroup && (
-              <FormField label="Data" htmlFor="date" required>
-                <Input id="date" name="date" type="date" defaultValue={dateStr} required />
-              </FormField>
-            )}
+            <FormField label={isGroup ? 'Data da próxima' : 'Data'} htmlFor="date">
+              <Input id="date" name="date" type="date" defaultValue={dateStr} />
+            </FormField>
           </div>
 
           <FormField label="Categoria" htmlFor="categoryId">
-            <Select value={categoryId} onValueChange={setCatId}>
-              <SelectTrigger><SelectValue placeholder="Sem categoria" /></SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Sem categoria" />
           </FormField>
 
-          {!isGroup && (
-            <FormField label="Observações" htmlFor="notes">
-              <Textarea id="notes" name="notes" defaultValue={entry.notes ?? ''} className="min-h-[56px]" />
-            </FormField>
-          )}
+          <FormField label="Observações" htmlFor="notes">
+            <Textarea id="notes" name="notes" defaultValue={entry.notes ?? ''} className="min-h-[56px]" placeholder="Opcional" />
+          </FormField>
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>
