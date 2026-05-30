@@ -80,20 +80,49 @@ function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { ic
   )
 }
 
-const navItems = [
-  { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',    color: 'blue',   desc: 'Visão geral do seu financeiro — saldo, metas e projeções',   pro: false },
-  { href: '/projection',   icon: TrendingUp,      label: 'Projeção',     color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses',   pro: true  },
-  { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações',   color: 'purple', desc: 'Histórico completo de todas as entradas e saídas',           pro: false },
-  { href: '/income',       icon: Banknote,        label: 'Rendas',       color: 'green',  desc: 'Gerencie suas fontes de renda recorrentes e avulsas',        pro: false },
-  { href: '/goals',        icon: Target,          label: 'Metas',        color: 'orange', desc: 'Acompanhe o progresso das suas metas financeiras',           pro: false },
-  { href: '/bills',        icon: FileText,        label: 'Contas',       color: 'red',    desc: 'Contas a pagar, parcelas e próximos vencimentos',            pro: false },
-  { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',    color: 'cyan',   desc: 'Defina limites de gasto por categoria ao mês',               pro: true  },
-  { href: '/people',       icon: Users,           label: 'Pessoas',      color: 'amber',  desc: 'Controle dívidas, acertos e parcelamentos com pessoas',      pro: false },
-  { href: '/categories',   icon: Tag,             label: 'Categorias',   color: 'indigo', desc: 'Crie e organize as categorias das suas transações',          pro: false },
-  { href: '/calendar',     icon: CalendarDays,    label: 'Calendário',   color: 'blue',   desc: 'Visualize contas, rendas e recorrências por dia no mês',     pro: false },
-  { href: '/reports',      icon: BarChart3,       label: 'Relatórios',   color: 'purple', desc: 'Análises, gráficos e insights sobre seus gastos',            pro: true  },
-  { href: '/import',       icon: Upload,          label: 'Importar',     color: 'green',  desc: 'Importe extratos bancários em CSV ou OFX',                   pro: true  },
+// Grupos de navegação com separadores
+const navGroups = [
+  {
+    label: 'Visão geral',
+    items: [
+      { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',  color: 'blue',   desc: 'Saldo, metas, contas e projeções do mês',              pro: false },
+      { href: '/calendar',     icon: CalendarDays,    label: 'Calendário', color: 'cyan',   desc: 'Visualize contas, rendas e recorrências por dia',      pro: false },
+      { href: '/projection',   icon: TrendingUp,      label: 'Projeção',   color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses', pro: true },
+    ],
+  },
+  {
+    label: 'Dinheiro',
+    items: [
+      { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações', color: 'purple', desc: 'Histórico de todas as entradas e saídas',              pro: false },
+      { href: '/income',       icon: Banknote,        label: 'Rendas',     color: 'green',  desc: 'Fontes de renda recorrentes e avulsas',                pro: false },
+      { href: '/bills',        icon: FileText,        label: 'Contas',     color: 'red',    desc: 'Contas a pagar, parcelas e vencimentos',               pro: false },
+      { href: '/people',       icon: Users,           label: 'Pessoas',    color: 'amber',  desc: 'Dívidas, acertos e parcelamentos com pessoas',         pro: false },
+    ],
+  },
+  {
+    label: 'Planejamento',
+    items: [
+      { href: '/goals',        icon: Target,          label: 'Metas',      color: 'orange', desc: 'Acompanhe o progresso das suas metas',                 pro: false },
+      { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',  color: 'cyan',   desc: 'Limites de gasto por categoria ao mês',                pro: true  },
+    ],
+  },
+  {
+    label: 'Análise',
+    items: [
+      { href: '/reports',      icon: BarChart3,       label: 'Relatórios', color: 'purple', desc: 'Gráficos e insights sobre seus gastos',                pro: true  },
+    ],
+  },
+  {
+    label: 'Organização',
+    items: [
+      { href: '/categories',   icon: Tag,             label: 'Categorias', color: 'indigo', desc: 'Categorias das suas transações',                       pro: false },
+      { href: '/import',       icon: Upload,          label: 'Importar',   color: 'green',  desc: 'Importe extratos bancários em CSV',                    pro: true  },
+    ],
+  },
 ]
+
+// Flat list para collapsed mode
+const navItems = navGroups.flatMap(g => g.items)
 
 interface SidebarProps {
   user?:     { name: string; email: string }
@@ -128,61 +157,80 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }
       </div>
 
       {/* Nav */}
-      <nav className={cn('flex-1 py-4 flex flex-col', collapsed ? 'overflow-visible gap-3 px-1 items-center' : 'overflow-y-auto gap-1 px-2')}>
-        {navItems.map(({ href, icon: Icon, label, color, desc, pro }) => {
-          const isActive  = pathname === href || pathname.startsWith(href + '/')
-          const count     = badges[href] ?? 0
-          const showBadge = pro && !isPro
+      <nav className={cn('flex-1 py-3 flex flex-col', collapsed ? 'overflow-visible gap-3 px-1 items-center' : 'overflow-y-auto px-2')}>
+        {collapsed ? (
+          // Collapsed: flat list com ícones
+          <div className="flex flex-col gap-3">
+            {navItems.map(({ href, icon: Icon, label, desc, pro }) => {
+              const isActive = pathname === href || pathname.startsWith(href + '/')
+              const count    = badges[href] ?? 0
+              return (
+                <WithTooltip key={href} content={
+                  <div className="flex flex-col gap-0.5 max-w-[200px]">
+                    <span className="font-semibold text-slate-100">{label}{pro && !isPro ? ' · PRO' : count > 0 ? ` · ${count}` : ''}</span>
+                    <span className="text-slate-400 font-normal text-[11px] leading-snug">{desc}</span>
+                  </div>
+                } side="right" delayDuration={1500}>
+                  <Link href={href} className="relative flex justify-center">
+                    <GlassNavIcon icon={<Icon size={16} />} color="slate" active={isActive} />
+                    {count > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-brand-500 text-[9px] font-bold text-white flex items-center justify-center px-0.5 leading-none z-10">
+                        {count > 99 ? '99+' : count}
+                      </span>
+                    )}
+                  </Link>
+                </WithTooltip>
+              )
+            })}
+          </div>
+        ) : (
+          // Expanded: grupos com labels
+          <div className="flex flex-col gap-4 py-1">
+            {navGroups.map((group, gi) => (
+              <div key={group.label}>
+                <p className="text-[10px] font-semibold text-slate-700 uppercase tracking-wider px-2 mb-1">{group.label}</p>
+                <div className="flex flex-col gap-0.5">
+                  {group.items.map(({ href, icon: Icon, label, desc, pro }) => {
+                    const isActive  = pathname === href || pathname.startsWith(href + '/')
+                    const count     = badges[href] ?? 0
+                    const showBadge = pro && !isPro
 
-          const tooltipContent = (
-            <div className="flex flex-col gap-0.5 max-w-[200px]">
-              <span className="font-semibold text-slate-100">{label}{count > 0 && ` · ${count} pendente${count > 1 ? 's' : ''}`}</span>
-              <span className="text-slate-400 font-normal text-[11px] leading-snug">{desc}</span>
-            </div>
-          )
-
-          const item = collapsed ? (
-            /* ── Collapsed: glass icon ── */
-            <Link key={href} href={href} className="relative flex justify-center">
-              <GlassNavIcon icon={<Icon size={16} />} color="slate" active={isActive} />
-              {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-ink-900 flex items-center justify-center px-0.5 leading-none z-10">
-                  {count > 99 ? '99+' : count}
-                </span>
-              )}
-            </Link>
-          ) : (
-            /* ── Expanded: glass icon + label ── */
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-medium transition-all duration-150',
-                isActive
-                  ? 'bg-brand-800/60 text-brand-300 border border-brand-700/40'
-                  : 'text-slate-500 hover:bg-ink-700/60 hover:text-slate-300',
-              )}
-            >
-              <GlassNavIcon icon={<Icon size={13} />} color="slate" active={isActive} size={32} />
-              <span className="flex-1">{label}</span>
-              {showBadge && <ProBadge />}
-              {count > 0 && !showBadge && (
-                <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold flex items-center justify-center px-1 leading-none tabular-nums">
-                  {count > 99 ? '99+' : count}
-                </span>
-              )}
-              {count === 0 && !showBadge && isActive && (
-                <span className="ml-auto size-1.5 rounded-full bg-brand-400" />
-              )}
-            </Link>
-          )
-
-          return (
-            <WithTooltip key={href} content={tooltipContent} side="right" delayDuration={1500}>
-              {item}
-            </WithTooltip>
-          )
-        })}
+                    return (
+                      <WithTooltip key={href} content={
+                        <div className="flex flex-col gap-0.5 max-w-[200px]">
+                          <span className="font-semibold text-slate-100">{label}</span>
+                          <span className="text-slate-400 font-normal text-[11px] leading-snug">{desc}</span>
+                        </div>
+                      } side="right" delayDuration={1500}>
+                        <Link
+                          href={href}
+                          className={cn(
+                            'flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-medium transition-all duration-150',
+                            isActive
+                              ? 'bg-brand-800/60 text-brand-300 border border-brand-700/40'
+                              : 'text-slate-500 hover:bg-ink-700/60 hover:text-slate-300',
+                          )}
+                        >
+                          <GlassNavIcon icon={<Icon size={13} />} color="slate" active={isActive} size={32} />
+                          <span className="flex-1">{label}</span>
+                          {showBadge && <ProBadge />}
+                          {count > 0 && !showBadge && (
+                            <span className="min-w-[18px] h-[18px] rounded-full bg-brand-600/30 text-brand-300 border border-brand-600/30 text-[10px] font-bold flex items-center justify-center px-1 leading-none tabular-nums">
+                              {count > 99 ? '99+' : count}
+                            </span>
+                          )}
+                          {count === 0 && !showBadge && isActive && (
+                            <span className="size-1.5 rounded-full bg-brand-400" />
+                          )}
+                        </Link>
+                      </WithTooltip>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* Footer */}
