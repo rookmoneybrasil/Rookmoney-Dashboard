@@ -18,7 +18,9 @@ export async function sendPasswordResetEmail(
 
     <!-- Header com logo -->
     <div style="text-align:center;padding:32px 0 24px;">
-      <span style="font-size:28px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;">Rook</span><span style="font-size:28px;font-weight:800;color:#6366f1;letter-spacing:-0.5px;">Money</span>
+      <img src="${appUrl}/icon-192.png" alt="Rook Money" width="52" height="52"
+        style="display:inline-block;border-radius:14px;vertical-align:middle;margin-right:10px;" />
+      <span style="font-size:26px;font-weight:800;color:#f1f5f9;letter-spacing:-0.5px;vertical-align:middle;">Rook</span><span style="font-size:26px;font-weight:800;color:#01abf7;letter-spacing:-0.5px;vertical-align:middle;">Money</span>
     </div>
 
     <!-- Card principal -->
