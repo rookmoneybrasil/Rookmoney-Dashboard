@@ -5,7 +5,7 @@ import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Sparkles, X, Re
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
+const API = ''  // proxy route: /api/projection (same-origin)
 
 type ProjectionItem = { id: string; label: string; amount: number; day: number; type: string; href: string; actual?: boolean; overdue?: boolean }
 type ProjectionMonth = {
@@ -196,7 +196,7 @@ export default function ProjectionPage() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`${API}/api/v1/projection?months=${months}`, { credentials: 'include' })
+    fetch(`${API}/api/projection?months=${months}`)
       .then(r => r.json())
       .then(j => {
         const d = j.data ?? []

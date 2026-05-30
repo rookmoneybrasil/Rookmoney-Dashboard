@@ -9,7 +9,7 @@ import { ptBR } from 'date-fns/locale'
 import { formatCurrency } from '@/lib/utils'
 import type { CalendarEvent, CalendarData } from '@/lib/api-client'
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
+const API = ''  // proxy route: /api/calendar (same-origin)
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -41,7 +41,7 @@ export default function CalendarPage() {
   useEffect(() => {
     setLoading(true)
     setSelectedDay(null)
-    fetch(`${API}/api/v1/calendar?month=${monthStr}`, { credentials: 'include' })
+    fetch(`${API}/api/calendar?month=${monthStr}`)
       .then(r => r.json())
       .then(json => { setData(json.data); setLoading(false) })
       .catch(() => setLoading(false))
