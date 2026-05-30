@@ -11,6 +11,7 @@ import { DeletePersonButton } from '@/components/people/delete-person-button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { PersonEntryRow } from '@/lib/api-client'
 import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
+import { MigrateRecurringButton } from '@/components/people/migrate-recurring-button'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -134,16 +135,24 @@ export default async function PersonPage({ params }: Props) {
   if (!person) notFound()
 
   const allEntries   = person.entries
+  const today        = new Date()
+  // Count entries as "due" only if date is within next 45 days (avoids inflating balance with distant future installments)
+  const dueSoon      = (e: PersonEntryRow) => new Date(e.date) <= new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
 
   // For balance: only unsettled entries
   const openEntries    = allEntries.filter((e) => !e.isSettled)
   const settledEntries = allEntries.filter((e) =>  e.isSettled)
 
+  // Balance uses only entries due within 45 days (prevents 120x installments inflating the balance)
+  const balanceEntries = openEntries.filter(dueSoon)
   let balance = 0
-  for (const e of openEntries) balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
+  for (const e of balanceEntries) balance += e.type === 'THEY_OWE_ME' ? Number(e.amount) : -Number(e.amount)
 
-  const theyOweTotal = openEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + Number(e.amount), 0)
-  const iOweTotal    = openEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + Number(e.amount), 0)
+  const theyOweTotal = balanceEntries.filter((e) => e.type === 'THEY_OWE_ME').reduce((s, e) => s + Number(e.amount), 0)
+  const iOweTotal    = balanceEntries.filter((e) => e.type === 'I_OWE_THEM').reduce((s, e) => s + Number(e.amount), 0)
+
+  // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
+  const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
 
   // For display: group ALL entries (open + settled) by installmentGroupId so we render each
   // group once. A group is "pending" if any entry is unsettled; "settled" if all settled.
@@ -233,6 +242,15 @@ export default async function PersonPage({ params }: Props) {
           </p>
         </div>
       </div>
+
+      {/* ── Migração de recorrentes antigos ─────────── */}
+      {hasOldRecurring && (
+        <div className="flex flex-col gap-2 p-3 rounded-xl bg-amber-400/8 border border-amber-400/20">
+          <p className="text-xs text-amber-300 font-medium">⚠️ Pagamentos no formato antigo detectados</p>
+          <p className="text-xs text-slate-500">Estes pagamentos foram cadastrados como parcelas fixas. Converta para o novo sistema recorrente para que o saldo fique correto.</p>
+          <MigrateRecurringButton />
+        </div>
+      )}
 
       {/* ── Recorrentes ativos ──────────────────────── */}
       {recurring.length > 0 && (

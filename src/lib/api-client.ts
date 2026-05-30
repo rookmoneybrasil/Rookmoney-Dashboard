@@ -225,6 +225,8 @@ export const clientApi = {
     clientFetch<PersonEntryRecurringItem>('/people/recurring', { method: 'POST', body: JSON.stringify(data) }),
   stopPersonRecurring: (id: string) =>
     clientFetch<void>(`/people/recurring/${id}`, { method: 'DELETE' }),
+  migratePersonRecurring: () =>
+    clientFetch<{ converted: number; message: string }>('/people/migrate-recurring', { method: 'POST' }),
 
   // Settings
   getProfile: () => clientFetch<User>('/settings'),
