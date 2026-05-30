@@ -6,17 +6,48 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Allow Google profile pictures and other common image hosts
+    remotePatterns: [
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+    ],
   },
 
   async headers() {
     return [
+      // Security headers for all routes
       {
-        // Allow the Expo web dev server to call the API
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options',           value: 'DENY' },
+          { key: 'X-Content-Type-Options',    value: 'nosniff' },
+          { key: 'Referrer-Policy',           value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy',        value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-DNS-Prefetch-Control',    value: 'off' },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-eval needed for Next.js dev
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com",
+              "font-src 'self'",
+              "connect-src 'self' https://rookmoney-api-production.up.railway.app https://api.stripe.com",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
+        ],
+      },
+      // CORS for local mobile dev
+      {
         source: '/api/:path*',
         headers: [
-          { key: 'Access-Control-Allow-Origin',  value: 'http://localhost:8082' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type,Authorization' },
+          { key: 'Access-Control-Allow-Origin',      value: 'http://localhost:8082' },
+          { key: 'Access-Control-Allow-Methods',     value: 'GET,POST,PUT,DELETE,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers',     value: 'Content-Type,Authorization' },
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
         ],
       },
