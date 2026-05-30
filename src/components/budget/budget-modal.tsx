@@ -7,9 +7,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/ui/select'
+import { CategorySelect } from '@/components/ui/category-select'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -98,14 +96,7 @@ export function BudgetModal({ categories, month, budget }: Props) {
             </div>
           ) : (
             <FormField label="Categoria" htmlFor="categoryId" required>
-              <Select value={categoryId} onValueChange={setCat}>
-                <SelectTrigger><SelectValue placeholder="Selecionar categoria" /></SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategorySelect categories={categories} value={categoryId} onChange={setCat} placeholder="Selecionar categoria" />
             </FormField>
           )}
 

@@ -8,9 +8,6 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/ui/select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -100,13 +97,24 @@ export function EditBillModal({ bill, categories }: Props) {
               defaultValue={bill.notes ?? ''} className="min-h-[60px]" />
           </FormField>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <div onClick={() => setRec(!isRecurring)}
-              className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors ${isRecurring ? 'bg-brand-600' : 'bg-ink-600'}`}>
-              <span className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isRecurring ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />
-            </div>
-            <span className="text-sm text-slate-300">Recorrente (mensal)</span>
-          </label>
+          {/* Tipo: Avulso vs Recorrente */}
+          <div className="flex gap-2">
+            {([
+              { val: false, label: 'Avulso',     icon: '💸', desc: 'Pago uma vez' },
+              { val: true,  label: 'Recorrente', icon: '🔁', desc: 'Repete todo mês' },
+            ]).map(({ val, label, icon, desc }) => (
+              <button key={label} type="button" onClick={() => setRec(val)}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition-all ${
+                  isRecurring === val
+                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                }`}>
+                <span className="text-base">{icon}</span>
+                <span>{label}</span>
+                <span className="text-[10px] text-slate-600">{desc}</span>
+              </button>
+            ))}
+          </div>
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>

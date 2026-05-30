@@ -6,38 +6,35 @@ import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { triggerMascot } from '@/lib/mascot'
 
-const TYPE_LABELS = {
-  EMPLOYMENT: '💼 CLT / PJ',
-  FREELANCE:  '🧑‍💻 Freelance',
-  RENTAL:     '🏠 Aluguel',
-  OTHER:      '💡 Outro',
-}
+const TYPES = [
+  { val: 'EMPLOYMENT', label: 'CLT / PJ',  icon: '💼' },
+  { val: 'FREELANCE',  label: 'Freelance',  icon: '🧑‍💻' },
+  { val: 'RENTAL',     label: 'Aluguel',    icon: '🏠' },
+  { val: 'OTHER',      label: 'Outro',      icon: '💡' },
+]
 
 interface Category { id: string; name: string; icon: string; color: string }
-
 interface Source {
   id: string; name: string; type: string; amount: number
   isRecurring: boolean; dayOfMonth: number | null; categoryId: string | null; notes: string | null
 }
-
 interface Props { source?: Source; categories?: Category[]; className?: string; title?: string; disabled?: boolean }
 
 export function IncomeSourceModal({ source, categories = [], className, title, disabled }: Props) {
-  const isEdit = !!source
-  const [open, setOpen]           = useState(false)
-  const [type, setType]           = useState(source?.type ?? 'EMPLOYMENT')
+  const isEdit      = !!source
+  const [open,        setOpen]    = useState(false)
+  const [type,        setType]    = useState(source?.type ?? 'EMPLOYMENT')
   const [isRecurring, setRec]     = useState(source?.isRecurring ?? true)
-  const [categoryId, setCatId]    = useState(source?.categoryId ?? '')
+  const [categoryId,  setCatId]   = useState(source?.categoryId ?? '')
 
   const { mutate, pending, error } = useMutation(
     (data: Parameters<typeof clientApi.createIncomeSource>[0]) =>
-      isEdit
-        ? clientApi.updateIncomeSource(source.id, data)
-        : clientApi.createIncomeSource(data),
+      isEdit ? clientApi.updateIncomeSource(source.id, data) : clientApi.createIncomeSource(data),
     {
       onSuccess: () => {
         setOpen(false)
@@ -49,12 +46,9 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
   return (
     <Modal open={open} onOpenChange={setOpen}>
       {isEdit ? (
-        <button
-          onClick={() => !disabled && setOpen(true)}
+        <button onClick={() => !disabled && setOpen(true)}
           className={className ?? "size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10 transition-colors"}
-          title={title ?? "Editar"}
-          style={disabled ? { cursor: 'not-allowed' } : undefined}
-        >
+          title={title ?? "Editar"} style={disabled ? { cursor: 'not-allowed' } : undefined}>
           <Pencil className="size-3.5" />
         </button>
       ) : (
@@ -77,12 +71,12 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
             const dayRaw = fd.get('dayOfMonth') as string
             mutate({
               name:        fd.get('name') as string,
-              type:        fd.get('type') as string,
+              type,
               amount:      parseFloat(fd.get('amount') as string),
-              isRecurring: fd.get('isRecurring') === 'true',
+              isRecurring,
               dayOfMonth:  dayRaw ? parseInt(dayRaw, 10) : null,
               notes:       (fd.get('notes') as string) || null,
-              categoryId:  (fd.get('categoryId') as string) || null,
+              categoryId:  categoryId || null,
             })
           }}
           className="flex flex-col gap-4"
@@ -91,63 +85,65 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
             <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
           )}
 
+          {/* Tipo: Avulso vs Recorrente */}
+          <div className="flex gap-2">
+            {([
+              { val: true,  label: 'Recorrente', icon: '🔁', desc: 'Entra todo mês' },
+              { val: false, label: 'Eventual',   icon: '💡', desc: 'Renda pontual' },
+            ]).map(({ val, label, icon, desc }) => (
+              <button key={label} type="button" onClick={() => setRec(val)}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition-all ${
+                  isRecurring === val
+                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                }`}>
+                <span className="text-base">{icon}</span>
+                <span>{label}</span>
+                <span className="text-[10px] text-slate-600">{desc}</span>
+              </button>
+            ))}
+          </div>
+
           <FormField label="Nome" htmlFor="name" required>
-            <Input id="name" name="name" placeholder="Ex.: Empresa X, Cliente Y" defaultValue={source?.name} required />
+            <Input id="name" name="name" placeholder="Ex.: Empresa X, Cliente Y"
+              defaultValue={source?.name} required />
           </FormField>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Tipo" htmlFor="type" required>
+            <FormField label="Tipo" htmlFor="type">
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {Object.entries(TYPE_LABELS).map(([val, label]) => (
-                    <SelectItem key={val} value={val}>{label}</SelectItem>
+                  {TYPES.map(({ val, label, icon }) => (
+                    <SelectItem key={val} value={val}>{icon} {label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <input type="hidden" name="type" value={type} />
             </FormField>
-
-            <FormField label="Valor esperado (R$)" htmlFor="amount" required>
+            <FormField label="Valor (R$)" htmlFor="amount" required>
               <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
                 placeholder="0,00" defaultValue={source?.amount} required />
             </FormField>
           </div>
 
-          {/* Recorrente toggle */}
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="hidden" name="isRecurring" value={isRecurring ? 'true' : 'false'} />
-            <div onClick={() => setRec(!isRecurring)}
-              className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors ${isRecurring ? 'bg-brand-600' : 'bg-ink-600'}`}>
-              <span className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isRecurring ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />
-            </div>
-            <span className="text-sm text-slate-300">Recorrente (mensal)</span>
-          </label>
-
           {isRecurring && (
             <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
-              <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={31}
-                placeholder="Ex.: 5 (todo dia 5)" defaultValue={source?.dayOfMonth ?? undefined} />
+              <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                placeholder="Ex.: 5 (todo dia 5)"
+                defaultValue={source?.dayOfMonth ?? undefined} />
             </FormField>
           )}
 
-          <FormField label="Categoria padrão" htmlFor="categoryId">
-            <Select value={categoryId} onValueChange={setCatId}>
-              <SelectTrigger><SelectValue placeholder="Selecionar (para auto-registro)" /></SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <input type="hidden" name="categoryId" value={categoryId} />
+          <FormField label="Categoria" htmlFor="categoryId">
+            <CategorySelect categories={categories} value={categoryId} onChange={setCatId}
+              placeholder="Selecionar" />
             {isRecurring && (
-              <p className="text-xs text-slate-600 mt-1">Necessário para registro automático mensal.</p>
+              <p className="text-[11px] text-slate-600 mt-1">Necessária para registro automático mensal.</p>
             )}
           </FormField>
 
           <FormField label="Observações" htmlFor="notes">
-            <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[60px]"
+            <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[56px]"
               defaultValue={source?.notes ?? ''} />
           </FormField>
 
