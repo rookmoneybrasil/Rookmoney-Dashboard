@@ -155,29 +155,26 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
                     </p>
                   </div>
 
-                  {/* Botão unificado: valor + ação */}
-                  {person.balance === 0 ? (
-                    <div className="flex items-center gap-2 shrink-0 bg-ink-700 group-hover:bg-ink-600 border border-ink-600 px-3 py-2 rounded-xl transition-all">
-                      <span className="text-xs text-slate-500 font-medium">Quitado</span>
-                      <ArrowRight className="size-3.5 text-slate-600 group-hover:text-slate-400 transition-colors" />
-                    </div>
-                  ) : person.balance > 0 ? (
-                    <div className="flex items-center gap-2 shrink-0 bg-success/10 group-hover:bg-success/20 border border-success/25 px-3 py-2 rounded-xl transition-all">
-                      <div className="text-right">
-                        <p className="text-sm font-bold text-success leading-none">{formatCurrency(person.balance)}</p>
-                        <p className="text-[10px] text-success/70 mt-0.5">te deve/mês</p>
+                  {/* Botão com os dois valores (te deve + você deve) */}
+                  <div className="flex items-center gap-2 shrink-0 bg-ink-700 group-hover:bg-ink-600 border border-ink-600 group-hover:border-ink-500 px-3 py-2 rounded-xl transition-all min-w-[130px]">
+                    <div className="flex flex-col gap-0.5 flex-1">
+                      {/* Te deve */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-slate-600">te deve</span>
+                        <span className={`text-xs font-semibold tabular-nums ${(person.theyOweMe ?? (person.balance > 0 ? person.balance : 0)) > 0 ? 'text-success' : 'text-slate-600'}`}>
+                          {formatCurrency(person.theyOweMe ?? (person.balance > 0 ? person.balance : 0))}
+                        </span>
                       </div>
-                      <ArrowRight className="size-3.5 text-success/60 group-hover:text-success transition-colors" />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 shrink-0 bg-danger/10 group-hover:bg-danger/20 border border-danger/25 px-3 py-2 rounded-xl transition-all">
-                      <div className="text-right">
-                        <p className="text-sm font-bold text-danger leading-none">{formatCurrency(-person.balance)}</p>
-                        <p className="text-[10px] text-danger/70 mt-0.5">você deve/mês</p>
+                      {/* Você deve */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-slate-600">vc deve</span>
+                        <span className={`text-xs font-semibold tabular-nums ${(person.iOweThem ?? (person.balance < 0 ? -person.balance : 0)) > 0 ? 'text-danger' : 'text-slate-600'}`}>
+                          {formatCurrency(person.iOweThem ?? (person.balance < 0 ? -person.balance : 0))}
+                        </span>
                       </div>
-                      <ArrowRight className="size-3.5 text-danger/60 group-hover:text-danger transition-colors" />
                     </div>
-                  )}
+                    <ArrowRight className="size-3.5 text-slate-500 group-hover:text-slate-300 transition-colors shrink-0" />
+                  </div>
                 </Link>
               ))}
             </div>
