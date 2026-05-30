@@ -146,14 +146,7 @@ export function EditTransactionModal({ transaction, categories }: Props) {
               <Input id="date" name="date" type="date" defaultValue={dateStr} required />
             </FormField>
             <FormField label="Categoria" htmlFor="categoryId" required>
-              <Select value={categoryId} onValueChange={setCatId}>
-                <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
             </FormField>
           </div>
 

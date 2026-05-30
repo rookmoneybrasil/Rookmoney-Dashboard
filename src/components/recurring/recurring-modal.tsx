@@ -157,18 +157,7 @@ export function RecurringModal({ categories, item }: Props) {
           </div>
 
           <FormField label="Categoria" htmlFor="categoryId" required>
-            <Select value={categoryId} onValueChange={setCatId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
             <input type="hidden" name="categoryId" value={categoryId} />
           </FormField>
 

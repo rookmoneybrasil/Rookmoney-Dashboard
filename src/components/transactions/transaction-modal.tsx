@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CategorySelect } from '@/components/ui/category-select'
 import {
   Select,
   SelectTrigger,
@@ -208,18 +209,7 @@ export function TransactionModal({ categories }: Props) {
             </FormField>
 
             <FormField label="Categoria" htmlFor="categoryId" required>
-              <Select value={categoryId} onValueChange={setCatId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Selecionar" />
             </FormField>
           </div>
 

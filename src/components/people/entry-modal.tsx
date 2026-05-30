@@ -198,14 +198,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
 
           {/* Category */}
           <FormField label="Categoria" htmlFor="categoryId">
-            <Select value={categoryId} onValueChange={setCatId}>
-              <SelectTrigger><SelectValue placeholder="Opcional" /></SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
             <input type="hidden" name="categoryId" value={categoryId} />
           </FormField>
 
