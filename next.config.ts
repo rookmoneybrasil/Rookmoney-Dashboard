@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', 'pg-pool'],
+  experimental: {
+    serverActions: { bodySizeLimit: '5mb' },
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
