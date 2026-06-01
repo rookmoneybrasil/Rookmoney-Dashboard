@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/ui/select'
@@ -27,12 +28,12 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const [installments, setInst]   = useState(2)
   const [alreadyPaid, setAlready] = useState(0)
   const [dayOfMonth, setDay]      = useState(1)
-  const [amount, setAmount]       = useState('')
+  const [amountNum, setAmountNum] = useState(0)
   const [categoryId, setCatId]    = useState('')
 
   function reset() {
     setOpen(false); setEntryType('THEY_OWE_ME'); setMode('single')
-    setInst(2); setAlready(0); setDay(1); setAmount(''); setCatId('')
+    setInst(2); setAlready(0); setDay(1); setAmountNum(0); setCatId('')
   }
 
   const { mutate: mutateEntry, pending: pendingEntry, error: errorEntry } = useMutation(
@@ -55,7 +56,6 @@ export function EntryModal({ personId, personName, categories }: Props) {
     : mutateEntry
 
   const today     = new Date().toISOString().split('T')[0]
-  const amountNum = parseFloat(amount) || 0
 
   const effectiveInstallments = mode === 'parcelado' ? installments : 1
 
@@ -145,8 +145,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label={mode === 'recorrente' ? 'Valor/mês (R$)' : mode === 'parcelado' ? 'Valor por parcela (R$)' : 'Valor (R$)'} htmlFor="amount" required>
-              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-                placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+              <CurrencyInput id="amount" name="amount" required onValueChange={setAmountNum} />
             </FormField>
             <FormField label={mode === 'parcelado' ? 'Próxima parcela' : '1ª data'} htmlFor="date" required>
               <Input id="date" name="date" type="date" defaultValue={today} required />

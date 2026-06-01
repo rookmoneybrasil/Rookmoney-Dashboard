@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
@@ -101,8 +102,7 @@ export function BudgetModal({ categories, month, budget }: Props) {
           )}
 
           <FormField label="Limite mensal (R$)" htmlFor="amount" required>
-            <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-              placeholder="0,00" defaultValue={budget?.amount} required />
+            <CurrencyInput id="amount" name="amount" defaultValue={budget?.amount} required />
           </FormField>
 
           <ModalFooter>

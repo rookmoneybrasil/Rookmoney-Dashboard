@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { triggerMascot } from '@/lib/mascot'
 import { formatCurrency } from '@/lib/utils'
 import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
@@ -25,16 +26,15 @@ export function BillModal({ categories }: Props) {
   const [categoryId,   setCatId]      = useState('')
   const [installments, setInst]       = useState(2)
   const [alreadyPaid,  setAlready]    = useState(0)
-  const [amount,       setAmount]     = useState('')
+  const [amountNum,    setAmountNum]  = useState(0)
   const [name,         setName]       = useState('')
   const [showServices, setShowSvc]    = useState(false)
 
   const detectedBrand = getServiceBrand(name, undefined)
-  const amountNum     = parseFloat(amount) || 0
 
   function reset() {
     setOpen(false); setMode('avulso'); setCatId('')
-    setInst(2); setAlready(0); setAmount(''); setName(''); setShowSvc(false)
+    setInst(2); setAlready(0); setAmountNum(0); setName(''); setShowSvc(false)
   }
 
   const { mutate, pending, error } = useMutation(
@@ -66,8 +66,8 @@ export function BillModal({ categories }: Props) {
     mutate({
       name,
       amount: mode === 'parcelado'
-        ? String(amountNum * installments) // total = per-installment × total
-        : amount,
+        ? String(amountNum * installments)
+        : (fd.get('amount') as string),
       dueDate: fd.get('dueDate') as string,
       isRecurring: mode === 'recorrente',
       categoryId,
@@ -179,8 +179,7 @@ export function BillModal({ categories }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label={amountLabel} htmlFor="amount" required>
-              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-                placeholder="0,00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+              <CurrencyInput id="amount" name="amount" required onValueChange={setAmountNum} />
             </FormField>
             <FormField label={dateLabel} htmlFor="dueDate" required>
               <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />

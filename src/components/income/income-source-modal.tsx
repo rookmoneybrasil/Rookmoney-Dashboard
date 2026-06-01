@@ -5,6 +5,7 @@ import { Plus, Pencil } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
@@ -121,8 +122,7 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
               </Select>
             </FormField>
             <FormField label="Valor (R$)" htmlFor="amount" required>
-              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-                placeholder="0,00" defaultValue={source?.amount} required />
+              <CurrencyInput id="amount" name="amount" defaultValue={source?.amount} required />
             </FormField>
           </div>
 

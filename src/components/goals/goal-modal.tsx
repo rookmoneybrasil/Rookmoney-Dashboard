@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -98,27 +99,11 @@ export function GoalModal() {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Valor alvo (R$)" htmlFor="targetAmount" required>
-              <Input
-                id="targetAmount"
-                name="targetAmount"
-                type="number"
-                step="0.01"
-                min="1"
-                placeholder="0,00"
-                required
-              />
+              <CurrencyInput id="targetAmount" name="targetAmount" required />
             </FormField>
 
             <FormField label="Já tenho (R$)" htmlFor="currentAmount">
-              <Input
-                id="currentAmount"
-                name="currentAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0,00"
-                defaultValue="0"
-              />
+              <CurrencyInput id="currentAmount" name="currentAmount" />
             </FormField>
           </div>
 

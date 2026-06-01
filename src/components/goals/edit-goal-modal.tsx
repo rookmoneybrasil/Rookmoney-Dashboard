@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -84,8 +85,7 @@ export function EditGoalModal({ goal }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Valor alvo (R$)" htmlFor="targetAmount" required>
-              <Input id="targetAmount" name="targetAmount" type="number" step="0.01" min="0.01"
-                defaultValue={Number(goal.targetAmount)} required />
+              <CurrencyInput id="targetAmount" name="targetAmount" defaultValue={Number(goal.targetAmount)} required />
             </FormField>
             <FormField label="Prazo" htmlFor="deadline">
               <Input id="deadline" name="deadline" type="date" defaultValue={deadlineStr} />

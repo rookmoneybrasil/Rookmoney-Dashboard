@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -80,8 +81,7 @@ export function EditBillModal({ bill, categories }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Valor (R$)" htmlFor="amount" required>
-              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-                defaultValue={bill.amount} required />
+              <CurrencyInput id="amount" name="amount" defaultValue={bill.amount} required />
             </FormField>
             <FormField label="Vencimento" htmlFor="dueDate" required>
               <Input id="dueDate" name="dueDate" type="date" defaultValue={dateStr} required />

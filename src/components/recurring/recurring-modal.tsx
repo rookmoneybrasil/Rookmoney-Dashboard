@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import {
   Select,
   SelectTrigger,
@@ -144,16 +145,7 @@ export function RecurringModal({ categories, item }: Props) {
             </FormField>
 
             <FormField label="Valor (R$)" htmlFor="amount" required>
-              <Input
-                id="amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0.01"
-                placeholder="0,00"
-                defaultValue={item?.amount}
-                required
-              />
+              <CurrencyInput id="amount" name="amount" defaultValue={item?.amount} required />
             </FormField>
           </div>
 

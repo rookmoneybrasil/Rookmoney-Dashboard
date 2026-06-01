@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/ui/select'
@@ -101,8 +102,7 @@ export function EditTransactionModal({ transaction, categories }: Props) {
           </div>
 
           <FormField label="Valor (R$)" htmlFor="amount" required>
-            <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-              defaultValue={Number(transaction.amount)} required />
+            <CurrencyInput id="amount" name="amount" defaultValue={Number(transaction.amount)} required />
           </FormField>
 
           <FormField label="Descrição" htmlFor="description">

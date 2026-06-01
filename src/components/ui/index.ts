@@ -1,4 +1,5 @@
 export * from './avatar'
+export * from './currency-input'
 export * from './badge'
 export * from './button'
 export * from './card'

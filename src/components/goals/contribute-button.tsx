@@ -5,6 +5,7 @@ import { Plus, Minus } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalDescription, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
@@ -97,8 +98,7 @@ export function ContributeButton({ goalId, goalName, remaining, current, categor
           {error && <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>}
 
           <FormField label="Valor (R$)" htmlFor="amount" required>
-            <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-              placeholder="0,00" autoFocus required />
+            <CurrencyInput id="amount" name="amount" required />
           </FormField>
 
           <FormField label="Categoria" htmlFor="categoryId">

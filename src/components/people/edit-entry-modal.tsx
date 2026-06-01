@@ -5,6 +5,7 @@ import { Pencil, TrendingUp, TrendingDown } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -107,8 +108,7 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label={isGroup ? 'Valor por parcela (R$)' : 'Valor (R$)'} htmlFor="amount" required>
-              <Input id="amount" name="amount" type="number" step="0.01" min="0.01"
-                defaultValue={Number(entry.amount).toFixed(2)} required />
+              <CurrencyInput id="amount" name="amount" defaultValue={Number(entry.amount)} required />
             </FormField>
             <FormField label={isGroup ? 'Data da próxima' : 'Data'} htmlFor="date">
               <Input id="date" name="date" type="date" defaultValue={dateStr} />

@@ -5,7 +5,6 @@ import { NotificationBell } from './notification-bell'
 import { Avatar } from '@/components/ui/avatar'
 import { Settings, Crown } from 'lucide-react'
 import { LogoutButton } from './logout-button'
-import { ThemeToggle } from './theme-toggle'
 
 export async function Header() {
   const [notifications, user] = await Promise.all([
@@ -28,9 +27,6 @@ export async function Header() {
       <div className="flex items-center gap-2">
         {/* Notification bell */}
         <NotificationBell notifications={notifications} />
-
-        {/* Theme toggle */}
-        <ThemeToggle />
 
         {/* PRO upgrade — only for Free users */}
         {user && !isPro && (
