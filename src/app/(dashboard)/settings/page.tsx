@@ -9,6 +9,7 @@ import { Crown, Zap, ArrowRight, MessageCircle } from 'lucide-react'
 import { UpgradeBanner } from '@/components/settings/upgrade-banner'
 import { DeleteAccountButton } from '@/components/settings/delete-account-button'
 import { ExportDataButton } from '@/components/settings/export-data-button'
+import { FeedbackForm } from '@/components/settings/feedback-form'
 import Link from 'next/link'
 
 export default async function SettingsPage() {
@@ -122,6 +123,19 @@ export default async function SettingsPage() {
             </div>
             <ExportDataButton />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Feedback */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="size-4 text-brand-400" />
+            Bugs e sugestões
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FeedbackForm />
         </CardContent>
       </Card>
 
