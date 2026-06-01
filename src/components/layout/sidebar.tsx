@@ -20,6 +20,7 @@ import {
   CalendarDays,
   TrendingUp,
   Crown,
+  LifeBuoy,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { WithTooltip } from '@/components/ui/tooltip'
@@ -111,6 +112,12 @@ const navGroups = [
     items: [
       { href: '/categories',   icon: Tag,             label: 'Categorias', color: 'indigo', desc: 'Categorias das suas transações',                       pro: false },
       { href: '/import',       icon: Upload,          label: 'Importar',   color: 'green',  desc: 'Importe extratos bancários em CSV',                    pro: true  },
+    ],
+  },
+  {
+    label: 'Ajuda',
+    items: [
+      { href: '/support',      icon: LifeBuoy,        label: 'Suporte',    color: 'blue',   desc: 'Abra um ticket, reporte bugs ou envie sugestões',      pro: false },
     ],
   },
 ]

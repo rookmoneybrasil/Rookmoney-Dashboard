@@ -18,7 +18,7 @@ export async function submitFeedback(
   const body      = (formData.get('body')      as string)?.trim()
   const imageData = (formData.get('imageData') as string) || null
 
-  if (!['bug', 'suggestion'].includes(type)) return { error: 'Tipo inválido.' }
+  if (!['bug', 'suggestion', 'ticket'].includes(type)) return { error: 'Tipo inválido.' }
   if (!title) return { error: 'Título obrigatório.' }
   if (!body)  return { error: 'Descrição obrigatória.' }
   if (imageData && imageData.length > MAX_IMAGE_BYTES * 1.4)

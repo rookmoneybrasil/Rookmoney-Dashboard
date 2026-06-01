@@ -8,12 +8,11 @@ import { AppearanceForm } from '@/components/settings/appearance-form'
 import { ConnectionsCard } from '@/components/settings/connections-card'
 import { PlanUsageCard } from '@/components/settings/plan-usage-card'
 import { PrivacyCard } from '@/components/settings/privacy-card'
-import { FeedbackForm } from '@/components/settings/feedback-form'
 import { UpgradeBanner } from '@/components/settings/upgrade-banner'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import {
   User, Lock, Bell, Palette, BarChart2, MessageCircle,
-  Shield, Link2, MessageSquare,
+  Shield,
 } from 'lucide-react'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -139,20 +138,6 @@ export default async function SettingsPage() {
             ? <PlanUsageCard plan={user.plan} usage={usage} limits={limits} />
             : <p className="text-sm text-slate-500">Dados de uso não disponíveis.</p>
           }
-        </CardContent>
-      </Card>
-
-      {/* ─── SUPORTE ────────────────────────────────────────────────── */}
-      <SectionLabel>Suporte</SectionLabel>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="size-4 text-brand-400" /> Bugs e sugestões
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FeedbackForm />
         </CardContent>
       </Card>
 
