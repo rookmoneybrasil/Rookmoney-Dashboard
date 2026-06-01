@@ -1,4 +1,4 @@
-import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText } from 'lucide-react'
+import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -7,6 +7,7 @@ import { serverApi } from '@/lib/api-client'
 import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
+import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
 
 const statusConfig = {
   paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
@@ -16,9 +17,12 @@ const statusConfig = {
 }
 
 export default async function BillsPage() {
-  const [bills, categories] = await Promise.all([serverApi.bills(), serverApi.categories()])
+  const [bills, categories, recurringBills] = await Promise.all([
+    serverApi.bills(),
+    serverApi.categories(),
+    serverApi.recurringBills(),
+  ])
 
-  /* ── Split installment groups from regular bills ── */
   const grouped = new Map<string, typeof bills>()
   const regular: typeof bills = []
 
@@ -37,9 +41,8 @@ export default async function BillsPage() {
     const paidCount = items.filter((b) => b.isPaid).length
     const total     = items[0].installmentTotal ?? items.length
     const nextDue   = sorted.find((b) => !b.isPaid) ?? sorted[sorted.length - 1]
-    const totalPaid = paidCount * items[0].amount
     const grandTotal = total * items[0].amount
-    return { items: sorted, paidCount, total, nextDue, name: items[0].name, amount: items[0].amount, groupId: items[0].installmentGroupId!, totalPaid, grandTotal }
+    return { items: sorted, paidCount, total, nextDue, name: items[0].name, amount: items[0].amount, groupId: items[0].installmentGroupId!, totalPaid: paidCount * items[0].amount, grandTotal }
   })
 
   const activeGroups    = allGroups.filter((g) => g.paidCount < g.total)
@@ -55,6 +58,10 @@ export default async function BillsPage() {
   const totalPaid = paid.reduce((s, b) => s + Number(b.amount), 0)
     + allGroups.reduce((s, g) => s + g.paidCount * g.amount, 0)
 
+  const activeRecurring = recurringBills.filter(r => r.isActive)
+  const pausedRecurring = recurringBills.filter(r => !r.isActive)
+  const monthlyFixed    = activeRecurring.reduce((s, r) => s + Number(r.amount), 0)
+
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       {/* Header */}
@@ -65,7 +72,6 @@ export default async function BillsPage() {
             {pending.length + activeGroups.length} pendente{pending.length + activeGroups.length !== 1 ? 's' : ''} ·{' '}
             {paid.length} paga{paid.length !== 1 ? 's' : ''}
           </p>
-          <p className="text-xs text-slate-600 mt-1 max-w-md">Cadastre boletos, parcelas e contas fixas. Ao marcar como paga, uma despesa é gerada automaticamente. Contas recorrentes criam o próximo mês sozinhas.</p>
         </div>
         <BillModal categories={categories} />
       </div>
@@ -92,25 +98,65 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {bills.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+      {/* ── Contas Fixas ────────────────────────────────────── */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <RefreshCw className="size-3.5" />
+            Contas Fixas
+            {activeRecurring.length > 0 && (
+              <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px] ml-1">
+                {formatCurrency(monthlyFixed)}/mês
+              </span>
+            )}
+          </h2>
+        </div>
+
+        {recurringBills.length === 0 ? (
+          <Card padding="none">
+            <CardContent>
+              <div className="flex flex-col items-center gap-2 py-8 text-center">
+                <RefreshCw className="size-5 text-slate-700" />
+                <p className="text-sm text-slate-600">Nenhuma conta fixa cadastrada</p>
+                <p className="text-xs text-slate-700 max-w-xs">
+                  Contas fixas (aluguel, internet, streaming...) se repetem todo mês. Cadastre uma vez e elas aparecem automaticamente.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card padding="none">
+            <CardContent>
+              <div className="divide-y divide-white/5">
+                {activeRecurring.map((r) => (
+                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
+                ))}
+                {pausedRecurring.map((r) => (
+                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {bills.length === 0 && recurringBills.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
           <div className="size-14 rounded-2xl bg-ink-700 border border-ink-600 flex items-center justify-center text-slate-600">
             <FileText className="size-6" />
           </div>
-          <div className="flex flex-col gap-1">
+          <div>
             <p className="text-slate-300 text-sm font-medium">Nenhuma conta cadastrada</p>
-            <p className="text-slate-600 text-xs max-w-xs">Adicione boletos, parcelas e contas fixas para nunca mais perder um vencimento.</p>
+            <p className="text-slate-600 text-xs max-w-xs mt-1">Adicione boletos, parcelas e contas fixas para nunca mais perder um vencimento.</p>
           </div>
-          <BillModal categories={categories} />
         </div>
       )}
 
-      {/* ── Active installment groups ──────────────────────── */}
+      {/* ── Parceladas ──────────────────────────────────────── */}
       {activeGroups.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <Layers className="size-3.5" />
-            Parceladas
+            <Layers className="size-3.5" /> Parceladas
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {activeGroups.map((group) => {
@@ -128,16 +174,11 @@ export default async function BillsPage() {
                           <p className="text-xs text-slate-500">{formatCurrency(group.amount)}/parcela · {group.total}x</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs font-semibold text-slate-400 tabular-nums">
-                            {group.paidCount}/{group.total}
-                          </span>
+                          <span className="text-xs font-semibold text-slate-400 tabular-nums">{group.paidCount}/{group.total}</span>
                           <ChevronDown className="size-4 text-slate-600 transition-transform duration-200 group-open/det:rotate-180" />
                         </div>
                       </summary>
-
-                      {/* Collapsible content */}
                       <div className="px-4 pb-4 flex flex-col gap-3 border-t border-white/5 pt-3">
-                        {/* Progress */}
                         <div className="flex flex-col gap-1.5">
                           <Progress value={group.paidCount} max={group.total} variant="brand" size="sm" />
                           <div className="flex items-center justify-between">
@@ -145,22 +186,17 @@ export default async function BillsPage() {
                             <span className="text-xs text-slate-500">Próxima: {formatDate(group.nextDue.dueDate)}</span>
                           </div>
                         </div>
-
-                        {/* Installment list */}
                         <div className="flex flex-col gap-0.5">
                           {group.items.map((inst) => {
                             const s = classifyBillStatus(inst.dueDate, inst.isPaid)
                             return (
-                              <div key={inst.id} className={`flex items-center justify-between gap-2 py-1.5 group/inst ${inst.isPaid ? 'opacity-40' : ''}`}>
+                              <div key={inst.id} className={`flex items-center justify-between gap-2 py-1.5 ${inst.isPaid ? 'opacity-40' : ''}`}>
                                 <div className="flex items-center gap-2 min-w-0">
                                   <span className="text-xs tabular-nums text-slate-600 w-7 shrink-0">{inst.installmentCurrent}ª</span>
                                   <span className="text-xs text-slate-500">{formatDate(inst.dueDate)}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                  <Badge
-                                    variant={inst.isPaid ? 'success' : s === 'overdue' || s === 'urgent' ? 'danger' : 'default'}
-                                    size="sm"
-                                  >
+                                  <Badge variant={inst.isPaid ? 'success' : s === 'overdue' || s === 'urgent' ? 'danger' : 'default'} size="sm">
                                     {inst.isPaid ? 'Pago' : s === 'overdue' ? 'Atrasado' : s === 'urgent' ? 'Urgente' : 'Pendente'}
                                   </Badge>
                                   <EditBillModal bill={inst} categories={categories} />
@@ -170,8 +206,6 @@ export default async function BillsPage() {
                             )
                           })}
                         </div>
-
-                        {/* Cancel group */}
                         <DeleteBillGroupButton groupId={group.groupId} />
                       </div>
                     </details>
@@ -183,7 +217,7 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {/* ── Regular pending bills ───────────────────────────── */}
+      {/* ── Pendentes ───────────────────────────────────────── */}
       {pending.length > 0 && (
         <div className="flex flex-col gap-2">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pendentes</h2>
@@ -199,12 +233,12 @@ export default async function BillsPage() {
                       <div className={`size-9 rounded-lg flex items-center justify-center shrink-0 ${
                         status === 'overdue' || status === 'urgent' ? 'bg-danger/10 text-danger' : 'bg-ink-600 text-slate-500'
                       }`}>
-                        <Icon className="size-4" />
+                        {bill.recurringBillId ? <RefreshCw className="size-4" /> : <Icon className="size-4" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-medium text-slate-200 truncate">{bill.name}</p>
-                          {bill.isRecurring && <span className="text-xs text-slate-600 shrink-0">↻ mensal</span>}
+                          {bill.recurringBillId && <span className="text-[10px] text-brand-500 shrink-0">↻ fixa</span>}
                         </div>
                         <p className="text-xs text-slate-500">
                           {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
@@ -228,7 +262,7 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {/* ── Paid regular bills ─────────────────────────────── */}
+      {/* ── Pagas ───────────────────────────────────────────── */}
       {paid.length > 0 && (
         <div className="flex flex-col gap-2">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pagas</h2>
@@ -244,7 +278,7 @@ export default async function BillsPage() {
                       <p className="text-sm text-slate-400 truncate">{bill.name}</p>
                       <p className="text-xs text-slate-600">
                         {bill.category?.name ?? 'Sem categoria'} · {formatDate(bill.dueDate)}
-                        {bill.isRecurring && <span className="ml-1 text-brand-500">↻ mensal</span>}
+                        {bill.recurringBillId && <span className="ml-1 text-brand-600">↻ fixa</span>}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -260,12 +294,11 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {/* ── Completed installment groups (history) ─────────── */}
+      {/* ── Histórico de parcelamentos ──────────────────────── */}
       {completedGroups.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <Archive className="size-3.5" />
-            Histórico de parcelamentos
+            <Archive className="size-3.5" /> Histórico de parcelamentos
           </h2>
           <Card padding="none">
             <CardContent>
@@ -277,14 +310,10 @@ export default async function BillsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-slate-400 truncate">{group.name}</p>
-                      <p className="text-xs text-slate-600">
-                        {group.total}x de {formatCurrency(group.amount)} · quitado
-                      </p>
+                      <p className="text-xs text-slate-600">{group.total}x de {formatCurrency(group.amount)} · quitado</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-sm font-semibold text-slate-400 tabular-nums">
-                        {formatCurrency(group.grandTotal)}
-                      </span>
+                      <span className="text-sm font-semibold text-slate-400 tabular-nums">{formatCurrency(group.grandTotal)}</span>
                       <Badge variant="success" size="sm">{group.total}/{group.total}</Badge>
                       <DeleteInstallmentGroupButton groupId={group.groupId} />
                     </div>

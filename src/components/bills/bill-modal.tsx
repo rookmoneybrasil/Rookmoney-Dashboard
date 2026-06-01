@@ -38,49 +38,67 @@ export function BillModal({ categories }: Props) {
   }
 
   const { mutate, pending, error } = useMutation(
-    (data: { name: string; amount: string; dueDate: string; isRecurring: boolean; categoryId: string; installments?: number; notes: string }) =>
+    (data: { name: string; amount: string; dueDate: string; categoryId: string; installments?: number; notes: string }) =>
       clientApi.createBill({
         name: data.name,
         amount: parseFloat(data.amount),
         dueDate: data.dueDate,
-        isRecurring: data.isRecurring,
+        isRecurring: false,
         categoryId: data.categoryId || undefined,
         installments: data.installments,
         notes: data.notes || undefined,
       }),
-    {
-      onSuccess: () => {
-        reset()
-        triggerMascot('determined', 'Conta registrada! Não esqueça de pagar no prazo. 📅')
-      },
-    },
+    { onSuccess: () => { reset(); triggerMascot('determined', 'Conta registrada! 📅') } },
   )
+
+  const { mutate: mutateRecurring, pending: pendingRecurring, error: errorRecurring } = useMutation(
+    (data: { name: string; amount: string; dayOfMonth: string; categoryId: string; notes: string }) =>
+      clientApi.createRecurringBill({
+        name:       data.name,
+        amount:     parseFloat(data.amount),
+        dayOfMonth: parseInt(data.dayOfMonth) || 1,
+        categoryId: data.categoryId || null,
+        notes:      data.notes || null,
+        generateNow: true, // also create this month's instance if day has passed
+      }),
+    { onSuccess: () => { reset(); triggerMascot('determined', 'Conta fixa cadastrada! Vou gerar automaticamente todo mês. 🔁') } },
+  )
+
+  const isBusy = pending || pendingRecurring
+  const anyError = error || errorRecurring
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
-    const totalInstallments = mode === 'parcelado' ? installments : undefined
-    const skipInstallments  = mode === 'parcelado' ? alreadyPaid : 0
 
-    // For parcelado with already-paid: adjust amount to total and let API handle skip
+    if (mode === 'recorrente') {
+      mutateRecurring({
+        name:       name,
+        amount:     fd.get('amount') as string,
+        dayOfMonth: fd.get('dayOfMonth') as string,
+        categoryId,
+        notes:      fd.get('notes') as string,
+      })
+      return
+    }
+
     mutate({
       name,
       amount: mode === 'parcelado'
         ? String(amountNum * installments)
         : (fd.get('amount') as string),
       dueDate: fd.get('dueDate') as string,
-      isRecurring: mode === 'recorrente',
       categoryId,
-      installments: totalInstallments,
+      installments: mode === 'parcelado' ? installments : undefined,
       notes: fd.get('notes') as string,
     })
   }
 
   const submitLabel = mode === 'parcelado'
     ? `Criar ${installments - alreadyPaid} parcelas`
-    : mode === 'recorrente' ? 'Criar recorrente' : 'Adicionar'
+    : mode === 'recorrente' ? 'Salvar conta fixa' : 'Adicionar'
 
-  const dateLabel = mode === 'parcelado' ? 'Próximo vencimento' : '1º vencimento'
+  const dateLabel   = mode === 'parcelado' ? 'Próximo vencimento' : '1º vencimento'
   const amountLabel = mode === 'parcelado' ? 'Valor por parcela (R$)' : 'Valor (R$)'
 
   return (
@@ -99,8 +117,8 @@ export function BillModal({ categories }: Props) {
         </ModalHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && (
-            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
+          {anyError && (
+            <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{anyError}</p>
           )}
 
           {/* Mode selector */}
@@ -181,10 +199,22 @@ export function BillModal({ categories }: Props) {
             <FormField label={amountLabel} htmlFor="amount" required>
               <CurrencyInput id="amount" name="amount" required onValueChange={setAmountNum} />
             </FormField>
-            <FormField label={dateLabel} htmlFor="dueDate" required>
-              <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />
-            </FormField>
+            {mode === 'recorrente' ? (
+              <FormField label="Todo dia" htmlFor="dayOfMonth" required>
+                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                  defaultValue={1} placeholder="1-28" required />
+              </FormField>
+            ) : (
+              <FormField label={dateLabel} htmlFor="dueDate" required>
+                <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />
+              </FormField>
+            )}
           </div>
+          {mode === 'recorrente' && (
+            <p className="text-xs text-slate-600 -mt-2 px-1">
+              A conta será gerada automaticamente nesse dia todo mês.
+            </p>
+          )}
 
           {/* Parcelado options */}
           {mode === 'parcelado' && (
@@ -242,7 +272,7 @@ export function BillModal({ categories }: Props) {
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={reset}>Cancelar</Button>
-            <Button type="submit" loading={pending} disabled={!name.trim()}>{submitLabel}</Button>
+            <Button type="submit" loading={isBusy} disabled={!name.trim()}>{submitLabel}</Button>
           </ModalFooter>
         </form>
       </ModalContent>

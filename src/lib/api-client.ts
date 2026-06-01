@@ -97,6 +97,9 @@ export const serverApi = {
   budget: (month?: string) =>
     serverFetch<BudgetItem[]>(`/budget${month ? `?month=${month}` : ''}`),
 
+  // Recurring Bills (templates)
+  recurringBills: () => serverFetch<RecurringBill[]>('/bills/recurring'),
+
   // Reports
   reports: (months = 6, month?: string) => serverFetch<ReportsData>(`/reports?months=${months}${month ? `&month=${month}` : ''}`),
 
@@ -243,6 +246,14 @@ export const clientApi = {
   deleteAccount: () =>
     clientFetch<void>('/settings', { method: 'DELETE' }),
 
+  // Recurring Bills (templates)
+  createRecurringBill: (data: RecurringBillInput) =>
+    clientFetch<RecurringBill>('/bills/recurring', { method: 'POST', body: JSON.stringify(data) }),
+  updateRecurringBill: (id: string, data: Partial<RecurringBillInput> & { isActive?: boolean }) =>
+    clientFetch<RecurringBill>(`/bills/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteRecurringBill: (id: string) =>
+    clientFetch<void>(`/bills/recurring/${id}`, { method: 'DELETE' }),
+
   // Bill groups
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
@@ -298,8 +309,10 @@ export interface TransactionPage { items: Transaction[]; total: number; page: nu
 export interface GoalContribution { id: string; amount: number; note: string | null; createdAt: string }
 export interface Goal { id: string; name: string; targetAmount: number; currentAmount: number; deadline: string | null; description: string | null; icon: string | null; color: string | null; isCompleted: boolean; completedAt: string | null; createdAt: string; updatedAt: string; userId: string; contributions: GoalContribution[] }
 export interface GoalInput { name: string; targetAmount: number; currentAmount?: number; deadline?: string; description?: string; icon?: string; color?: string }
-export interface Bill { id: string; name: string; amount: number; dueDate: string; isPaid: boolean; paidAt: string | null; isRecurring: boolean; notes: string | null; categoryId: string | null; category: Category | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; paidTransactionId: string | null; createdAt: string; updatedAt: string; userId: string }
+export interface Bill { id: string; name: string; amount: number; dueDate: string; isPaid: boolean; paidAt: string | null; isRecurring: boolean; notes: string | null; categoryId: string | null; category: Category | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; paidTransactionId: string | null; recurringBillId: string | null; createdAt: string; updatedAt: string; userId: string }
 export interface BillInput { name: string; amount: number; dueDate: string; isRecurring?: boolean; categoryId?: string; installments?: number; notes?: string }
+export interface RecurringBill { id: string; name: string; amount: number; dayOfMonth: number; isActive: boolean; lastAutoMonth: string | null; notes: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
+export interface RecurringBillInput { name: string; amount: number; dayOfMonth: number; categoryId?: string | null; notes?: string | null; generateNow?: boolean }
 export interface Budget { id: string; categoryId: string; month: string; amount: number; category: Category }
 export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; notes?: string | null; categoryId?: string | null }
 export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
