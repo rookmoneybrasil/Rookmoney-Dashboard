@@ -355,3 +355,10 @@ model Feedback {
   @@index([userId])
   @@index([status])
 }
+
+// ─── DataMigration ───────────────────────────────────────────────────
+
+model DataMigration {
+  id    String   @id
+  ranAt DateTime @default(now())
+}
