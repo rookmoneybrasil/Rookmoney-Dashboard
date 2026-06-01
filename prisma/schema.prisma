@@ -28,6 +28,11 @@ model User {
   city                String?
   occupation          String?
   birthdate           DateTime?
+  notifBillReminder   Boolean   @default(true)
+  notifCategoryLimit  Boolean   @default(true)
+  notifMonthlyEmail   Boolean   @default(false)
+  currency            String    @default("BRL")
+  dateFormat          String    @default("dd/MM/yyyy")
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
