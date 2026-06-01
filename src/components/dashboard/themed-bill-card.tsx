@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { BorderGlow } from '@/components/ui/border-glow'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ArrowUpFromLine, AlertTriangle } from 'lucide-react'
@@ -15,19 +14,11 @@ interface Props {
 }
 
 export function ThemedBillCard({ pendingBillsCount, pendingBillsAmount, personPayablesAmount, overdueCount }: Props) {
-  const { theme } = useTheme()
-  const isDark    = theme !== 'light'
-
-  const bg = isDark ? '#1A0505' : '#FFF5F5'
-  const glowColor = isDark ? '0 84 60' : '0 60 50'
-  const fillOpacity = isDark ? 0.6 : 0.15
-  const glowIntensity = isDark ? 1.2 : 0.3
-
   const total = (pendingBillsAmount ?? 0) + (personPayablesAmount ?? 0)
 
   return (
-    <BorderGlow backgroundColor={bg} glowColor={glowColor} colors={['#ef4444', '#f87171', '#dc2626']}
-      borderRadius={12} glowRadius={24} glowIntensity={glowIntensity} coneSpread={30} fillOpacity={fillOpacity}>
+    <BorderGlow backgroundColor="#1A0505" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']}
+      borderRadius={12} glowRadius={24} glowIntensity={1.2} coneSpread={30} fillOpacity={0.6}>
       <Card className="bg-transparent border-transparent h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
