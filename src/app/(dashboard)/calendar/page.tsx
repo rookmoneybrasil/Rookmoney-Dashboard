@@ -58,8 +58,15 @@ export default function CalendarPage() {
 
   const selectedEvents: CalendarEvent[] = selectedDay && data ? (data.byDay[selectedDay] ?? []) : []
 
-  const totalPending = data?.events.filter(e => e.status === 'pending' || e.status === 'overdue').reduce((s, e) => s + Number(e.amount), 0) ?? 0
-  const totalExpected = data?.events.filter(e => e.status === 'expected').reduce((s, e) => s + Number(e.amount), 0) ?? 0
+  // Bug 2 fix: totalPending includes 'expected' bills (not-yet-generated templates)
+  // totalExpected only counts income-type events (income sources + recurring income)
+  const totalPending  = data?.events
+    .filter(e => (e.status === 'pending' || e.status === 'overdue') ||
+                 (e.status === 'expected' && e.type === 'bill'))
+    .reduce((s, e) => s + Number(e.amount), 0) ?? 0
+  const totalExpected = data?.events
+    .filter(e => e.status === 'expected' && (e.type === 'income' || e.type === 'recurring'))
+    .reduce((s, e) => s + Number(e.amount), 0) ?? 0
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">
@@ -241,15 +248,19 @@ export default function CalendarPage() {
                           className="text-xs font-semibold tabular-nums"
                           style={{ color: COLOR_MAP[ev.color] }}
                         >
-                          {ev.status === 'expected' ? '+' : '-'}{formatCurrency(ev.amount)}
+                          {(ev.status === 'expected' || ev.status === 'received') && ev.type !== 'bill' ? '+' : '-'}{formatCurrency(ev.amount)}
                         </span>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
                           ev.status === 'paid'     ? 'bg-success/10 text-success' :
-                          ev.status === 'overdue'  ? 'bg-danger/10 text-danger' :
-                          ev.status === 'expected' ? 'bg-success/10 text-success' :
+                          ev.status === 'received' ? 'bg-success/10 text-success' :
+                          ev.status === 'overdue'  ? 'bg-danger/10 text-danger'  :
+                          ev.status === 'expected' ? 'bg-slate-700 text-slate-400' :
                                                      'bg-warning/10 text-warning'
                         }`}>
-                          {ev.status === 'paid' ? 'Pago' : ev.status === 'overdue' ? 'Atrasado' : ev.status === 'expected' ? 'Previsto' : 'Pendente'}
+                          {ev.status === 'paid'     ? 'Pago'     :
+                           ev.status === 'received' ? 'Recebido' :
+                           ev.status === 'overdue'  ? 'Atrasado' :
+                           ev.status === 'expected' ? 'Previsto' : 'Pendente'}
                         </span>
                       </div>
                     </div>
