@@ -1,16 +1,13 @@
 import type { NextConfig } from 'next'
+import path from 'path'
 
-// next-intl: without the plugin, register request config via turbopack resolveAlias
-// Next.js 16 uses Turbopack by default — webpack config is not supported
+// Build uses --webpack explicitly (see package.json build script)
+// Next.js 16 defaults to Turbopack but middleware.js.nft.json is not generated
+// correctly by Turbopack on Vercel — forcing webpack fixes the issue.
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', 'pg-pool'],
   experimental: {
     serverActions: { bodySizeLimit: '5mb' },
-  },
-  turbopack: {
-    resolveAlias: {
-      'next-intl/config': './src/i18n/request.ts',
-    },
   },
   images: {
     dangerouslyAllowSVG: true,
@@ -20,6 +17,12 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
     ],
+  },
+
+  webpack(config) {
+    // Register next-intl request config so getTranslations() works server-side
+    config.resolve.alias['next-intl/config'] = path.resolve('./src/i18n/request.ts')
+    return config
   },
 
   async headers() {
