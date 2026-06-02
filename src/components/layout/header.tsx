@@ -52,7 +52,14 @@ export async function Header() {
               <span className="text-xs font-medium text-slate-300">{user.name.split(' ')[0]}</span>
               <span className="text-[10px] text-slate-600 truncate max-w-[120px]">{user.email}</span>
             </div>
-            <Avatar src={user.profileImage ?? undefined} name={user.name} size="sm" />
+            <div className="relative shrink-0">
+              <Avatar src={user.profileImage ?? undefined} name={user.name} size="sm" />
+              {isPro && (
+                <div className="absolute -bottom-1 -right-1 size-4 rounded-full bg-amber-400 border-2 border-ink-800 flex items-center justify-center">
+                  <Crown className="size-2.5 text-ink-900 fill-ink-900" />
+                </div>
+              )}
+            </div>
             <LogoutButton />
           </div>
         )}
