@@ -57,8 +57,13 @@ async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
   })
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`)
+    const err = await res.json().catch(() => ({})) as { error?: string; code?: string }
+    // Plan limit hit → redirect to billing page automatically
+    if (err.code === 'PLAN_LIMIT' || err.code === 'PRO_REQUIRED') {
+      window.location.href = '/billing'
+      throw new Error(err.error ?? 'Limite do plano atingido.')
+    }
+    throw new Error(err.error ?? `HTTP ${res.status}`)
   }
 
   // 204 No Content (DELETE) — no body to parse
