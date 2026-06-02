@@ -35,12 +35,16 @@ export function ProGate({ feature, children, locked = true, perks = DEFAULT_PERK
       <div className="absolute inset-0 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl bg-ink-800/95 border border-amber-400/20 rounded-2xl overflow-hidden shadow-2xl flex backdrop-blur-sm">
           {/* Image side */}
-          <div className="hidden md:block relative w-52 shrink-0 bg-gradient-to-b from-amber-400/5 to-ink-800">
+          <div
+            className="hidden md:block relative shrink-0"
+            style={{ width: 220, background: 'linear-gradient(135deg, #1a3d8f22 0%, #080e1d 100%)' }}
+          >
             <Image
               src="/rookinho-organizando.png"
               alt="Rookinho"
               fill
-              className="object-contain object-bottom"
+              sizes="220px"
+              className="object-contain object-center"
             />
           </div>
 
