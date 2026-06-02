@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { randomBytes } from 'crypto'
+import { randomBytes, createHash } from 'crypto'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
 import { createSession, deleteSession } from '@/lib/auth'
@@ -98,15 +98,18 @@ export async function requestPasswordReset(
 
   // Always return success to avoid email enumeration
   if (user) {
-    const token   = randomBytes(32).toString('hex')
-    const expiry  = new Date(Date.now() + 1000 * 60 * 60) // 1 hour
+    const rawToken  = randomBytes(32).toString('hex')
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex')
+    const expiry    = new Date(Date.now() + 1000 * 60 * 60) // 1 hour
 
+    // Store the HASH — never the raw token (security: if DB leaks, tokens can't be used)
     await db.user.update({
       where: { id: user.id },
-      data:  { passwordResetToken: token, passwordResetExpiry: expiry },
+      data:  { passwordResetToken: tokenHash, passwordResetExpiry: expiry },
     })
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`
+    // Send the RAW token in the email link
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${rawToken}`
     await sendPasswordResetEmail(user.email, user.name, resetUrl)
   }
 
@@ -122,12 +125,16 @@ export async function resetPassword(
   const confirm  = formData.get('confirm')  as string
 
   if (!token)    return { error: 'Token inválido.' }
-  if (!password || password.length < 8) return { error: 'Senha deve ter no mínimo 8 caracteres.' }
+  if (!password || password.length < 8)              return { error: 'Senha deve ter no mínimo 8 caracteres.' }
+  if (!/[0-9]/.test(password))                       return { error: 'Senha deve conter pelo menos um número.' }
+  if (!/[^a-zA-Z0-9]/.test(password))               return { error: 'Senha deve conter pelo menos um caractere especial.' }
   if (password !== confirm) return { error: 'As senhas não coincidem.' }
 
+  // Hash the received token to compare with the stored hash
+  const tokenHash = createHash('sha256').update(token).digest('hex')
   const user = await db.user.findFirst({
     where: {
-      passwordResetToken:  token,
+      passwordResetToken:  tokenHash,
       passwordResetExpiry: { gt: new Date() },
     },
   })

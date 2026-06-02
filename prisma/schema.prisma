@@ -33,6 +33,10 @@ model User {
   notifMonthlyEmail   Boolean   @default(false)
   currency            String    @default("BRL")
   dateFormat          String    @default("dd/MM/yyyy")
+  chatUsageMonth      String?
+  chatUsageCount      Int       @default(0)
+  scannerUsageMonth   String?
+  scannerUsageCount   Int       @default(0)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
