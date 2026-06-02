@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, getTranslations } from 'next-intl/server'
-import { ThemeProvider } from '@/components/theme-provider'
+import { getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 
@@ -9,12 +7,18 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'landing' })
 
   const ogLocale = locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_419' : 'en_US'
 
   return {
-    title:       { default: 'Rook Money — ' + (locale === 'pt' ? 'Controle financeiro inteligente' : locale === 'es' ? 'Control financiero inteligente' : 'Smart financial control'), template: '%s · Rook Money' },
+    title: {
+      default: 'Rook Money — ' + (
+        locale === 'pt' ? 'Controle financeiro inteligente' :
+        locale === 'es' ? 'Control financiero inteligente' :
+        'Smart financial control'
+      ),
+      template: '%s · Rook Money',
+    },
     description: locale === 'pt'
       ? 'Dashboard inteligente, metas financeiras, orçamento por categoria e relatórios detalhados. Organize suas finanças em minutos. Grátis para começar.'
       : locale === 'es'
@@ -28,11 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       url:      APP_URL,
       images:   [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
-    appleWebApp: {
-      capable:        true,
-      statusBarStyle: 'black-translucent',
-      title:          'Rook Money',
-    },
+    appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Rook Money' },
   }
 }
 
@@ -40,6 +40,8 @@ export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }))
 }
 
+// No html/body here — those are in the root app/layout.tsx
+// This layout only validates the locale param
 export default async function LocaleLayout({
   children,
   params,
@@ -53,18 +55,5 @@ export default async function LocaleLayout({
     notFound()
   }
 
-  const messages = await getMessages()
-  const htmlLang = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es' : 'en'
-
-  return (
-    <html lang={htmlLang} suppressHydrationWarning>
-      <body className="h-full antialiased">
-        <NextIntlClientProvider messages={messages}>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  )
+  return <>{children}</>
 }

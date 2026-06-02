@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,11 +33,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale   = await getLocale()
+  const messages = await getMessages()
+  const htmlLang = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es' : 'en'
+
   return (
-    <html className={`${poppins.variable} h-full`} suppressHydrationWarning>
+    <html lang={htmlLang} className={`${poppins.variable} h-full`} suppressHydrationWarning>
       <body className="h-full antialiased">
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   )
