@@ -100,8 +100,8 @@ export async function playGoalComplete() {
   const c = await ensureRunning()
   if (!c) return
   const t = c.currentTime
-  const notes = [523, 659, 784, 1047, 1319]
-  notes.forEach((freq, i) => tone(c, freq, t + i * 0.08, 0.18, 0.15))
+  const notes: number[] = [523, 659, 784, 1047, 1319]
+  notes.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.08, 0.18, 0.15))
 }
 
 /** PRO upgrade celebration — full fanfare with harmony */
@@ -109,14 +109,10 @@ export async function playProUpgrade() {
   const c = await ensureRunning()
   if (!c) return
   const t = c.currentTime
-  // Melody
-  [523, 659, 784, 1047, 1319, 1047, 1319].forEach((freq, i) =>
-    tone(c, freq, t + i * 0.07, 0.18, 0.18)
-  )
-  // Low harmony
-  [262, 330, 392].forEach((freq, i) =>
-    tone(c, freq, t + i * 0.14, 0.25, 0.08)
-  )
+  const melody: number[] = [523, 659, 784, 1047, 1319, 1047, 1319]
+  const harmony: number[] = [262, 330, 392]
+  melody.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.07, 0.18, 0.18))
+  harmony.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.14, 0.25, 0.08))
 }
 
 /** Error / validation fail — low double buzz */
