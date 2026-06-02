@@ -700,6 +700,9 @@ export default function LandingPage() {
               <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
                 Termos de Uso
               </Link>
+              <Link href="/changelog" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                Atualizações
+              </Link>
               <a href="mailto:contato@rookmoney.com" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
                 Contato
               </a>
