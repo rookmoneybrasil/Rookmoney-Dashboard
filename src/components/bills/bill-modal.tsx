@@ -38,7 +38,7 @@ export function BillModal({ categories }: Props) {
   }
 
   const { mutate, pending, error } = useMutation(
-    (data: { name: string; amount: string; dueDate: string; categoryId: string; installments?: number; notes: string }) =>
+    (data: { name: string; amount: string; dueDate: string; categoryId: string; installments?: number; alreadyPaid?: number; notes: string }) =>
       clientApi.createBill({
         name: data.name,
         amount: parseFloat(data.amount),
@@ -46,6 +46,7 @@ export function BillModal({ categories }: Props) {
         isRecurring: false,
         categoryId: data.categoryId || undefined,
         installments: data.installments,
+        alreadyPaid:  data.alreadyPaid,
         notes: data.notes || undefined,
       }),
     { onSuccess: () => { reset(); triggerMascot('determined', 'Conta registrada! 📅') } },
@@ -86,11 +87,12 @@ export function BillModal({ categories }: Props) {
     mutate({
       name,
       amount: mode === 'parcelado'
-        ? String(amountNum * remaining)   // only the remaining installments
+        ? String(amountNum * remaining)        // total amount for remaining installments
         : (fd.get('amount') as string),
       dueDate: fd.get('dueDate') as string,
       categoryId,
-      installments: mode === 'parcelado' ? remaining : undefined,
+      installments: mode === 'parcelado' ? installments : undefined,  // full total
+      alreadyPaid:  mode === 'parcelado' ? alreadyPaid  : undefined,  // offset for numbering
       notes: fd.get('notes') as string,
     })
   }
