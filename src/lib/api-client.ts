@@ -264,7 +264,7 @@ export const clientApi = {
   exportData: () => clientFetch<Record<string, unknown>>('/export'),
 
   // Billing (Stripe)
-  createCheckout: () => clientFetch<{ url: string }>('/billing/checkout', { method: 'POST' }),
+  createCheckout: (annual = false) => clientFetch<{ url: string }>('/billing/checkout', { method: 'POST', body: JSON.stringify({ annual }) }),
   createPortal:   () => clientFetch<{ url: string }>('/billing/portal',   { method: 'POST' }),
 
   // Admin

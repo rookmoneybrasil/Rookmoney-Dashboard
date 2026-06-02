@@ -29,7 +29,7 @@ export function BillingClient({ user }: Props) {
   async function handleUpgrade() {
     setLoadingUp(true)
     try {
-      const { url } = await clientApi.createCheckout()
+      const { url } = await clientApi.createCheckout(annual)
       if (url) window.location.href = url
     } catch {
       alert('Erro ao iniciar checkout. Tente novamente.')
