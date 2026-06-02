@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Crown, Check, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity } from 'lucide-react'
+import { Crown, Check, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight } from 'lucide-react'
 import { clientApi, type User } from '@/lib/api-client'
 import { UsageBar } from '@/components/ui/limit-banner'
 
@@ -190,19 +190,66 @@ export function BillingClient({ user }: Props) {
 
       {/* PRO — manage subscription */}
       {isPro && (
-        <div className="bg-ink-800 border border-white/6 rounded-2xl p-5 flex flex-col gap-4">
-          <p className="text-sm font-medium text-slate-300">Gerenciar assinatura</p>
-          <p className="text-sm text-slate-500 leading-relaxed">
-            Acesse o portal da Stripe para atualizar o método de pagamento, ver o histórico de cobranças ou cancelar a assinatura.
-            Ao cancelar, você mantém o acesso PRO até o fim do período já pago.
-          </p>
-          <button
-            onClick={handlePortal}
-            disabled={loadingPort}
-            className="self-start text-sm border border-white/10 hover:border-white/20 text-slate-300 hover:text-slate-100 px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
-          >
-            {loadingPort ? 'Carregando...' : 'Abrir portal de assinatura'}
-          </button>
+        <div className="bg-ink-800 border border-white/6 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-white/5">
+            <p className="text-sm font-semibold text-slate-300">Gerenciar assinatura</p>
+            <p className="text-xs text-slate-600 mt-0.5">Tudo é gerenciado de forma segura via Stripe</p>
+          </div>
+          <div className="divide-y divide-white/5">
+            {/* Update payment */}
+            <button
+              onClick={handlePortal}
+              disabled={loadingPort}
+              className="w-full flex items-center gap-4 px-5 py-4 hover:bg-ink-700/50 transition-colors text-left disabled:opacity-50"
+            >
+              <div className="size-9 rounded-xl bg-brand-800/60 flex items-center justify-center shrink-0">
+                <CreditCard className="size-4 text-brand-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-200">Atualizar forma de pagamento</p>
+                <p className="text-xs text-slate-500">Trocar cartão ou adicionar novo</p>
+              </div>
+              <ChevronRight className="size-4 text-slate-600 shrink-0" />
+            </button>
+
+            {/* Billing history */}
+            <button
+              onClick={handlePortal}
+              disabled={loadingPort}
+              className="w-full flex items-center gap-4 px-5 py-4 hover:bg-ink-700/50 transition-colors text-left disabled:opacity-50"
+            >
+              <div className="size-9 rounded-xl bg-ink-700 flex items-center justify-center shrink-0">
+                <Receipt className="size-4 text-slate-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-200">Histórico de cobranças</p>
+                <p className="text-xs text-slate-500">Ver faturas e comprovantes</p>
+              </div>
+              <ChevronRight className="size-4 text-slate-600 shrink-0" />
+            </button>
+
+            {/* Cancel */}
+            <button
+              onClick={handlePortal}
+              disabled={loadingPort}
+              className="w-full flex items-center gap-4 px-5 py-4 hover:bg-danger/5 transition-colors text-left disabled:opacity-50 group"
+            >
+              <div className="size-9 rounded-xl bg-danger/10 flex items-center justify-center shrink-0">
+                <XCircle className="size-4 text-danger" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-danger">Cancelar assinatura</p>
+                <p className="text-xs text-slate-500">Você mantém o PRO até o fim do período pago</p>
+              </div>
+              <ChevronRight className="size-4 text-slate-600 shrink-0" />
+            </button>
+          </div>
+
+          {loadingPort && (
+            <div className="px-5 py-3 border-t border-white/5 text-xs text-slate-500 text-center">
+              Abrindo portal seguro...
+            </div>
+          )}
         </div>
       )}
 
