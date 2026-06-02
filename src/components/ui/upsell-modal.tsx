@@ -49,13 +49,12 @@ export function UpsellModal() {
         </button>
 
         {/* Left — image */}
-        <div className="hidden sm:flex w-64 shrink-0 flex-col items-center justify-end bg-gradient-to-b from-brand-900/30 to-ink-800 overflow-hidden">
+        <div className="hidden sm:block relative w-64 shrink-0 bg-gradient-to-b from-brand-900/30 to-ink-800 min-h-[380px]">
           <Image
             src="/rookinho-organizando.png"
             alt="Rookinho"
-            width={240}
-            height={280}
-            className="object-contain w-full"
+            fill
+            className="object-contain object-bottom"
             priority
           />
         </div>
