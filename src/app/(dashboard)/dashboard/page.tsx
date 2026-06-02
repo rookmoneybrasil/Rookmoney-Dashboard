@@ -265,11 +265,11 @@ export default async function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {(data.upcomingPersonPayables ?? []).length === 0 ? (
+              {(data.futurePersonPayables ?? []).length === 0 ? (
                 <p className="text-sm text-slate-600 py-2 text-center">Nenhum compromisso próximo.</p>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {(data.upcomingPersonPayables ?? []).map((entry) => (
+                  {(data.futurePersonPayables ?? []).map((entry) => (
                     <div key={entry.id} className="flex items-center justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-300 truncate">{entry.person.name} · {entry.description}</p>
