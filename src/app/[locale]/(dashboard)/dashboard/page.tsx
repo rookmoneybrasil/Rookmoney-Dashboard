@@ -13,7 +13,8 @@ import { RookinhoInsight } from '@/components/dashboard/rookinho-insight'
 import { DashboardKPIs } from '@/components/dashboard/stat-card-modals'
 import { ThemedBillCard } from '@/components/dashboard/themed-bill-card'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { ptBR, enUS, es as esLocale } from 'date-fns/locale'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { Card, CardHeader, CardTitle, CardContent, StatCard } from '@/components/ui/card'
 import { BorderGlow } from '@/components/ui/border-glow'
 import { Progress } from '@/components/ui/progress'
@@ -31,6 +32,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default async function DashboardPage() {
+  const [t, locale] = await Promise.all([
+    getTranslations('dashboard'),
+    getLocale(),
+  ])
+  const dateLocale = locale === 'en' ? enUS : locale === 'es' ? esLocale : ptBR
+
   const now = new Date()
   const currentMonth = format(now, 'yyyy-MM')
   const [data, budgets, me] = await Promise.all([
@@ -40,16 +47,15 @@ export default async function DashboardPage() {
   ])
   const isPro = me?.plan === 'PRO'
   const hour      = now.getHours()
-  const greeting  = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
-  const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR })
+  const monthLabel = format(now, 'MMMM yyyy', { locale: dateLocale })
   const firstName  = data.userName.split(' ')[0]
   const mood       = data.mood as MascotMood
 
   const moodLabel: Partial<Record<MascotMood, string>> = {
-    angry: 'Você tem contas atrasadas!',
-    sad:   'Saldo negativo este mês.',
-    happy: 'Saldo positivo este mês!',
-    idle:  'Sem movimentações ainda.',
+    angry: t('alerts.overdueBills'),
+    sad:   t('alerts.negativeBalance'),
+    happy: t('alerts.positiveBalance'),
+    idle:  t('empty.noTransactions'),
   }
 
   const projData = {
@@ -75,12 +81,12 @@ export default async function DashboardPage() {
   const health = {
     score:      Math.min(100, totalScore + 30),
     grade:      grade as 'S' | 'A' | 'B' | 'C' | 'D' | 'F',
-    label:      totalScore >= 60 ? 'Muito bom' : totalScore >= 45 ? 'Bom' : totalScore >= 30 ? 'Regular' : 'Atenção',
+    label:      totalScore >= 60 ? t('health.veryGood') : totalScore >= 45 ? t('health.good') : totalScore >= 30 ? t('health.regular') : t('health.attention'),
     color:      totalScore >= 45 ? 'text-success' : totalScore >= 30 ? 'text-amber-400' : 'text-danger',
     components: [
-      { key: 'savings_rate', label: 'Taxa de poupança', score: savingsScore, max: 30, detail: data.monthIncome > 0 ? `${savingsRate >= 0 ? 'Poupou' : 'Gastou'} ${Math.abs(savingsRate)}% da renda` : 'Sem renda registrada', status: savingsRate >= 20 ? 'good' : savingsRate >= 0 ? 'ok' : 'bad' },
-      { key: 'bills_on_time', label: 'Contas em dia', score: billsScore, max: 20, detail: data.overdueCount === 0 ? 'Nenhuma conta atrasada' : `${data.overdueCount} conta(s) em atraso`, status: data.overdueCount === 0 ? 'good' : data.overdueCount <= 2 ? 'ok' : 'bad' },
-      { key: 'goals', label: 'Metas ativas', score: goalsScore, max: 20, detail: data.goals.length > 0 ? `${data.goals.length} meta(s) ativa(s)` : 'Sem metas definidas', status: data.goals.length >= 2 ? 'good' : data.goals.length === 1 ? 'ok' : 'neutral' },
+      { key: 'savings_rate', label: t('health.savingsRate'), score: savingsScore, max: 30, detail: data.monthIncome > 0 ? `${savingsRate >= 0 ? t('health.saved') : t('health.spent')} ${Math.abs(savingsRate)}% ${t('health.ofIncome')}` : t('empty.noTransactions'), status: savingsRate >= 20 ? 'good' : savingsRate >= 0 ? 'ok' : 'bad' },
+      { key: 'bills_on_time', label: t('health.billsOnTime'), score: billsScore, max: 20, detail: data.overdueCount === 0 ? t('health.noBillsOverdue') : t('health.billsOverdue', { count: data.overdueCount }), status: data.overdueCount === 0 ? 'good' : data.overdueCount <= 2 ? 'ok' : 'bad' },
+      { key: 'goals', label: t('health.activeGoals'), score: goalsScore, max: 20, detail: data.goals.length > 0 ? t('health.activeGoalsCount', { count: data.goals.length }) : t('health.noGoals'), status: data.goals.length >= 2 ? 'good' : data.goals.length === 1 ? 'ok' : 'neutral' },
     ],
     tips: [],
   }
@@ -99,7 +105,7 @@ export default async function DashboardPage() {
 
       {/* ── KPIs ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Visão do mês — {monthLabel}</SectionLabel>
+        <SectionLabel>{t('sections.monthView')} — {monthLabel}</SectionLabel>
         <DashboardKPIs
           totalReceivable={data.totalReceivable}
           totalPeopleReceivable={data.totalPeopleReceivable}
@@ -125,7 +131,7 @@ export default async function DashboardPage() {
 
       {/* ── Atenção ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Atenção</SectionLabel>
+        <SectionLabel>{t('sections.attention')}</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <RookinhoInsight insight={data.insight ?? ''} mood={mood} />
           <NextBillHighlight bills={data.upcomingBills} />
@@ -134,7 +140,7 @@ export default async function DashboardPage() {
 
       {/* ── Este mês ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Este mês</SectionLabel>
+        <SectionLabel>{t('sections.thisMonth')}</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <MonthPace income={data.monthIncome} expense={data.monthExpense} dayOfMonth={now.getDate()} daysInMonth={daysInMonth} />
           <CategoryDonut categories={data.topCategories ?? []} total={data.monthExpense} />
@@ -143,20 +149,20 @@ export default async function DashboardPage() {
 
       {/* ── Atividade ────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Atividade recente</SectionLabel>
+        <SectionLabel>{t('sections.recentActivity')}</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Transações — 2/3 */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Transações recentes</CardTitle>
-                  <a href="/transactions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+                  <CardTitle>{t('sections.recentTransactions')}</CardTitle>
+                  <a href="/transactions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.recentActivity')} →</a>
                 </div>
               </CardHeader>
               <CardContent>
                 {data.recentTransactions.length === 0 ? (
-                  <p className="text-sm text-slate-600 py-4 text-center">Nenhuma transação ainda.</p>
+                  <p className="text-sm text-slate-600 py-4 text-center">{t('empty.noTransactions')}</p>
                 ) : (
                   <div className="flex flex-col divide-y divide-white/5">
                     {data.recentTransactions.map((tx) => {
@@ -189,13 +195,13 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Metas ativas</CardTitle>
-                <a href="/goals" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+                <CardTitle>{t('sections.activeGoals')}</CardTitle>
+                <a href="/goals" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.activeGoals')} →</a>
               </div>
             </CardHeader>
             <CardContent>
               {data.goals.length === 0 ? (
-                <p className="text-sm text-slate-600 py-4 text-center">Nenhuma meta criada.</p>
+                <p className="text-sm text-slate-600 py-4 text-center">{t('empty.noGoals')}</p>
               ) : (
                 <div className="flex flex-col gap-4">
                   {data.goals.map((goal) => {
@@ -223,7 +229,7 @@ export default async function DashboardPage() {
 
       {/* ── Compromissos ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Compromissos</SectionLabel>
+        <SectionLabel>{t('sections.upcomingBills')}</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* A Pagar — theme-aware */}
           <ThemedBillCard
@@ -237,13 +243,13 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Próximos vencimentos</CardTitle>
-                <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+                <CardTitle>{t('sections.upcomingBills')}</CardTitle>
+                <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.upcomingBills')} →</a>
               </div>
             </CardHeader>
             <CardContent>
               {data.upcomingBills.length === 0 ? (
-                <p className="text-sm text-slate-600 py-2 text-center">Nenhuma conta próxima.</p>
+                <p className="text-sm text-slate-600 py-2 text-center">{t('empty.noBills')}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {data.upcomingBills.map((bill) => {
@@ -269,13 +275,13 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Com pessoas</CardTitle>
-                <a href="/people" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver todas →</a>
+                <CardTitle>{t('sections.withPeople')}</CardTitle>
+                <a href="/people" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.withPeople')} →</a>
               </div>
             </CardHeader>
             <CardContent>
               {(data.futurePersonPayables ?? []).length === 0 ? (
-                <p className="text-sm text-slate-600 py-2 text-center">Nenhum compromisso próximo.</p>
+                <p className="text-sm text-slate-600 py-2 text-center">{t('empty.noCommitments')}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {(data.futurePersonPayables ?? []).map((entry) => (
@@ -298,15 +304,15 @@ export default async function DashboardPage() {
 
       {/* ── Planejamento ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Planejamento</SectionLabel>
+        <SectionLabel>{t('sections.planning')}</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Orçamento */}
           {budgets.length > 0 ? (
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Orçamento do mês</CardTitle>
-                  <a href="/budget" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Ver tudo →</a>
+                  <CardTitle>{t('sections.monthBudget')}</CardTitle>
+                  <a href="/budget" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.monthBudget')} →</a>
                 </div>
               </CardHeader>
               <CardContent>
@@ -334,8 +340,8 @@ export default async function DashboardPage() {
             <Card>
               <CardHeader><CardTitle>Orçamento do mês</CardTitle></CardHeader>
               <CardContent>
-                <p className="text-sm text-slate-600 py-2 text-center">Nenhum orçamento configurado.</p>
-                <a href="/budget" className="block text-center text-xs text-brand-400 hover:text-brand-300 mt-2">Configurar orçamento →</a>
+                <p className="text-sm text-slate-600 py-2 text-center">{t('empty.noBudget')}</p>
+                <a href="/budget" className="block text-center text-xs text-brand-400 hover:text-brand-300 mt-2">{t('empty.setupBudget')}</a>
               </CardContent>
             </Card>
           )}
@@ -347,7 +353,7 @@ export default async function DashboardPage() {
 
       {/* ── Futuro ───────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2">
-        <SectionLabel>Futuro</SectionLabel>
+        <SectionLabel>{t('sections.future')}</SectionLabel>
         <ProjectionsSection projections={projData.projections as never} />
       </div>
 

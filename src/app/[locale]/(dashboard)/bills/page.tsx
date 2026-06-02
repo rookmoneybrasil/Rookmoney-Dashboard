@@ -1,4 +1,5 @@
 import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -9,14 +10,14 @@ import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
 
-const statusConfig = {
-  paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
-  pending: { label: 'Pendente', variant: 'default' as const, icon: Clock       },
-  urgent:  { label: 'Urgente',  variant: 'warning' as const, icon: AlertCircle },
-  overdue: { label: 'Atrasado', variant: 'danger'  as const, icon: AlertCircle },
-}
-
 export default async function BillsPage() {
+  const t = await getTranslations('bills')
+  const statusConfig = {
+    paid:    { label: t('status.paid'),    variant: 'success' as const, icon: Check       },
+    pending: { label: t('status.pending'), variant: 'default' as const, icon: Clock       },
+    urgent:  { label: t('status.urgent'),  variant: 'warning' as const, icon: AlertCircle },
+    overdue: { label: t('status.overdue'), variant: 'danger'  as const, icon: AlertCircle },
+  }
   const [bills, categories, recurringBills] = await Promise.all([
     serverApi.bills(),
     serverApi.categories(),

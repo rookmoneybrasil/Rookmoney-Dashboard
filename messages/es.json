@@ -29,7 +29,35 @@
     "free": "Gratis",
     "upgrade": "Mejorar plan",
     "currency": "USD",
-    "locale": "es-419"
+    "locale": "es-419",
+    "transactions": "transacciones",
+    "bills": "facturas",
+    "goals": "metas",
+    "people": "personas",
+    "categories": "categorías",
+    "month": "mes",
+    "income": "ingreso",
+    "expense": "gasto",
+    "new": "Nuevo",
+    "viewAll": "Ver todos",
+    "noResults": "Sin resultados",
+    "deleteConfirm": "¿Estás seguro?",
+    "amount": "Monto",
+    "date": "Fecha",
+    "description": "Descripción",
+    "category": "Categoría",
+    "type": "Tipo",
+    "name": "Nombre",
+    "notes": "Notas",
+    "status": "Estado",
+    "actions": "Acciones",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "overdue": "Vencido",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "monthly": "Mensual",
+    "annual": "Anual"
   },
   "nav": {
     "groups": {
@@ -472,10 +500,24 @@
   },
   "proGate": {
     "upgrade": "Mejorar plan",
-    "back": "Volver"
+    "back": "Volver",
+    "exclusivePro": "es exclusivo del PRO",
+    "unlockFor": "Desbloquea por $9.90/mes",
+    "subscribe": "Suscribirse al PRO",
+    "perks": {
+      "unlimited": "Transacciones, metas y facturas ilimitadas",
+      "reports": "Informes y proyección financiera",
+      "chat": "Chat con Rookinho (IA)",
+      "import": "Importación de extractos bancarios",
+      "budget": "Presupuesto por categoría"
+    }
   },
   "limitBanner": {
     "approaching": "Estás usando el {pct}% del límite de {feature} del plan Gratis.",
-    "upgrade": "Mejorar a PRO"
+    "upgrade": "Mejorar a PRO",
+    "atLimit": "⛔ Límite alcanzado:",
+    "nearLimit": "⚠️ Casi en el límite del plan Gratis:",
+    "upgradeBtn": "Mejorar a PRO"
   }
+}
 }

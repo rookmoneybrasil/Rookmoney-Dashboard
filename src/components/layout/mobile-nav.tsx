@@ -10,30 +10,13 @@ import {
   X, Menu, RefreshCw, Upload, Users, CalendarDays,
 } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
-
-const PRIMARY_NAV = [
-  { href: '/dashboard',    icon: LayoutDashboard, label: 'Início'     },
-  { href: '/transactions', icon: ArrowLeftRight,  label: 'Transações' },
-  { href: '/bills',        icon: FileText,        label: 'Contas'     },
-  { href: '/people',       icon: Users,           label: 'Pessoas'    },
-]
-
-const MORE_NAV = [
-  { href: '/income',     icon: Banknote,  label: 'Rendas'       },
-  { href: '/goals',      icon: Target,    label: 'Metas'        },
-  { href: '/budget',     icon: PiggyBank, label: 'Orçamento'    },
-  { href: '/calendar',   icon: CalendarDays, label: 'Calendário'  },
-  { href: '/reports',    icon: BarChart3,    label: 'Relatórios'  },
-  { href: '/import',     icon: Upload,    label: 'Importar'     },
-  { href: '/categories', icon: Tag,       label: 'Categorias'   },
-  { href: '/settings',   icon: Settings,  label: 'Configurações'},
-]
+import { useTranslations } from 'next-intl'
 
 interface MobileNavProps {
   badges?: Record<string, number>
 }
 
-function Badge({ count }: { count: number }) {
+function BadgeCount({ count }: { count: number }) {
   if (count === 0) return null
   return (
     <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-ink-900 flex items-center justify-center px-0.5 leading-none">
@@ -45,6 +28,26 @@ function Badge({ count }: { count: number }) {
 export function MobileNav({ badges = {} }: MobileNavProps) {
   const pathname  = usePathname()
   const [open, setOpen] = useState(false)
+  const t    = useTranslations('nav.items')
+  const tAuth = useTranslations('auth.login')
+
+  const PRIMARY_NAV = [
+    { href: '/dashboard',    icon: LayoutDashboard, label: t('dashboard')    },
+    { href: '/transactions', icon: ArrowLeftRight,  label: t('transactions') },
+    { href: '/bills',        icon: FileText,        label: t('bills')        },
+    { href: '/people',       icon: Users,           label: t('people')       },
+  ]
+
+  const MORE_NAV = [
+    { href: '/income',     icon: Banknote,    label: t('income')      },
+    { href: '/goals',      icon: Target,      label: t('goals')       },
+    { href: '/budget',     icon: PiggyBank,   label: t('budget')      },
+    { href: '/calendar',   icon: CalendarDays,label: t('calendar')    },
+    { href: '/reports',    icon: BarChart3,   label: t('reports')     },
+    { href: '/import',     icon: Upload,      label: t('import')      },
+    { href: '/categories', icon: Tag,         label: t('categories')  },
+    { href: '/settings',   icon: Settings,    label: t('settings')    },
+  ]
 
   const isMoreActive   = MORE_NAV.some((n) => pathname.startsWith(n.href))
   const moreBadgeTotal = MORE_NAV.reduce((s, n) => s + (badges[n.href] ?? 0), 0)
@@ -66,7 +69,7 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
             >
               <span className="relative">
                 <Icon className="size-5" />
-                <Badge count={count} />
+                <BadgeCount count={count} />
               </span>
               <span className="text-[10px] font-medium leading-none">{label}</span>
             </Link>
@@ -82,9 +85,9 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
         >
           <span className="relative">
             <Menu className="size-5" />
-            {moreBadgeTotal > 0 && <Badge count={moreBadgeTotal} />}
+            {moreBadgeTotal > 0 && <BadgeCount count={moreBadgeTotal} />}
           </span>
-          <span className="text-[10px] font-medium leading-none">Mais</span>
+          <span className="text-[10px] font-medium leading-none">···</span>
         </button>
       </nav>
 
@@ -98,7 +101,6 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
             className="absolute bottom-0 inset-x-0 bg-ink-800 rounded-t-2xl border-t border-white/6 p-4 pb-8"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Handle */}
             <div className="w-10 h-1 rounded-full bg-ink-500 mx-auto mb-4" />
 
             <div className="flex items-center justify-between mb-4">
@@ -144,7 +146,7 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-ink-700 text-slate-400 hover:bg-danger/10 hover:text-danger transition-colors"
               >
                 <LogOut className="size-5" />
-                <span className="text-xs font-medium leading-none">Sair</span>
+                <span className="text-xs font-medium leading-none">{tAuth('submit')}</span>
               </button>
             </div>
           </div>

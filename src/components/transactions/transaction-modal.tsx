@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
+import { useTranslations } from 'next-intl'
 
 interface Category {
   id: string
@@ -38,6 +39,8 @@ interface Props {
 }
 
 export function TransactionModal({ categories }: Props) {
+  const t = useTranslations('transactions')
+  const c = useTranslations('common')
   const [open, setOpen]        = useState(false)
   const [type, setType]        = useState<'INCOME' | 'EXPENSE'>('EXPENSE')
   const [categoryId, setCatId] = useState('')
@@ -92,12 +95,12 @@ export function TransactionModal({ categories }: Props) {
         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"
       >
         <Plus className="size-3.5" />
-        Nova transação
+        {t('new')}
       </button>
 
       <ModalContent size="sm">
         <ModalHeader>
-          <ModalTitle>Nova transação</ModalTitle>
+          <ModalTitle>{t('new')}</ModalTitle>
         </ModalHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -119,7 +122,7 @@ export function TransactionModal({ categories }: Props) {
               }`}
             >
               <ArrowDownRight className="size-4" />
-              Despesa
+              {t('expense')}
             </button>
             <button
               type="button"
@@ -131,15 +134,15 @@ export function TransactionModal({ categories }: Props) {
               }`}
             >
               <ArrowUpRight className="size-4" />
-              Receita
+              {t('income')}
             </button>
           </div>
 
-          <FormField label="Valor (R$)" htmlFor="amount" required>
+          <FormField label={c('amount')} htmlFor="amount" required>
             <CurrencyInput id="amount" name="amount" required />
           </FormField>
 
-          <FormField label="Descrição" htmlFor="description">
+          <FormField label={c('description')} htmlFor="description">
             <div className="flex flex-col gap-2">
               {/* Quick-pick service chips */}
               <div className="flex flex-wrap gap-1.5">
@@ -194,7 +197,7 @@ export function TransactionModal({ categories }: Props) {
           </FormField>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Data" htmlFor="date" required>
+            <FormField label={c('date')} htmlFor="date" required>
               <Input
                 id="date"
                 name="date"
@@ -204,8 +207,8 @@ export function TransactionModal({ categories }: Props) {
               />
             </FormField>
 
-            <FormField label="Categoria" htmlFor="categoryId" required>
-              <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Selecionar" />
+            <FormField label={c('category')} htmlFor="categoryId" required>
+              <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder={c('category')} />
             </FormField>
           </div>
 
@@ -215,10 +218,10 @@ export function TransactionModal({ categories }: Props) {
               variant="secondary"
               onClick={() => setOpen(false)}
             >
-              Cancelar
+              {c('cancel')}
             </Button>
             <Button type="submit" loading={pending} disabled={!categoryId}>
-              Adicionar
+              {c('add')}
             </Button>
           </ModalFooter>
         </form>

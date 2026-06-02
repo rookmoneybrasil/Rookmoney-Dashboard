@@ -29,7 +29,35 @@
     "free": "Grátis",
     "upgrade": "Fazer upgrade",
     "currency": "BRL",
-    "locale": "pt-BR"
+    "locale": "pt-BR",
+    "transactions": "transações",
+    "bills": "contas",
+    "goals": "metas",
+    "people": "pessoas",
+    "categories": "categorias",
+    "month": "mês",
+    "income": "receita",
+    "expense": "despesa",
+    "new": "Novo",
+    "viewAll": "Ver todos",
+    "noResults": "Nenhum resultado",
+    "deleteConfirm": "Tem certeza?",
+    "amount": "Valor",
+    "date": "Data",
+    "description": "Descrição",
+    "category": "Categoria",
+    "type": "Tipo",
+    "name": "Nome",
+    "notes": "Observações",
+    "status": "Status",
+    "actions": "Ações",
+    "paid": "Pago",
+    "pending": "Pendente",
+    "overdue": "Vencido",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "monthly": "Mensal",
+    "annual": "Anual"
   },
   "nav": {
     "groups": {
@@ -472,10 +500,24 @@
   },
   "proGate": {
     "upgrade": "Fazer upgrade",
-    "back": "Voltar"
+    "back": "Voltar",
+    "exclusivePro": "é exclusivo do PRO",
+    "unlockFor": "Desbloqueie por R$19,90/mês",
+    "subscribe": "Assinar PRO",
+    "perks": {
+      "unlimited": "Transações, metas e contas ilimitadas",
+      "reports": "Relatórios e projeção financeira",
+      "chat": "Chat com Rookinho (IA)",
+      "import": "Importação de extratos bancários",
+      "budget": "Orçamento por categoria"
+    }
   },
   "limitBanner": {
     "approaching": "Você está usando {pct}% do limite de {feature} do plano Free.",
-    "upgrade": "Fazer upgrade para PRO"
+    "upgrade": "Fazer upgrade para PRO",
+    "atLimit": "⛔ Limite atingido:",
+    "nearLimit": "⚠️ Quase no limite do plano Free:",
+    "upgradeBtn": "Upgrade para PRO"
   }
+}
 }

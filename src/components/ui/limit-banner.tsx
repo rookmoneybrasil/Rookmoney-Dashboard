@@ -3,6 +3,7 @@
 import { Crown, X, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface Props {
   usage:  { transactionsThisMonth: number; bills: number; goals: number }
@@ -17,6 +18,8 @@ function atLimit(used: number, limit: number | null) {
 }
 
 export function LimitBanner({ usage, limits }: Props) {
+  const t = useTranslations('limitBanner')
+  const c = useTranslations('common')
   const [dismissed, setDismissed] = useState(false)
   if (dismissed) return null
 
@@ -31,9 +34,9 @@ export function LimitBanner({ usage, limits }: Props) {
 
   const isAtLimit = txFull || billFull || goalFull
   const messages: string[] = []
-  if (txNear && limits.transactionsPerMonth)   messages.push(`${usage.transactionsThisMonth}/${limits.transactionsPerMonth} transações`)
-  if (billNear && limits.bills)                messages.push(`${usage.bills}/${limits.bills} contas`)
-  if (goalNear && limits.goals)                messages.push(`${usage.goals}/${limits.goals} metas`)
+  if (txNear && limits.transactionsPerMonth)   messages.push(`${usage.transactionsThisMonth}/${limits.transactionsPerMonth} ${c('transactions')}`)
+  if (billNear && limits.bills)                messages.push(`${usage.bills}/${limits.bills} ${c('bills')}`)
+  if (goalNear && limits.goals)                messages.push(`${usage.goals}/${limits.goals} ${c('goals')}`)
 
   return (
     <div className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
@@ -47,7 +50,7 @@ export function LimitBanner({ usage, limits }: Props) {
       }
       <p className={`flex-1 text-sm ${isAtLimit ? 'text-danger' : 'text-amber-200'}`}>
         <span className="font-semibold">
-          {isAtLimit ? '⛔ Limite atingido:' : '⚠️ Quase no limite do plano Free:'}
+          {isAtLimit ? t('atLimit') : t('nearLimit')}
         </span>{' '}
         {messages.join(' · ')}.
       </p>
@@ -60,7 +63,7 @@ export function LimitBanner({ usage, limits }: Props) {
         }`}
       >
         <Crown className="size-3" />
-        Upgrade para PRO
+        {t('upgradeBtn')}
         <ArrowRight className="size-3" />
       </Link>
       <button onClick={() => setDismissed(true)}

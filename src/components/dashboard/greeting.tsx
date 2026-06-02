@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { MASCOT_SRCS, type MascotMood } from '@/lib/mascot'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { format, type Locale } from 'date-fns'
+import { ptBR, enUS, es } from 'date-fns/locale'
+import { useTranslations, useLocale } from 'next-intl'
+
+const DATE_LOCALES: Record<string, Locale> = { pt: ptBR, en: enUS, es }
 
 interface Props {
   firstName: string
@@ -14,14 +17,18 @@ interface Props {
 }
 
 export function DashboardGreeting({ firstName, mood, moodLabel }: Props) {
-  const [greeting, setGreeting]     = useState('Olá')
+  const t          = useTranslations('dashboard.greeting')
+  const locale     = useLocale()
+  const dateLocale = DATE_LOCALES[locale] ?? ptBR
+
+  const [greeting, setGreeting]     = useState('')
   const [monthLabel, setMonthLabel] = useState('')
 
   useEffect(() => {
     const h = new Date().getHours()
-    setGreeting(h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite')
-    setMonthLabel(format(new Date(), 'MMMM yyyy', { locale: ptBR }))
-  }, [])
+    setGreeting(h < 12 ? t('morning') : h < 18 ? t('afternoon') : t('evening'))
+    setMonthLabel(format(new Date(), 'MMMM yyyy', { locale: dateLocale }))
+  }, [locale])
 
   return (
     <div className="flex items-center gap-3">
@@ -39,7 +46,9 @@ export function DashboardGreeting({ firstName, mood, moodLabel }: Props) {
         <h1 className="text-xl font-semibold text-slate-100 capitalize">
           {greeting}, {firstName}.
         </h1>
-        <p className="text-sm text-slate-500 mt-0.5 capitalize">{monthLabel} · Visão Geral</p>
+        <p className="text-sm text-slate-500 mt-0.5 capitalize">
+          {monthLabel}
+        </p>
       </div>
     </div>
   )

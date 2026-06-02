@@ -29,7 +29,35 @@
     "free": "Free",
     "upgrade": "Upgrade",
     "currency": "USD",
-    "locale": "en-US"
+    "locale": "en-US",
+    "transactions": "transactions",
+    "bills": "bills",
+    "goals": "goals",
+    "people": "people",
+    "categories": "categories",
+    "month": "month",
+    "income": "income",
+    "expense": "expense",
+    "new": "New",
+    "viewAll": "See all",
+    "noResults": "No results",
+    "deleteConfirm": "Are you sure?",
+    "amount": "Amount",
+    "date": "Date",
+    "description": "Description",
+    "category": "Category",
+    "type": "Type",
+    "name": "Name",
+    "notes": "Notes",
+    "status": "Status",
+    "actions": "Actions",
+    "paid": "Paid",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "active": "Active",
+    "inactive": "Inactive",
+    "monthly": "Monthly",
+    "annual": "Annual"
   },
   "nav": {
     "groups": {
@@ -472,10 +500,24 @@
   },
   "proGate": {
     "upgrade": "Upgrade now",
-    "back": "Go back"
+    "back": "Go back",
+    "exclusivePro": "is exclusive to PRO",
+    "unlockFor": "Unlock for $9.90/month",
+    "subscribe": "Subscribe to PRO",
+    "perks": {
+      "unlimited": "Unlimited transactions, goals and bills",
+      "reports": "Reports and financial projection",
+      "chat": "Chat with Rookinho (AI)",
+      "import": "Bank statement import",
+      "budget": "Category budget"
+    }
   },
   "limitBanner": {
     "approaching": "You're using {pct}% of your {feature} limit on the Free plan.",
-    "upgrade": "Upgrade to PRO"
+    "upgrade": "Upgrade to PRO",
+    "atLimit": "⛔ Limit reached:",
+    "nearLimit": "⚠️ Almost at your Free plan limit:",
+    "upgradeBtn": "Upgrade to PRO"
   }
+}
 }
