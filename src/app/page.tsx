@@ -1,5 +1,7 @@
-// Root page — next-intl middleware handles locale detection and routing.
-// This file is a fallback only and should not be reached in production.
+import { redirect } from 'next/navigation'
+
+// With localePrefix: 'always', all locales have a prefix.
+// Root / redirects to default locale /pt
 export default function RootPage() {
-  return null
+  redirect('/pt')
 }

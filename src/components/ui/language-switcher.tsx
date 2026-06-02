@@ -19,15 +19,14 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   function switchLocale(next: string) {
     if (next === locale) return
     startTransition(() => {
-      // Strip ANY locale prefix (pt, en, es) from current pathname
+      // Strip current locale prefix from pathname
       let path = pathname
       for (const l of ['pt', 'en', 'es']) {
-        if (path === `/${l}`) { path = '/'; break }
+        if (path === `/${l}`) { path = ''; break }
         if (path.startsWith(`/${l}/`)) { path = path.slice(l.length + 1); break }
       }
-      // Default locale (pt) has no prefix — others get /<locale>
-      const nextPath = next === 'pt' ? (path || '/') : `/${next}${path === '/' ? '' : path}`
-      router.replace(nextPath)
+      // With localePrefix: 'always', all locales have a prefix
+      router.replace(`/${next}${path ? `/${path}` : ''}`)
     })
   }
 
