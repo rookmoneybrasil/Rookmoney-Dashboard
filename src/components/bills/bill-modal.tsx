@@ -82,20 +82,22 @@ export function BillModal({ categories }: Props) {
       return
     }
 
+    const remaining = installments - alreadyPaid
     mutate({
       name,
       amount: mode === 'parcelado'
-        ? String(amountNum * installments)
+        ? String(amountNum * remaining)   // only the remaining installments
         : (fd.get('amount') as string),
       dueDate: fd.get('dueDate') as string,
       categoryId,
-      installments: mode === 'parcelado' ? installments : undefined,
+      installments: mode === 'parcelado' ? remaining : undefined,
       notes: fd.get('notes') as string,
     })
   }
 
+  const remaining   = installments - alreadyPaid
   const submitLabel = mode === 'parcelado'
-    ? `Criar ${installments - alreadyPaid} parcelas`
+    ? `Criar ${remaining} parcela${remaining !== 1 ? 's' : ''}`
     : mode === 'recorrente' ? 'Salvar conta fixa' : 'Adicionar'
 
   const dateLabel   = mode === 'parcelado' ? 'Próximo vencimento' : '1º vencimento'

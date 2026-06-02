@@ -1,5 +1,7 @@
 'use client'
 
+import React from 'react'
+
 /**
  * Client-side delete buttons for each resource type.
  * These wrap ConfirmDeleteButton with clientApi calls so server pages
@@ -68,13 +70,20 @@ export function DeleteInstallmentGroupButton({ groupId }: { groupId: string }) {
 }
 
 export function MarkBillPaidButton({ id, isPaid }: { id: string; isPaid: boolean }) {
+  const [loading, setLoading] = React.useState(false)
   return (
     <button
-      onClick={async () => { await clientApi.markBillPaid(id, !isPaid); reload() }}
-      className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-success hover:bg-success/10 transition-colors"
+      disabled={loading}
+      onClick={async () => {
+        if (loading) return
+        setLoading(true)
+        try { await clientApi.markBillPaid(id, !isPaid); reload() }
+        catch  { setLoading(false) }
+      }}
+      className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-success hover:bg-success/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       title={isPaid ? 'Marcar como pendente' : 'Marcar como paga'}
     >
-      <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <svg className={`size-4 ${loading ? 'animate-spin opacity-50' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
         {isPaid
           ? <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
           : <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />}

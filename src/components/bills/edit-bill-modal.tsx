@@ -22,6 +22,7 @@ interface Bill {
   isRecurring: boolean
   notes: string | null
   categoryId: string | null
+  recurringBillId?: string | null  // if set, managed by a RecurringBill template
 }
 
 interface Props { bill: Bill; categories: Category[] }
@@ -97,24 +98,31 @@ export function EditBillModal({ bill, categories }: Props) {
               defaultValue={bill.notes ?? ''} className="min-h-[60px]" />
           </FormField>
 
-          {/* Tipo: Avulso vs Recorrente */}
-          <div className="flex gap-2">
-            {([
-              { val: false, label: 'Avulso',     icon: '💸', desc: 'Pago uma vez' },
-              { val: true,  label: 'Recorrente', icon: '🔁', desc: 'Repete todo mês' },
-            ]).map(({ val, label, icon, desc }) => (
-              <button key={label} type="button" onClick={() => setRec(val)}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition-all ${
-                  isRecurring === val
-                    ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
-                    : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
-                }`}>
-                <span className="text-base">{icon}</span>
-                <span>{label}</span>
-                <span className="text-[10px] text-slate-600">{desc}</span>
-              </button>
-            ))}
-          </div>
+          {/* Tipo: Avulso vs Recorrente — hide for bills managed by a RecurringBill template */}
+          {!bill.recurringBillId && (
+            <div className="flex gap-2">
+              {([
+                { val: false, label: 'Avulso',     icon: '💸', desc: 'Pago uma vez' },
+                { val: true,  label: 'Recorrente', icon: '🔁', desc: 'Repete todo mês' },
+              ]).map(({ val, label, icon, desc }) => (
+                <button key={label} type="button" onClick={() => setRec(val)}
+                  className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition-all ${
+                    isRecurring === val
+                      ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                      : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                  }`}>
+                  <span className="text-base">{icon}</span>
+                  <span>{label}</span>
+                  <span className="text-[10px] text-slate-600">{desc}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {bill.recurringBillId && (
+            <p className="text-xs text-slate-600 bg-ink-700/40 border border-white/5 rounded-lg px-3 py-2">
+              Esta conta é gerada automaticamente pela conta fixa configurada.
+            </p>
+          )}
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>
