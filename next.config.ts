@@ -1,7 +1,9 @@
 import type { NextConfig } from 'next'
-import createNextIntlPlugin from 'next-intl/plugin'
+import path from 'path'
 
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
+// Manually configure next-intl without the plugin wrapper
+// createNextIntlPlugin causes middleware.js.nft.json build failure on Next.js 16 + Vercel
+// The plugin only adds a webpack alias for "next-intl/config" → i18n/request.ts
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', 'pg-pool'],
@@ -16,6 +18,12 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
     ],
+  },
+
+  webpack(config) {
+    // next-intl: register request config so getTranslations() works server-side
+    config.resolve.alias['next-intl/config'] = path.resolve('./src/i18n/request.ts')
+    return config
   },
 
   async headers() {
@@ -58,4 +66,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withNextIntl(nextConfig)
+export default nextConfig
