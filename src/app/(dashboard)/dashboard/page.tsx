@@ -56,8 +56,8 @@ export default async function DashboardPage() {
       expense:           p.projectedExpense,
       balance:           p.projectedIncome - p.projectedExpense,
       monthlyResult:     p.projectedIncome - p.projectedExpense,
-      incomeItems:       { sources: [], recurring: [], people: [] },
-      expenseItems:      { bills:   [], recurring: [], people: [] },
+      incomeItems:  p.incomeItems  ?? { sources: [], recurring: [], people: [] },
+      expenseItems: p.expenseItems ?? { bills:   [], recurring: [], people: [] },
     })),
   }
 

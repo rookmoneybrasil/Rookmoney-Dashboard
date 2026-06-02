@@ -333,7 +333,12 @@ export interface UpcomingPersonPayable { id: string; description: string; amount
 export interface MonthlyHistory { month: string; income: number; expense: number }
 export interface TopCategory { name: string; icon: string; color: string; amount: number; pct: number }
 export interface DashboardData { userName: string; monthBalance: number; monthIncome: number; monthExpense: number; incomeChange: number; expenseChange: number; totalReceivable: number; totalPeopleReceivable: number; totalIncomeReceivable: number; recentTransactions: Transaction[]; goals: Goal[]; upcomingBills: Bill[]; upcomingPersonPayables: UpcomingPersonPayable[]; futurePersonPayables: UpcomingPersonPayable[]; upcomingPeopleReceivable: UpcomingPersonPayable[]; pendingIncomeSources: { id: string; name: string; amount: number; isRecurring: boolean; dayOfMonth: number | null }[]; pendingBillsCount: number; pendingBillsAmount: number; personPayablesAmount: number; overdueCount: number; overBudgetCount: number; projections: ProjectionMonth[]; mood: string; monthlyHistory: MonthlyHistory[]; topCategories: TopCategory[]; insight: string }
-export interface ProjectionMonth { month: string; projectedIncome: number; projectedExpense: number; projectedBalance: number }
+export type ProjectionBreakdownItem = { id: string; label: string; amount: number; icon?: string }
+export interface ProjectionMonth {
+  month: string; projectedIncome: number; projectedExpense: number; projectedBalance: number
+  incomeItems?:  { sources: ProjectionBreakdownItem[]; recurring: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
+  expenseItems?: { bills: ProjectionBreakdownItem[]; recurring: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
+}
 export interface ReportsData { monthly: MonthlyReport[]; period: PeriodReport; categoryTrend: CategoryTrend[]; topExpenses: TopExpense[]; spendingByDay: SpendingDay[]; incomeSources: IncomeSourceReport[] }
 export interface MonthlyReport { monthKey: string; monthFull: string; totalIncome: number; totalExpense: number; balance: number; savingsRate: number }
 export interface PeriodReport { totalIncome: number; totalExpense: number; balance: number; netBalance: number; savingsRate: number; avgMonthlyIncome: number; avgMonthlyExpense: number; positiveMonths: number; totalMonths: number; bestMonth: string | null; worstMonth: string | null }
