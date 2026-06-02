@@ -17,16 +17,16 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const [pending, startTransition] = useTransition()
 
   function switchLocale(next: string) {
+    if (next === locale) return
     startTransition(() => {
-      // Strip current locale prefix from pathname if present
+      // Strip ANY locale prefix (pt, en, es) from current pathname
       let path = pathname
-      for (const l of ['en', 'es']) {
-        if (path.startsWith(`/${l}`)) {
-          path = path.slice(l.length + 1) || '/'
-          break
-        }
+      for (const l of ['pt', 'en', 'es']) {
+        if (path === `/${l}`) { path = '/'; break }
+        if (path.startsWith(`/${l}/`)) { path = path.slice(l.length + 1); break }
       }
-      const nextPath = next === 'pt' ? path : `/${next}${path}`
+      // Default locale (pt) has no prefix — others get /<locale>
+      const nextPath = next === 'pt' ? (path || '/') : `/${next}${path === '/' ? '' : path}`
       router.replace(nextPath)
     })
   }

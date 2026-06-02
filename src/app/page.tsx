@@ -1,7 +1,5 @@
-// Root page — handled by next-intl middleware which rewrites to /[locale]/
-// This file should never be reached in production, but serves as fallback.
-import { redirect } from 'next/navigation'
-
+// Root page — next-intl middleware handles locale detection and routing.
+// This file is a fallback only and should not be reached in production.
 export default function RootPage() {
-  redirect('/pt')
+  return null
 }
