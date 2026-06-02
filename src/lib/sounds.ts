@@ -99,20 +99,29 @@ export async function playBillPaid() {
 export async function playGoalComplete() {
   const c = await ensureRunning()
   if (!c) return
-  const t = c.currentTime
-  const notes: number[] = [523, 659, 784, 1047, 1319]
-  notes.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.08, 0.18, 0.15))
+  const t: number = c.currentTime
+  tone(c, 523,  t,        0.18, 0.15)
+  tone(c, 659,  t + 0.08, 0.18, 0.15)
+  tone(c, 784,  t + 0.16, 0.18, 0.15)
+  tone(c, 1047, t + 0.24, 0.18, 0.15)
+  tone(c, 1319, t + 0.32, 0.22, 0.18)
 }
 
 /** PRO upgrade celebration — full fanfare with harmony */
 export async function playProUpgrade() {
   const c = await ensureRunning()
   if (!c) return
-  const t = c.currentTime
-  const melody: number[] = [523, 659, 784, 1047, 1319, 1047, 1319]
-  const harmony: number[] = [262, 330, 392]
-  melody.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.07, 0.18, 0.18))
-  harmony.forEach((freq: number, i: number) => tone(c, freq, t + i * 0.14, 0.25, 0.08))
+  const t: number = c.currentTime
+  tone(c, 523,  t,        0.18, 0.18)
+  tone(c, 659,  t + 0.07, 0.18, 0.18)
+  tone(c, 784,  t + 0.14, 0.18, 0.18)
+  tone(c, 1047, t + 0.21, 0.18, 0.18)
+  tone(c, 1319, t + 0.28, 0.25, 0.18)
+  tone(c, 1047, t + 0.35, 0.18, 0.15)
+  tone(c, 1319, t + 0.42, 0.30, 0.20)
+  tone(c, 262,  t,        0.25, 0.08)
+  tone(c, 330,  t + 0.14, 0.25, 0.08)
+  tone(c, 392,  t + 0.28, 0.25, 0.08)
 }
 
 /** Error / validation fail — low double buzz */
