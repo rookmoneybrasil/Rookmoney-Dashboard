@@ -703,6 +703,19 @@ export default function LandingPage() {
               <a href="mailto:contato@rookmoney.com" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
                 Contato
               </a>
+              <a
+                href="https://www.instagram.com/rookmoneybr/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-500 hover:text-pink-400 transition-colors"
+                aria-label="Instagram"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                </svg>
+              </a>
             </nav>
             <p className="text-sm text-slate-600 text-center sm:text-right">
               &copy; {new Date().getFullYear()} Rook Money
