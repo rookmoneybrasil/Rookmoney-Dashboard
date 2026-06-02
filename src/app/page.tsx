@@ -692,9 +692,22 @@ export default function LandingPage() {
           <Link href="/" className="relative h-7 w-28 shrink-0">
             <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain object-left opacity-60" />
           </Link>
-          <p className="text-sm text-slate-600 text-center sm:text-right">
-            &copy; {new Date().getFullYear()} Rook Money. Todos os direitos reservados.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <nav className="flex items-center gap-5">
+              <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                Privacidade
+              </Link>
+              <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                Termos de Uso
+              </Link>
+              <a href="mailto:contato@rookmoney.com" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                Contato
+              </a>
+            </nav>
+            <p className="text-sm text-slate-600 text-center sm:text-right">
+              &copy; {new Date().getFullYear()} Rook Money
+            </p>
+          </div>
         </div>
       </footer>
 
