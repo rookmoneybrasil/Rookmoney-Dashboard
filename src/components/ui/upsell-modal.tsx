@@ -60,7 +60,7 @@ export function UpsellModal() {
               alt="Rookinho"
               fill
               sizes="420px"
-              className="object-contain object-center drop-shadow-2xl"
+              className="object-cover object-center"
               priority
             />
             {/* Subtle gradient overlay on right edge to blend with content */}

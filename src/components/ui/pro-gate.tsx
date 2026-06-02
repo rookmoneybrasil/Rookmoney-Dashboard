@@ -44,7 +44,7 @@ export function ProGate({ feature, children, locked = true, perks = DEFAULT_PERK
               alt="Rookinho"
               fill
               sizes="220px"
-              className="object-contain object-center"
+              className="object-cover object-center"
             />
           </div>
 
