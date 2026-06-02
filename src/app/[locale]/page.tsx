@@ -150,9 +150,10 @@ export default async function LandingPage() {
 
               <FadeIn delay={200}>
                 <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold leading-tight tracking-tight max-w-xl">
-                  {t('hero.title')}{' '}
+                  {t('hero.title')}
+                  <br />
                   <span
-                    className="text-transparent bg-clip-text"
+                    className="text-transparent bg-clip-text whitespace-nowrap"
                     style={{ backgroundImage: 'linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%)' }}
                   >
                     {t('hero.titleHighlight')}
