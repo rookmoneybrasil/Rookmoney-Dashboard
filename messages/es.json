@@ -445,8 +445,55 @@
   },
   "onboarding": {
     "skip": "Omitir",
+    "skipFull": "Omitir configuración e ir directo al panel",
     "next": "Siguiente",
     "start": "Comenzar",
+    "letsGo": "Empecemos",
+    "goToDashboard": "Ir al Panel",
+    "setupComplete": "¡Configuración completa!",
+    "allSet": "¡Todo listo! 🎉",
+    "allSetDesc": "Tu Rook Money está configurado. Ahora solo registra tus transacciones y ve crecer tu dinero.",
+    "whatNow": "Lo que puedes hacer ahora",
+    "nextSteps": [
+      "📊 Ver el panel con tu resumen",
+      "💳 Registrar tus gastos del mes",
+      "📅 Configurar más facturas en Facturas"
+    ],
+    "add": "Agregar",
+    "skip2": "Omitir",
+    "step1": {
+      "label": "Paso 1 · Ingresos",
+      "title": "¿Cuál es tu ingreso principal?",
+      "desc": "Tu salario o principal fuente de ingresos recurrentes.",
+      "sourceLabel": "¿De dónde viene?",
+      "sourcePlaceholder": "Ej.: Empresa X, Freelance, Autónomo...",
+      "amountLabel": "Monto mensual",
+      "dayLabel": "Día de cobro",
+      "tip": "Este ingreso se registrará automáticamente cada mes en la fecha indicada."
+    },
+    "step2": {
+      "label": "Paso 2 · Facturas",
+      "title": "¿Tienes alguna factura fija?",
+      "desc": "Alquiler, internet, gimnasio — gastos que se repiten cada mes.",
+      "nameLabel": "Nombre de la factura",
+      "namePlaceholder": "Ej.: Alquiler, Internet, Gimnasio...",
+      "amountLabel": "Monto",
+      "dayLabel": "Día de vencimiento",
+      "tip": "Las facturas recurrentes se renuevan automáticamente. También recibes alertas antes del vencimiento."
+    },
+    "step3": {
+      "label": "Paso 3 · Meta",
+      "title": "¿Tienes alguna meta financiera?",
+      "desc": "Fondo de emergencia, viaje, computadora nueva — cualquier objetivo.",
+      "nameLabel": "¿Cuál es tu meta?",
+      "namePlaceholder": "Ej.: Fondo de emergencia",
+      "amountLabel": "Monto objetivo",
+      "createGoal": "Crear meta"
+    },
+    "stepLabels": ["Ingresos", "Facturas", "Metas"],
+    "welcome": "Bienvenido a Rook Money",
+    "hello": "¡Hola, {name}! 👋",
+    "setup3steps": "Vamos a configurar tus finanzas en {steps} pasos rápidos — tarda menos de 2 minutos.",
     "steps": {
       "welcome": {
         "title": "Bienvenido a Rook Money",
@@ -522,6 +569,10 @@
       "contact": "Contacto",
       "rights": "Todos los derechos reservados."
     }
+  },
+  "financialHealth": {
+    "title": "Salud financiera",
+    "viewDetails": "Ver detalles por categoría"
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

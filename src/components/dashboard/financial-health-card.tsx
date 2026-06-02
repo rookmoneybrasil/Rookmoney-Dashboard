@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { FinancialHealth, HealthComponent } from '@/lib/api-client'
+import { useTranslations } from 'next-intl'
 
 // ─── Arc SVG ──────────────────────────────────────────────────────────────────
 
@@ -56,7 +57,7 @@ function ScoreArc({ score, color }: { score: number; color: string }) {
         {score}
       </text>
       <text x={cx} y={cy + 14} textAnchor="middle" className="fill-slate-500" fontSize="9" fontFamily="inherit">
-        de 100
+        /100
       </text>
     </svg>
   )
@@ -93,6 +94,7 @@ function ComponentRow({ comp }: { comp: HealthComponent }) {
 // ─── Main card ────────────────────────────────────────────────────────────────
 
 export function FinancialHealthCard({ health }: { health: FinancialHealth }) {
+  const t = useTranslations('financialHealth')
   const [expanded, setExpanded] = useState(false)
 
   const gradeBg: Record<string, string> = {
@@ -114,7 +116,7 @@ export function FinancialHealthCard({ health }: { health: FinancialHealth }) {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-semibold text-slate-300">Saúde financeira</h3>
+            <h3 className="text-sm font-semibold text-slate-300">{t('title')}</h3>
             <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${gradeBg[health.grade]}`}>
               {health.grade}
             </span>
@@ -145,7 +147,7 @@ export function FinancialHealthCard({ health }: { health: FinancialHealth }) {
         onClick={() => setExpanded(v => !v)}
         className="w-full flex items-center justify-between px-5 py-2.5 border-t border-ink-700 text-xs text-slate-500 hover:text-slate-300 hover:bg-ink-750 transition-colors"
       >
-        <span>Ver detalhes por categoria</span>
+        <span>{t('viewDetails')}</span>
         <ChevronDown className={`size-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} />
       </button>
 

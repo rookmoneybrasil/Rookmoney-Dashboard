@@ -13,16 +13,12 @@ import {
   createOnboardingGoal,
   markOnboarded,
 } from '@/app/actions/onboarding'
-
-const STEPS = [
-  { icon: Banknote,  label: 'Renda',  color: 'text-success'   },
-  { icon: FileText,  label: 'Contas', color: 'text-danger'    },
-  { icon: Target,    label: 'Metas',  color: 'text-brand-400' },
-]
+import { useTranslations } from 'next-intl'
 
 interface Props { firstName: string }
 
 export function OnboardingWizard({ firstName }: Props) {
+  const t = useTranslations('onboarding')
   const [step, setStep] = useState(0)
 
   const [incomeState, incomeAction, incomePending] = useActionState(createOnboardingIncome, undefined)
@@ -33,11 +29,17 @@ export function OnboardingWizard({ firstName }: Props) {
   useEffect(() => { if (billState   && !billState.error)   setStep(3) }, [billState])
   useEffect(() => { if (goalState   && !goalState.error)   setStep(4) }, [goalState])
 
+  const STEPS = [
+    { icon: Banknote,  label: t('stepLabels.0'), color: 'text-success' },
+    { icon: FileText,  label: t('stepLabels.1'), color: 'text-danger'  },
+    { icon: Target,    label: t('stepLabels.2'), color: 'text-brand-400' },
+  ]
+
   return (
     <div className="min-h-screen bg-ink-900 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
 
-        {/* ── Welcome ───────────────────────────────────────────── */}
+        {/* ── Welcome ─────────────────────────────────────── */}
         {step === 0 && (
           <div className="flex flex-col items-center text-center gap-8 animate-in fade-in duration-300">
             <div className="relative size-40 mascot-float">
@@ -46,17 +48,16 @@ export function OnboardingWizard({ firstName }: Props) {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="size-5 text-brand-400" />
-                <span className="text-xs font-semibold text-brand-400 uppercase tracking-widest">Bem-vindo ao Rook Money</span>
+                <span className="text-xs font-semibold text-brand-400 uppercase tracking-widest">{t('welcome')}</span>
               </div>
               <h1 className="text-3xl font-bold text-slate-100">
-                Olá, {firstName}! 👋
+                {t('hello', { name: firstName })}
               </h1>
               <p className="text-slate-400 text-base leading-relaxed max-w-sm">
-                Vamos configurar seu financeiro em <strong className="text-slate-200">3 passos rápidos</strong> — leva menos de 2 minutos.
+                {t('setup3steps', { steps: STEPS.length })}
               </p>
             </div>
 
-            {/* Step preview */}
             <div className="flex items-center gap-4 bg-ink-800 border border-white/6 rounded-2xl px-6 py-4 w-full">
               {STEPS.map((s, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
@@ -70,20 +71,19 @@ export function OnboardingWizard({ firstName }: Props) {
 
             <div className="flex flex-col gap-2 w-full">
               <Button onClick={() => setStep(1)} className="w-full gap-2 h-11 text-base">
-                Vamos começar
+                {t('letsGo')}
                 <ArrowRight className="size-4" />
               </Button>
               <button onClick={() => setStep(4)} className="text-xs text-slate-600 hover:text-slate-400 transition-colors py-1">
-                Pular configuração e ir direto ao dashboard
+                {t('skipFull')}
               </button>
             </div>
           </div>
         )}
 
-        {/* ── Steps 1-3 ─────────────────────────────────────────── */}
+        {/* ── Steps 1-3 ──────────────────────────────────── */}
         {step >= 1 && step <= 3 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-            {/* Progress */}
             <div className="flex items-center gap-3 mb-8">
               <button onClick={() => setStep(s => s - 1)} className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-ink-700 transition-colors">
                 <ArrowLeft className="size-4" />
@@ -96,7 +96,7 @@ export function OnboardingWizard({ firstName }: Props) {
               <span className="text-xs text-slate-600 tabular-nums">{step}/{STEPS.length}</span>
             </div>
 
-            {/* ── Step 1: Renda ── */}
+            {/* ── Step 1: Income ── */}
             {step === 1 && (
               <div className="flex flex-col gap-6">
                 <div className="flex items-start gap-4">
@@ -104,9 +104,9 @@ export function OnboardingWizard({ firstName }: Props) {
                     <Banknote className="size-5 text-success" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-success uppercase tracking-wider mb-1">Passo 1 · Renda</p>
-                    <h2 className="text-xl font-bold text-slate-100">Qual é sua renda principal?</h2>
-                    <p className="text-slate-500 text-sm mt-1">Seu salário ou a principal fonte de renda recorrente.</p>
+                    <p className="text-xs font-semibold text-success uppercase tracking-wider mb-1">{t('step1.label')}</p>
+                    <h2 className="text-xl font-bold text-slate-100">{t('step1.title')}</h2>
+                    <p className="text-slate-500 text-sm mt-1">{t('step1.desc')}</p>
                   </div>
                 </div>
 
@@ -115,36 +115,34 @@ export function OnboardingWizard({ firstName }: Props) {
                 )}
 
                 <form action={incomeAction} className="flex flex-col gap-4">
-                  <FormField label="De onde vem?" htmlFor="name" required>
-                    <Input id="name" name="name" placeholder="Ex.: Empresa X, Freelas, Autônomo..." autoFocus required />
+                  <FormField label={t('step1.sourceLabel')} htmlFor="name" required>
+                    <Input id="name" name="name" placeholder={t('step1.sourcePlaceholder')} autoFocus required />
                   </FormField>
                   <div className="grid grid-cols-2 gap-3">
-                    <FormField label="Valor mensal (R$)" htmlFor="amount" required>
+                    <FormField label={t('step1.amountLabel')} htmlFor="amount" required>
                       <Input id="amount" name="amount" type="number" step="0.01" min="1" placeholder="3.000,00" required />
                     </FormField>
-                    <FormField label="Dia de recebimento" htmlFor="dayOfMonth">
+                    <FormField label={t('step1.dayLabel')} htmlFor="dayOfMonth">
                       <Input id="dayOfMonth" name="dayOfMonth" type="number" min="1" max="31" placeholder="1" />
                     </FormField>
                   </div>
 
                   <div className="bg-success/5 border border-success/10 rounded-xl px-4 py-3 flex items-start gap-2">
                     <span className="text-success text-sm mt-0.5">💡</span>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Esta renda será lançada automaticamente todo mês na data informada.
-                    </p>
+                    <p className="text-xs text-slate-400 leading-relaxed">{t('step1.tip')}</p>
                   </div>
 
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="secondary" onClick={() => setStep(2)} className="flex-1">Pular</Button>
+                    <Button type="button" variant="secondary" onClick={() => setStep(2)} className="flex-1">{t('skip2')}</Button>
                     <Button type="submit" loading={incomePending} className="flex-1 gap-2">
-                      Adicionar <ArrowRight className="size-4" />
+                      {t('add')} <ArrowRight className="size-4" />
                     </Button>
                   </div>
                 </form>
               </div>
             )}
 
-            {/* ── Step 2: Conta fixa ── */}
+            {/* ── Step 2: Bills ── */}
             {step === 2 && (
               <div className="flex flex-col gap-6">
                 <div className="flex items-start gap-4">
@@ -152,9 +150,9 @@ export function OnboardingWizard({ firstName }: Props) {
                     <FileText className="size-5 text-danger" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-danger uppercase tracking-wider mb-1">Passo 2 · Contas</p>
-                    <h2 className="text-xl font-bold text-slate-100">Tem alguma conta fixa?</h2>
-                    <p className="text-slate-500 text-sm mt-1">Aluguel, internet, academia — despesas que se repetem todo mês.</p>
+                    <p className="text-xs font-semibold text-danger uppercase tracking-wider mb-1">{t('step2.label')}</p>
+                    <h2 className="text-xl font-bold text-slate-100">{t('step2.title')}</h2>
+                    <p className="text-slate-500 text-sm mt-1">{t('step2.desc')}</p>
                   </div>
                 </div>
 
@@ -163,36 +161,34 @@ export function OnboardingWizard({ firstName }: Props) {
                 )}
 
                 <form action={billAction} className="flex flex-col gap-4">
-                  <FormField label="Nome da conta" htmlFor="billName" required>
-                    <Input id="billName" name="name" placeholder="Ex.: Aluguel, Internet, Academia..." autoFocus required />
+                  <FormField label={t('step2.nameLabel')} htmlFor="billName" required>
+                    <Input id="billName" name="name" placeholder={t('step2.namePlaceholder')} autoFocus required />
                   </FormField>
                   <div className="grid grid-cols-2 gap-3">
-                    <FormField label="Valor (R$)" htmlFor="billAmount" required>
+                    <FormField label={t('step2.amountLabel')} htmlFor="billAmount" required>
                       <Input id="billAmount" name="amount" type="number" step="0.01" min="1" placeholder="1.200,00" required />
                     </FormField>
-                    <FormField label="Dia do vencimento" htmlFor="day">
+                    <FormField label={t('step2.dayLabel')} htmlFor="day">
                       <Input id="day" name="day" type="number" min="1" max="28" placeholder="10" />
                     </FormField>
                   </div>
 
                   <div className="bg-warning/5 border border-warning/10 rounded-xl px-4 py-3 flex items-start gap-2">
                     <span className="text-warning text-sm mt-0.5">💡</span>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Contas recorrentes se renovam automaticamente. Você também recebe alertas antes do vencimento.
-                    </p>
+                    <p className="text-xs text-slate-400 leading-relaxed">{t('step2.tip')}</p>
                   </div>
 
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="secondary" onClick={() => setStep(3)} className="flex-1">Pular</Button>
+                    <Button type="button" variant="secondary" onClick={() => setStep(3)} className="flex-1">{t('skip2')}</Button>
                     <Button type="submit" loading={billPending} className="flex-1 gap-2">
-                      Adicionar <ArrowRight className="size-4" />
+                      {t('add')} <ArrowRight className="size-4" />
                     </Button>
                   </div>
                 </form>
               </div>
             )}
 
-            {/* ── Step 3: Meta ── */}
+            {/* ── Step 3: Goal ── */}
             {step === 3 && (
               <div className="flex flex-col gap-6">
                 <div className="flex items-start gap-4">
@@ -200,9 +196,9 @@ export function OnboardingWizard({ firstName }: Props) {
                     <Target className="size-5 text-brand-400" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-brand-400 uppercase tracking-wider mb-1">Passo 3 · Meta</p>
-                    <h2 className="text-xl font-bold text-slate-100">Tem alguma meta financeira?</h2>
-                    <p className="text-slate-500 text-sm mt-1">Reserva de emergência, viagem, computador novo — qualquer objetivo.</p>
+                    <p className="text-xs font-semibold text-brand-400 uppercase tracking-wider mb-1">{t('step3.label')}</p>
+                    <h2 className="text-xl font-bold text-slate-100">{t('step3.title')}</h2>
+                    <p className="text-slate-500 text-sm mt-1">{t('step3.desc')}</p>
                   </div>
                 </div>
 
@@ -210,12 +206,11 @@ export function OnboardingWizard({ firstName }: Props) {
                   <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{goalState.error}</p>
                 )}
 
-                {/* Goal inspiration */}
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { icon: '🏖️', label: 'Viagem' },
-                    { icon: '🏠', label: 'Imóvel' },
-                    { icon: '🛡️', label: 'Reserva' },
+                    { icon: '🏖️', label: t('stepLabels.0') === 'Renda' ? 'Viagem' : 'Trip' },
+                    { icon: '🏠', label: t('stepLabels.0') === 'Renda' ? 'Imóvel' : 'Housing' },
+                    { icon: '🛡️', label: t('stepLabels.0') === 'Renda' ? 'Reserva' : 'Emergency' },
                   ].map(g => (
                     <button key={g.label} type="button"
                       className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-ink-800 border border-ink-600 hover:border-brand-500/40 hover:bg-brand-900/20 transition-colors text-xs text-slate-400">
@@ -226,17 +221,17 @@ export function OnboardingWizard({ firstName }: Props) {
                 </div>
 
                 <form action={goalAction} className="flex flex-col gap-4">
-                  <FormField label="Qual é a meta?" htmlFor="goalName" required>
-                    <Input id="goalName" name="name" placeholder="Ex.: Reserva de emergência" autoFocus required />
+                  <FormField label={t('step3.nameLabel')} htmlFor="goalName" required>
+                    <Input id="goalName" name="name" placeholder={t('step3.namePlaceholder')} autoFocus required />
                   </FormField>
-                  <FormField label="Valor alvo (R$)" htmlFor="targetAmount" required>
+                  <FormField label={t('step3.amountLabel')} htmlFor="targetAmount" required>
                     <Input id="targetAmount" name="targetAmount" type="number" step="0.01" min="1" placeholder="10.000,00" required />
                   </FormField>
 
                   <div className="flex gap-3 pt-2">
-                    <Button type="button" variant="secondary" onClick={() => setStep(4)} className="flex-1">Pular</Button>
+                    <Button type="button" variant="secondary" onClick={() => setStep(4)} className="flex-1">{t('skip2')}</Button>
                     <Button type="submit" loading={goalPending} className="flex-1 gap-2">
-                      Criar meta <ArrowRight className="size-4" />
+                      {t('step3.createGoal')} <ArrowRight className="size-4" />
                     </Button>
                   </div>
                 </form>
@@ -245,7 +240,7 @@ export function OnboardingWizard({ firstName }: Props) {
           </div>
         )}
 
-        {/* ── Done ─────────────────────────────────────────────── */}
+        {/* ── Done ────────────────────────────────────────── */}
         {step === 4 && (
           <div className="flex flex-col items-center text-center gap-8 animate-in fade-in zoom-in-95 duration-500">
             <div className="relative size-44 mascot-bounce">
@@ -254,28 +249,22 @@ export function OnboardingWizard({ firstName }: Props) {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-center gap-2">
                 <CheckCircle2 className="size-6 text-success" />
-                <span className="text-success font-semibold">Configuração concluída!</span>
+                <span className="text-success font-semibold">{t('setupComplete')}</span>
               </div>
-              <h2 className="text-3xl font-bold text-slate-100">Tudo pronto! 🎉</h2>
-              <p className="text-slate-400 text-base leading-relaxed max-w-sm">
-                Seu Rook Money está configurado. Agora é só lançar suas transações e acompanhar seu dinheiro crescer.
-              </p>
+              <h2 className="text-3xl font-bold text-slate-100">{t('allSet')}</h2>
+              <p className="text-slate-400 text-base leading-relaxed max-w-sm">{t('allSetDesc')}</p>
             </div>
 
             <div className="bg-ink-800 border border-white/6 rounded-2xl px-6 py-4 w-full flex flex-col gap-2 text-left">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">O que você pode fazer agora</p>
-              {[
-                '📊 Ver o dashboard com sua visão geral',
-                '💳 Lançar suas despesas do mês',
-                '📅 Configurar mais contas no Contas',
-              ].map(tip => (
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{t('whatNow')}</p>
+              {(t.raw('nextSteps') as string[]).map((tip: string) => (
                 <p key={tip} className="text-sm text-slate-400">{tip}</p>
               ))}
             </div>
 
             <form action={markOnboarded} className="w-full">
               <Button type="submit" className="w-full gap-2 h-11 text-base">
-                Ir pro Dashboard
+                {t('goToDashboard')}
                 <ArrowRight className="size-4" />
               </Button>
             </form>

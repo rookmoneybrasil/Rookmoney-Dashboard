@@ -445,8 +445,55 @@
   },
   "onboarding": {
     "skip": "Pular",
+    "skipFull": "Pular configuração e ir direto ao dashboard",
     "next": "Próximo",
     "start": "Começar",
+    "letsGo": "Vamos começar",
+    "goToDashboard": "Ir pro Dashboard",
+    "setupComplete": "Configuração concluída!",
+    "allSet": "Tudo pronto! 🎉",
+    "allSetDesc": "Seu Rook Money está configurado. Agora é só lançar suas transações e acompanhar seu dinheiro crescer.",
+    "whatNow": "O que você pode fazer agora",
+    "nextSteps": [
+      "📊 Ver o dashboard com sua visão geral",
+      "💳 Lançar suas despesas do mês",
+      "📅 Configurar mais contas em Contas"
+    ],
+    "add": "Adicionar",
+    "skip2": "Pular",
+    "step1": {
+      "label": "Passo 1 · Renda",
+      "title": "Qual é sua renda principal?",
+      "desc": "Seu salário ou a principal fonte de renda recorrente.",
+      "sourceLabel": "De onde vem?",
+      "sourcePlaceholder": "Ex.: Empresa X, Freelas, Autônomo...",
+      "amountLabel": "Valor mensal (R$)",
+      "dayLabel": "Dia de recebimento",
+      "tip": "Esta renda será lançada automaticamente todo mês na data informada."
+    },
+    "step2": {
+      "label": "Passo 2 · Contas",
+      "title": "Tem alguma conta fixa?",
+      "desc": "Aluguel, internet, academia — despesas que se repetem todo mês.",
+      "nameLabel": "Nome da conta",
+      "namePlaceholder": "Ex.: Aluguel, Internet, Academia...",
+      "amountLabel": "Valor (R$)",
+      "dayLabel": "Dia do vencimento",
+      "tip": "Contas recorrentes se renovam automaticamente. Você também recebe alertas antes do vencimento."
+    },
+    "step3": {
+      "label": "Passo 3 · Meta",
+      "title": "Tem alguma meta financeira?",
+      "desc": "Reserva de emergência, viagem, computador novo — qualquer objetivo.",
+      "nameLabel": "Qual é a meta?",
+      "namePlaceholder": "Ex.: Reserva de emergência",
+      "amountLabel": "Valor alvo (R$)",
+      "createGoal": "Criar meta"
+    },
+    "stepLabels": ["Renda", "Contas", "Metas"],
+    "welcome": "Bem-vindo ao Rook Money",
+    "hello": "Olá, {name}! 👋",
+    "setup3steps": "Vamos configurar seu financeiro em {steps} passos rápidos — leva menos de 2 minutos.",
     "steps": {
       "welcome": {
         "title": "Bem-vindo ao Rook Money",
@@ -522,6 +569,10 @@
       "contact": "Contato",
       "rights": "Todos os direitos reservados."
     }
+  },
+  "financialHealth": {
+    "title": "Saúde financeira",
+    "viewDetails": "Ver detalhes por categoria"
   },
   "errors": {
     "generic": "Algo deu errado. Tente novamente.",

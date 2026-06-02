@@ -445,8 +445,55 @@
   },
   "onboarding": {
     "skip": "Skip",
+    "skipFull": "Skip setup and go straight to the dashboard",
     "next": "Next",
     "start": "Get started",
+    "letsGo": "Let's start",
+    "goToDashboard": "Go to Dashboard",
+    "setupComplete": "Setup complete!",
+    "allSet": "All set! 🎉",
+    "allSetDesc": "Your Rook Money is configured. Now just log your transactions and watch your money grow.",
+    "whatNow": "What you can do now",
+    "nextSteps": [
+      "📊 See the dashboard with your overview",
+      "💳 Log your monthly expenses",
+      "📅 Set up more bills in Bills"
+    ],
+    "add": "Add",
+    "skip2": "Skip",
+    "step1": {
+      "label": "Step 1 · Income",
+      "title": "What is your main income?",
+      "desc": "Your salary or main recurring income source.",
+      "sourceLabel": "Where does it come from?",
+      "sourcePlaceholder": "e.g.: Company X, Freelance, Self-employed...",
+      "amountLabel": "Monthly amount",
+      "dayLabel": "Payment day",
+      "tip": "This income will be logged automatically every month on the given date."
+    },
+    "step2": {
+      "label": "Step 2 · Bills",
+      "title": "Do you have any fixed bills?",
+      "desc": "Rent, internet, gym — expenses that repeat every month.",
+      "nameLabel": "Bill name",
+      "namePlaceholder": "e.g.: Rent, Internet, Gym...",
+      "amountLabel": "Amount",
+      "dayLabel": "Due day",
+      "tip": "Recurring bills renew automatically. You also get reminders before the due date."
+    },
+    "step3": {
+      "label": "Step 3 · Goal",
+      "title": "Do you have a financial goal?",
+      "desc": "Emergency fund, trip, new computer — any objective.",
+      "nameLabel": "What is your goal?",
+      "namePlaceholder": "e.g.: Emergency fund",
+      "amountLabel": "Target amount",
+      "createGoal": "Create goal"
+    },
+    "stepLabels": ["Income", "Bills", "Goals"],
+    "welcome": "Welcome to Rook Money",
+    "hello": "Hello, {name}! 👋",
+    "setup3steps": "Let's set up your finances in {steps} quick steps — takes less than 2 minutes.",
     "steps": {
       "welcome": {
         "title": "Welcome to Rook Money",
@@ -522,6 +569,10 @@
       "contact": "Contact",
       "rights": "All rights reserved."
     }
+  },
+  "financialHealth": {
+    "title": "Financial health",
+    "viewDetails": "View details by category"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
