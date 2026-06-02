@@ -1,13 +1,23 @@
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { Poppins } from 'next/font/google'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
+import { ThemeProvider } from '@/components/theme-provider'
 import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
+import '../globals.css'
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+  display: 'swap',
+})
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
-
   const ogLocale = locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_419' : 'en_US'
 
   return {
@@ -33,6 +43,21 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       images:   [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
     appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Rook Money' },
+    icons: {
+      icon:    [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
+        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      shortcut: '/favicon.svg',
+      apple:    '/icon-192.png',
+    },
+    other: {
+      'mobile-web-app-capable':       'yes',
+      'apple-mobile-web-app-capable': 'yes',
+      'msapplication-TileColor':      '#020f21',
+      'theme-color':                  '#020f21',
+    },
   }
 }
 
@@ -40,8 +65,6 @@ export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }))
 }
 
-// No html/body here — those are in the root app/layout.tsx
-// This layout only validates the locale param
 export default async function LocaleLayout({
   children,
   params,
@@ -55,5 +78,18 @@ export default async function LocaleLayout({
     notFound()
   }
 
-  return <>{children}</>
+  const messages = await getMessages()
+  const htmlLang = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es' : 'en'
+
+  return (
+    <html lang={htmlLang} className={`${poppins.variable} h-full`} suppressHydrationWarning>
+      <body className="h-full antialiased">
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  )
 }
