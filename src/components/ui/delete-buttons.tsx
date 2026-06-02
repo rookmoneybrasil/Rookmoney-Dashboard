@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { playBillPaid, playClick } from '@/lib/sounds'
 
 /**
  * Client-side delete buttons for each resource type.
@@ -77,7 +78,11 @@ export function MarkBillPaidButton({ id, isPaid }: { id: string; isPaid: boolean
       onClick={async () => {
         if (loading) return
         setLoading(true)
-        try { await clientApi.markBillPaid(id, !isPaid); reload() }
+        try {
+          await clientApi.markBillPaid(id, !isPaid)
+          if (!isPaid) playBillPaid()  // only on paying, not on un-paying
+          reload()
+        }
         catch  { setLoading(false) }
       }}
       className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-success hover:bg-success/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { clientApi } from '@/lib/api-client'
 import { Button } from '@/components/ui/button'
-import { Palette } from 'lucide-react'
+import { Palette, Volume2, VolumeX } from 'lucide-react'
+import { getSoundsEnabled, toggleSounds, playIncome } from '@/lib/sounds'
 
 const CURRENCIES = [
   { value: 'BRL', label: 'Real brasileiro (R$)' },
@@ -18,6 +19,29 @@ const DATE_FORMATS = [
 ]
 
 interface Props { currency: string; dateFormat: string }
+
+function SoundToggle() {
+  const [on, setOn] = useState(() => {
+    if (typeof window === 'undefined') return true
+    return getSoundsEnabled()
+  })
+  function handle() {
+    const next = toggleSounds()
+    setOn(next)
+    if (next) playIncome() // preview sound when enabling
+  }
+  return (
+    <button onClick={handle}
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-colors ${
+        on
+          ? 'bg-brand-800/60 border-brand-700/40 text-brand-300'
+          : 'bg-ink-700/60 border-white/6 text-slate-500 hover:text-slate-400'
+      }`}>
+      {on ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
+      Sons: <span className="font-semibold">{on ? 'Ligado' : 'Desligado'}</span>
+    </button>
+  )
+}
 
 export function AppearanceForm({ currency, dateFormat }: Props) {
   const [form, setForm]     = useState({ currency, dateFormat })
@@ -65,12 +89,15 @@ export function AppearanceForm({ currency, dateFormat }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-ink-700/60 border border-white/6 text-xs text-slate-500">
           <Palette className="size-3.5 shrink-0" />
           Tema: <span className="text-slate-400 font-medium">Escuro</span>
           <span className="ml-1 text-ink-400 bg-ink-600 px-1.5 py-0.5 rounded text-[10px]">fixo</span>
         </div>
+
+        {/* Sound toggle */}
+        <SoundToggle />
       </div>
 
       {error && <p className="text-sm text-danger">{error}</p>}

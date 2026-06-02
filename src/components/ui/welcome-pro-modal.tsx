@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Crown, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { playProUpgrade } from '@/lib/sounds'
 
 const PERKS = [
   'Transações, metas e contas ilimitadas',
@@ -23,7 +24,7 @@ export function WelcomeProModal() {
   useEffect(() => {
     if (params.get('upgraded') === '1') {
       setOpen(true)
-      // Remove ?upgraded=1 from URL without reload
+      playProUpgrade()
       router.replace('/dashboard', { scroll: false })
     }
   }, [params, router])

@@ -8,6 +8,7 @@ import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { triggerMascot } from '@/lib/mascot'
+import { playGoalComplete, playIncome } from '@/lib/sounds'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -34,6 +35,7 @@ export function ContributeButton({ goalId, goalName, remaining, current, categor
     {
       onSuccess: () => {
         setOpen(false)
+        playGoalComplete()
         triggerMascot('celebrating', `Aporte adicionado em "${goalName}"! Continue assim! 💰`)
       },
     },

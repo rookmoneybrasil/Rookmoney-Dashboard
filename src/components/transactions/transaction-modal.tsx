@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
+import { playIncome, playExpense } from '@/lib/sounds'
 import { triggerMascot } from '@/lib/mascot'
 import {
   Modal,
@@ -60,8 +61,10 @@ export function TransactionModal({ categories }: Props) {
         setCatId('')
         setDesc('')
         if (type === 'INCOME') {
+          playIncome()
           triggerMascot('happy', 'Receita registrada! Dinheiro entrando! 💵')
         } else {
+          playExpense()
           triggerMascot('counting', 'Despesa registrada! Fique de olho no saldo. 📝')
         }
       },
