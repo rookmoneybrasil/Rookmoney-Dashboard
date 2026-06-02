@@ -117,6 +117,7 @@ const navGroups = [
   {
     label: 'Ajuda',
     items: [
+      { href: '/billing',      icon: Crown,           label: 'Meu plano',  color: 'amber',  desc: 'Gerencie sua assinatura e limites do plano',            pro: false },
       { href: '/support',      icon: LifeBuoy,        label: 'Suporte',    color: 'blue',   desc: 'Abra um ticket, reporte bugs ou envie sugestões',      pro: false },
     ],
   },
