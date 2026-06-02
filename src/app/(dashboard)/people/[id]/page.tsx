@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, CalendarDays } from 'lucide-react'
+import { addMonths, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { serverApi } from '@/lib/api-client'
 import { EntryModal } from '@/components/people/entry-modal'
 import { EntryActions } from '@/components/people/entry-actions'
@@ -171,7 +173,6 @@ export default async function PersonPage({ params }: Props) {
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     if (isOldRecurring && new Date(e.date) > cutoff) continue
 
-    // For installment groups: count only the first pending entry (monthly installment)
     if (e.installmentGroupId) {
       if (groupSeen.has(e.installmentGroupId)) continue
       groupSeen.add(e.installmentGroupId)
@@ -181,9 +182,54 @@ export default async function PersonPage({ params }: Props) {
     else                           iOweTotal    += Number(e.amount)
   }
 
-  // Recurring templates are NOT added to balance — they generate PersonEntry
-  // instances each month which are already counted in openEntries above.
-  const balance = theyOweTotal - iOweTotal
+  // Add recurring templates that DON'T have a generated entry this month yet
+  // (if there IS a generated entry, it's already counted in openEntries above)
+  let recurringTheyOwe = 0
+  let recurringIOwe    = 0
+  for (const r of recurring) {
+    if (!recurringEntryMap.has(r.id)) {
+      if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
+      else                           recurringIOwe    += Number(r.amount)
+    }
+  }
+
+  const theyOweTotalWithRecurring = theyOweTotal + recurringTheyOwe
+  const iOweTotalWithRecurring    = iOweTotal    + recurringIOwe
+  const balance = theyOweTotalWithRecurring - iOweTotalWithRecurring
+
+  // ── Mini projeção: próximos 3 meses ───────────────────────────────────────
+  const monthLabel = format(now, 'MMMM', { locale: ptBR })
+  const projection = Array.from({ length: 3 }, (_, i) => {
+    const d = addMonths(now, i)
+    const label = format(d, "MMM 'yy", { locale: ptBR })
+
+    // Installment groups: which entries are due in this month?
+    const dueEntries = openEntries.filter(e => {
+      const eDate = new Date(e.date)
+      return eDate.getFullYear() === d.getFullYear() && eDate.getMonth() === d.getMonth()
+    })
+
+    let projTheyOwe = 0
+    let projIOwe    = 0
+    const seenGroups = new Set<string>()
+
+    for (const e of dueEntries) {
+      if (e.installmentGroupId) {
+        if (seenGroups.has(e.installmentGroupId)) continue
+        seenGroups.add(e.installmentGroupId)
+      }
+      if (e.type === 'THEY_OWE_ME') projTheyOwe += Number(e.amount)
+      else                           projIOwe    += Number(e.amount)
+    }
+
+    // Add recurring monthly amounts (always apply each month)
+    for (const r of recurring) {
+      if (r.type === 'THEY_OWE_ME') projTheyOwe += Number(r.amount)
+      else                           projIOwe    += Number(r.amount)
+    }
+
+    return { label, theyOwe: projTheyOwe, iOwe: projIOwe, balance: projTheyOwe - projIOwe }
+  })
 
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
   const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
@@ -249,18 +295,40 @@ export default async function PersonPage({ params }: Props) {
       {/* Balance summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="size-4 text-success" />
-            <span className="text-xs text-slate-500">Te deve</span>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="size-4 text-success" />
+              <span className="text-xs text-slate-500">Te deve</span>
+            </div>
+            <span className="text-[10px] text-slate-600 capitalize">{monthLabel}</span>
           </div>
-          <p className="text-lg font-bold text-success">{formatCurrency(theyOweTotal)}</p>
+          <p className="text-lg font-bold text-success">{formatCurrency(theyOweTotalWithRecurring)}</p>
+          {recurringTheyOwe > 0 && theyOweTotal > 0 && (
+            <p className="text-[11px] text-slate-600 mt-1">
+              {formatCurrency(theyOweTotal)} avulso + {formatCurrency(recurringTheyOwe)} recorrente
+            </p>
+          )}
+          {recurringTheyOwe > 0 && theyOweTotal === 0 && (
+            <p className="text-[11px] text-slate-600 mt-1">recorrente mensal</p>
+          )}
         </div>
         <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingDown className="size-4 text-danger" />
-            <span className="text-xs text-slate-500">Você deve</span>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <TrendingDown className="size-4 text-danger" />
+              <span className="text-xs text-slate-500">Você deve</span>
+            </div>
+            <span className="text-[10px] text-slate-600 capitalize">{monthLabel}</span>
           </div>
-          <p className="text-lg font-bold text-danger">{formatCurrency(iOweTotal)}</p>
+          <p className="text-lg font-bold text-danger">{formatCurrency(iOweTotalWithRecurring)}</p>
+          {recurringIOwe > 0 && iOweTotal > 0 && (
+            <p className="text-[11px] text-slate-600 mt-1">
+              {formatCurrency(iOweTotal)} avulso + {formatCurrency(recurringIOwe)} recorrente
+            </p>
+          )}
+          {recurringIOwe > 0 && iOweTotal === 0 && (
+            <p className="text-[11px] text-slate-600 mt-1">recorrente mensal</p>
+          )}
         </div>
         <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
           <div className="flex items-center gap-2 mb-1">
@@ -276,6 +344,36 @@ export default async function PersonPage({ params }: Props) {
           </p>
         </div>
       </div>
+
+      {/* ── Mini projeção ────────────────────────────────── */}
+      {recurring.length > 0 && (
+        <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDays className="size-4 text-brand-400" />
+            <h2 className="text-sm font-semibold text-slate-300">Projeção dos próximos meses</h2>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {projection.map((m, i) => (
+              <div key={m.label} className={`rounded-lg p-3 border ${i === 0 ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
+                <p className="text-[11px] text-slate-500 capitalize mb-2 flex items-center gap-1">
+                  {i === 0 && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
+                  {m.label}
+                </p>
+                {m.theyOwe > 0 && (
+                  <p className="text-xs text-success font-medium">+{formatCurrency(m.theyOwe)}</p>
+                )}
+                {m.iOwe > 0 && (
+                  <p className="text-xs text-danger font-medium">-{formatCurrency(m.iOwe)}</p>
+                )}
+                <p className={`text-sm font-bold mt-1 ${m.balance >= 0 ? 'text-success' : 'text-danger'}`}>
+                  {m.balance >= 0 ? '+' : ''}{formatCurrency(m.balance)}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-slate-600 mt-2">Baseado nos recorrentes ativos + lançamentos pendentes</p>
+        </div>
+      )}
 
       {/* ── Auto-migração silenciosa de recorrentes antigos ── */}
       {hasOldRecurring && <MigrateRecurringButton />}
