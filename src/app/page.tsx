@@ -1,7 +1,5 @@
-import { redirect } from 'next/navigation'
-
-// With localePrefix: 'always', all locales have a prefix.
-// Root / redirects to default locale /pt
+// Root — next-intl middleware rewrites / to /pt internally with localePrefix: 'never'
+// URL never changes. This file is never rendered directly.
 export default function RootPage() {
-  redirect('/pt')
+  return null
 }
