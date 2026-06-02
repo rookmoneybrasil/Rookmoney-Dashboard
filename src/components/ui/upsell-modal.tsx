@@ -21,13 +21,13 @@ export function UpsellModal() {
 
   useEffect(() => {
     // Show once per day at most
-    const lastShown = localStorage.getItem(STORAGE_KEY)
-    const now       = Date.now()
-    if (lastShown && now - Number(lastShown) < 24 * 60 * 60 * 1000) return
+    // Use sessionStorage — clears on tab close / logout+login,
+    // so the modal shows on every new session.
+    if (sessionStorage.getItem(STORAGE_KEY)) return
 
     const timer = setTimeout(() => {
       setOpen(true)
-      localStorage.setItem(STORAGE_KEY, String(now))
+      sessionStorage.setItem(STORAGE_KEY, '1')
     }, DELAY_MS)
 
     return () => clearTimeout(timer)
