@@ -1,4 +1,7 @@
+import { Suspense } from 'react'
 import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
+import { WelcomeProModal } from '@/components/ui/welcome-pro-modal'
+import { UpsellModal } from '@/components/ui/upsell-modal'
 import { ProjectionsSection } from '@/components/dashboard/projections-section'
 import { FinancialHealthCard } from '@/components/dashboard/financial-health-card'
 import { DashboardGreeting } from '@/components/dashboard/greeting'
@@ -30,10 +33,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default async function DashboardPage() {
   const now = new Date()
   const currentMonth = format(now, 'yyyy-MM')
-  const [data, budgets] = await Promise.all([
+  const [data, budgets, me] = await Promise.all([
     serverApi.dashboard(),
     serverApi.budget(currentMonth).catch(() => [] as Awaited<ReturnType<typeof serverApi.budget>>),
+    serverApi.me().catch(() => null),
   ])
+  const isPro = me?.plan === 'PRO'
   const hour      = now.getHours()
   const greeting  = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR })
@@ -84,6 +89,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-5 max-w-7xl mx-auto">
+      {/* PRO welcome modal — fires when ?upgraded=1 is in URL */}
+      <Suspense><WelcomeProModal /></Suspense>
+      {/* Upsell modal — shown to free users after 8s, once per day */}
+      {!isPro && <UpsellModal />}
 
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <DashboardGreeting firstName={firstName} mood={mood} moodLabel={moodLabel[mood] ?? ''} />
