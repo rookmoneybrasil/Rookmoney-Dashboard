@@ -1,0 +1,481 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "of": "of",
+    "required": "required",
+    "optional": "optional",
+    "seeAll": "See all →",
+    "noData": "No data available",
+    "pro": "PRO",
+    "free": "Free",
+    "upgrade": "Upgrade",
+    "currency": "USD",
+    "locale": "en-US"
+  },
+  "nav": {
+    "groups": {
+      "overview": "Overview",
+      "money": "Money",
+      "planning": "Planning",
+      "analysis": "Analysis",
+      "organization": "Organization",
+      "help": "Help"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "calendar": "Calendar",
+      "projection": "Projection",
+      "income": "Income",
+      "bills": "Bills",
+      "people": "People",
+      "goals": "Goals",
+      "budget": "Budget",
+      "reports": "Reports",
+      "categories": "Categories",
+      "import": "Import",
+      "billing": "My plan",
+      "support": "Support",
+      "transactions": "Transactions",
+      "settings": "Settings",
+      "recurring": "Recurring"
+    },
+    "desc": {
+      "dashboard": "Balance, goals, bills and monthly projections",
+      "calendar": "View bills, income and recurring items by day",
+      "projection": "See how much you'll earn, pay and save in the next months",
+      "income": "Accounts receivable — recurring and one-time income sources",
+      "bills": "Bills to pay, installments and due dates",
+      "people": "Debts, settlements and installments with people",
+      "goals": "Track your financial goals progress",
+      "budget": "Monthly spending limits per category",
+      "reports": "Charts and insights about your spending",
+      "categories": "Your transaction categories",
+      "import": "Import bank statements in OFX or CSV",
+      "billing": "Manage your subscription and plan limits",
+      "support": "Open a ticket, report bugs or send suggestions"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back. Enter your details below.",
+      "resetSuccess": "Password reset successfully! Log in with your new password.",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password",
+      "submit": "Sign in",
+      "withGoogle": "Sign in with Google",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create free account"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "It's free. Start organizing your money today.",
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordHint": "Minimum 8 characters with letters and numbers",
+      "terms": "By creating an account you agree to our",
+      "termsLink": "Terms of Service",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "submit": "Create free account",
+      "withGoogle": "Sign up with Google",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we'll send you a link to create a new password.",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send reset link",
+      "backToLogin": "Back to sign in",
+      "successTitle": "Check your email",
+      "successSubtitle": "Reset instructions sent.",
+      "successMessage": "If an account with that email exists, you'll receive a password reset link in a few minutes. Also check your spam folder."
+    },
+    "resetPassword": {
+      "title": "Create new password",
+      "password": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Save new password"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "alerts": {
+      "overdueBills": "You have overdue bills!",
+      "negativeBalance": "Negative balance this month.",
+      "positiveBalance": "Positive balance this month!"
+    },
+    "sections": {
+      "monthView": "Month overview",
+      "attention": "Attention",
+      "thisMonth": "This month",
+      "recentActivity": "Recent activity",
+      "recentTransactions": "Recent transactions",
+      "activeGoals": "Active goals",
+      "upcomingBills": "Upcoming bills",
+      "withPeople": "With people",
+      "monthBudget": "Monthly budget",
+      "planning": "Planning",
+      "future": "Future"
+    },
+    "empty": {
+      "noTransactions": "No transactions yet.",
+      "noGoals": "No goals created.",
+      "noBills": "No upcoming bills.",
+      "noCommitments": "No upcoming commitments.",
+      "noBudget": "No budget set up.",
+      "setupBudget": "Set up budget →"
+    },
+    "health": {
+      "savingsRate": "Savings rate",
+      "saved": "Saved",
+      "spent": "Spent",
+      "ofIncome": "% of income",
+      "billsOnTime": "Bills on time",
+      "noBillsOverdue": "No overdue bills",
+      "billsOverdue": "{count} overdue bill(s)",
+      "activeGoals": "Active goals",
+      "activeGoalsCount": "{count} active goal(s)",
+      "noGoals": "No goals set",
+      "veryGood": "Very good",
+      "good": "Good",
+      "regular": "Fair",
+      "attention": "Attention",
+      "target": "target: {amount}"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "description": "Record all your income and expenses. Use filters to search by period, type or category.",
+    "income": "Income",
+    "expense": "Expense",
+    "all": "All",
+    "expenses": "Expenses",
+    "incomes": "Income",
+    "empty": "No transactions found",
+    "emptyFilter": "Try adjusting the filters",
+    "emptyFirst": "Use the button above to add your first transaction",
+    "incomeTooltip": "Money in",
+    "expenseTooltip": "Money out",
+    "new": "New transaction",
+    "delete": "Delete transaction",
+    "deleteConfirm": "Are you sure you want to delete this transaction?"
+  },
+  "bills": {
+    "title": "Bills",
+    "pending": "Pending",
+    "paid": "Paid",
+    "fixed": "Fixed Bills",
+    "perMonth": "/month",
+    "noFixed": "No fixed bills added",
+    "fixedDescription": "Fixed bills (rent, internet, streaming...) repeat every month. Add once and they appear automatically.",
+    "empty": "No bills added",
+    "emptyDescription": "Add bills, installments and fixed costs to never miss a due date.",
+    "installments": "Installments",
+    "perInstallment": "/installment",
+    "paidCount": "{paid}/{total}",
+    "paidPct": "{pct}% paid",
+    "next": "Next: {date}",
+    "status": {
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "urgent": "Urgent",
+      "pending": "Pending"
+    },
+    "recurring": "↻ fixed",
+    "noCategory": "No category",
+    "dueDate": "due {date}",
+    "history": "Installment history",
+    "settled": "{total}x of {amount} · settled",
+    "new": "New bill",
+    "delete": "Delete bill",
+    "markPaid": "Mark as paid"
+  },
+  "goals": {
+    "title": "Goals",
+    "description": "Define financial goals and track your progress. Each contribution is recorded as an expense and feeds the goal balance.",
+    "active": "Active",
+    "completed": "Completed",
+    "completedBadge": "Completed",
+    "target": "target: {amount}",
+    "new": "New goal",
+    "movements": "Transactions",
+    "withdrawal": "Withdrawal",
+    "contribute": "Contribute",
+    "delete": "Delete goal",
+    "empty": "No goals created yet.",
+    "emptyDescription": "Create goals to track your financial progress."
+  },
+  "budget": {
+    "title": "Budget",
+    "description": "Set a spending limit per category for each month. You get alerts when you approach or exceed the limit.",
+    "total": "Total budget",
+    "spent": "Spent so far",
+    "available": "Available",
+    "above": "over",
+    "empty": "No budget set",
+    "emptyDescription": "Set limits per category to control your spending.",
+    "overLimit": "Over limit",
+    "warning": "Warning {pct}%",
+    "categories": "{n} category(ies) over budget: {categories}",
+    "new": "New budget",
+    "proFeature": "Category budget"
+  },
+  "people": {
+    "title": "People",
+    "description": "Track who owes you and who you owe",
+    "subtitle": "Record one-time, installment or recurring entries. When settling a debt, the corresponding transaction is created automatically.",
+    "theyOweMe": "They owe me",
+    "iOweThem": "I owe them",
+    "netBalance": "Net balance",
+    "empty": "No people added",
+    "emptyDescription": "Add people to track debts and loans",
+    "noResults": "No people found for this filter.",
+    "clickToAdd": "Click to add entries",
+    "pendingEntries": "{count} pending entry(ies)",
+    "theyOweShort": "owes you",
+    "youOweShort": "you owe",
+    "count": "{count} of {total} person(s)",
+    "new": "New person",
+    "addEntry": "New entry",
+    "settle": "Settle",
+    "delete": "Delete person",
+    "iOwe": "I owe them",
+    "theyOwe": "They owe me"
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Visualize your financial evolution over the months — income, expenses, balance and spending by category.",
+    "empty": "No data to display",
+    "emptyDescription": "Record some transactions to start seeing charts, trends and insights about your finances.",
+    "monthlyEvolution": "Monthly evolution",
+    "bestMonth": "Best month: {month}",
+    "byCategory": "Spending by category",
+    "vsLastMonth": "change vs last month",
+    "topExpenses": "Top expenses",
+    "topInPeriod": "top {count} in period",
+    "spendingPattern": "Daily spending pattern",
+    "accumulated": "accumulated in period",
+    "patternNote": "Red days = higher accumulated spending. Useful for identifying due dates.",
+    "incomeSources": "Income sources",
+    "monthlySummary": "Monthly summary",
+    "noData": "No data yet.",
+    "headers": {
+      "month": "Month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "savingsPct": "Savings %"
+    },
+    "total": "Total",
+    "proFeature": "Advanced reports"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account and preferences",
+    "tabs": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "plan": "Plan",
+      "data": "Data & Privacy"
+    },
+    "sections": {
+      "profile": "Profile",
+      "security": "Security",
+      "connections": "Connections",
+      "whatsapp": "WhatsApp",
+      "notifications": "Notifications",
+      "appearance": "Appearance & format",
+      "usage": "Usage & limits",
+      "privacy": "Privacy & data"
+    },
+    "noUsageData": "Usage data not available."
+  },
+  "billing": {
+    "title": "My plan",
+    "free": "Free Plan",
+    "pro": "PRO Plan",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "annualDiscount": "2 months free",
+    "perMonth": "/month",
+    "upgrade": "Subscribe to PRO",
+    "manage": "Manage subscription",
+    "cancel": "Cancel anytime",
+    "currentPlan": "Current plan",
+    "proFeatures": "Everything in Free +",
+    "freeLimits": "Free plan limits"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "monthlyEvolution": "Month summary",
+    "expectedIncome": "Expected income",
+    "expectedExpenses": "Expected expenses",
+    "paidReceived": "paid/received",
+    "pending": "pending",
+    "status": {
+      "paid": "Paid",
+      "received": "Received",
+      "overdue": "Overdue",
+      "pending": "Pending",
+      "expected": "Expected"
+    },
+    "legend": {
+      "incomeOrPaid": "Income / Paid",
+      "pendingBill": "Pending bill",
+      "overdue": "Overdue"
+    },
+    "noEvents": "No events on this day",
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "projection": {
+    "title": "Financial Projection",
+    "subtitle": "Next 6 months",
+    "cumulativeBalance": "Cumulative balance",
+    "income": "Income",
+    "expenses": "Expenses",
+    "balance": "Balance",
+    "cumulative": "Cumulative",
+    "actual": "Actual",
+    "projected": "est",
+    "proFeature": "Financial Projection",
+    "proDescription": "See where your money is going in the next months based on your income, bills and recurring items."
+  },
+  "import": {
+    "title": "Import transactions",
+    "description": "Import your bank statement or scan receipts with AI.",
+    "tabs": {
+      "ofx": "Bank statement (OFX)",
+      "csv": "Import CSV",
+      "receipt": "Receipt / Invoice"
+    }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Get started",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Rook Money",
+        "description": "Your money, in the right move. Control your finances with clarity and intelligence — without the hassle."
+      },
+      "record": {
+        "title": "Record everything",
+        "description": "Log income and expenses in seconds. Categorize, filter by month and get the full picture."
+      },
+      "bills": {
+        "title": "Bills and due dates",
+        "description": "Never pay a late fee again. Your bills are organized by due date with urgency alerts."
+      },
+      "planning": {
+        "title": "Goals and planning",
+        "description": "Create financial goals and track progress. Category budgets and automatic recurring items."
+      },
+      "ready": {
+        "title": "All set",
+        "description": "Your account is ready. Start by adding your first transaction or exploring the dashboard."
+      }
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "support": "Support",
+      "login": "Sign in",
+      "cta": "Get started free"
+    },
+    "hero": {
+      "badge": "Simplified financial control",
+      "title": "Your finances.",
+      "titleHighlight": "In control.",
+      "description": "Smart dashboard, goals, category budgets and detailed reports. Simple, beautiful and efficient.",
+      "cta": "Get started free",
+      "login": "I already have an account"
+    },
+    "features": {
+      "title": "Everything you need",
+      "subtitle": "to organize your financial life",
+      "items": {
+        "dashboard": {
+          "title": "Smart dashboard",
+          "description": "Complete view of your finances in real time. Income, expenses, balance and trends in one place."
+        },
+        "bills": {
+          "title": "Bills to pay",
+          "description": "Never forget a bill. Set due dates and receive automatic reminders."
+        },
+        "goals": {
+          "title": "Financial goals",
+          "description": "Define objectives, track progress and celebrate every milestone on your path to financial freedom."
+        },
+        "income": {
+          "title": "Automatic income",
+          "description": "Record recurring income sources and let Rook automatically calculate your monthly earnings."
+        },
+        "budget": {
+          "title": "Category budget",
+          "description": "Set spending limits per category and stay in control with real-time visual alerts."
+        },
+        "reports": {
+          "title": "Detailed reports",
+          "description": "Charts and tables that reveal spending patterns. Export to CSV and make data-driven decisions."
+        }
+      }
+    },
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms of Service",
+      "contact": "Contact",
+      "rights": "All rights reserved."
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Page not found.",
+    "unauthorized": "Unauthorized access.",
+    "sessionExpired": "Session expired. Please sign in again.",
+    "planLimit": "You've reached your Free plan limit.",
+    "proRequired": "This feature is exclusive to the PRO plan."
+  },
+  "proGate": {
+    "upgrade": "Upgrade now",
+    "back": "Go back"
+  },
+  "limitBanner": {
+    "approaching": "You're using {pct}% of your {feature} limit on the Free plan.",
+    "upgrade": "Upgrade to PRO"
+  }
+}

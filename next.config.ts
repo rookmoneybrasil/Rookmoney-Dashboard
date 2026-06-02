@@ -1,4 +1,7 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin'
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', 'pg-pool'],
@@ -9,7 +12,6 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Allow Google profile pictures and other common image hosts
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
@@ -18,7 +20,6 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
-      // Security headers for all routes
       {
         source: '/:path*',
         headers: [
@@ -32,7 +33,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-eval needed for Next.js dev
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com",
               "font-src 'self'",
@@ -44,7 +45,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // CORS for local mobile dev
       {
         source: '/api/:path*',
         headers: [
@@ -56,6 +56,6 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-};
+}
 
-export default nextConfig;
+export default withNextIntl(nextConfig)

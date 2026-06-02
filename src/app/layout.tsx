@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -10,33 +9,10 @@ const poppins = Poppins({
   display: 'swap',
 })
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com.br'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
 export const metadata: Metadata = {
-  title:       { default: 'Rook Money — Controle financeiro inteligente', template: '%s · Rook Money' },
-  description: 'Dashboard inteligente, metas financeiras, orçamento por categoria e relatórios detalhados. Organize suas finanças em minutos. Grátis para começar.',
   metadataBase: new URL(APP_URL),
-  keywords:    ['finanças pessoais', 'controle financeiro', 'orçamento', 'metas financeiras', 'dashboard financeiro', 'app financeiro'],
-  openGraph: {
-    title:       'Rook Money — Seu dinheiro no movimento certo',
-    description: 'Dashboard inteligente, metas, orçamento por categoria e relatórios detalhados. Comece grátis, sem cartão.',
-    url:         APP_URL,
-    siteName:    'Rook Money',
-    locale:      'pt_BR',
-    type:        'website',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Rook Money — Controle financeiro inteligente' }],
-  },
-  twitter: {
-    card:        'summary_large_image',
-    title:       'Rook Money — Controle financeiro inteligente',
-    description: 'Dashboard, metas, orçamento e relatórios. Organize suas finanças em minutos. Grátis.',
-    images:      ['/og-image.png'],
-  },
-  appleWebApp: {
-    capable:        true,
-    statusBarStyle: 'black-translucent',
-    title:          'Rook Money',
-  },
   icons: {
     icon:  [
       { url: '/favicon.svg',  type: 'image/svg+xml' },
@@ -56,9 +32,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${poppins.variable} h-full`} suppressHydrationWarning>
+    <html className={`${poppins.variable} h-full`} suppressHydrationWarning>
       <body className="h-full antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        {children}
       </body>
     </html>
   )

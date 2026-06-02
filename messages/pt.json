@@ -1,0 +1,481 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "confirm": "Confirmar",
+    "add": "Adicionar",
+    "create": "Criar",
+    "update": "Atualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "yes": "Sim",
+    "no": "Não",
+    "or": "ou",
+    "and": "e",
+    "of": "de",
+    "required": "obrigatório",
+    "optional": "opcional",
+    "seeAll": "Ver todos →",
+    "noData": "Nenhum dado disponível",
+    "pro": "PRO",
+    "free": "Grátis",
+    "upgrade": "Fazer upgrade",
+    "currency": "BRL",
+    "locale": "pt-BR"
+  },
+  "nav": {
+    "groups": {
+      "overview": "Visão geral",
+      "money": "Dinheiro",
+      "planning": "Planejamento",
+      "analysis": "Análise",
+      "organization": "Organização",
+      "help": "Ajuda"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "calendar": "Calendário",
+      "projection": "Projeção",
+      "income": "Rendas",
+      "bills": "Contas",
+      "people": "Pessoas",
+      "goals": "Metas",
+      "budget": "Orçamento",
+      "reports": "Relatórios",
+      "categories": "Categorias",
+      "import": "Importar",
+      "billing": "Meu plano",
+      "support": "Suporte",
+      "transactions": "Transações",
+      "settings": "Configurações",
+      "recurring": "Recorrências"
+    },
+    "desc": {
+      "dashboard": "Saldo, metas, contas e projeções do mês",
+      "calendar": "Visualize contas, rendas e recorrências por dia",
+      "projection": "Veja quanto vai ganhar, pagar e sobrar nos próximos meses",
+      "income": "Contas a receber — fontes de renda recorrentes e avulsas",
+      "bills": "Contas a pagar, parcelas e vencimentos",
+      "people": "Dívidas, acertos e parcelamentos com pessoas",
+      "goals": "Acompanhe o progresso das suas metas",
+      "budget": "Limites de gasto por categoria ao mês",
+      "reports": "Gráficos e insights sobre seus gastos",
+      "categories": "Categorias das suas transações",
+      "import": "Importe extratos bancários em OFX ou CSV",
+      "billing": "Gerencie sua assinatura e limites do plano",
+      "support": "Abra um ticket, reporte bugs ou envie sugestões"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar na conta",
+      "subtitle": "Bem-vindo de volta. Insira seus dados abaixo.",
+      "resetSuccess": "Senha redefinida com sucesso! Faça login com sua nova senha.",
+      "email": "E-mail",
+      "emailPlaceholder": "voce@exemplo.com",
+      "password": "Senha",
+      "passwordPlaceholder": "••••••••",
+      "rememberMe": "Lembrar de mim",
+      "forgotPassword": "Esqueci a senha",
+      "submit": "Entrar",
+      "withGoogle": "Entrar com Google",
+      "noAccount": "Não tem conta?",
+      "createAccount": "Criar conta grátis"
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "É grátis. Comece a organizar seu dinheiro hoje.",
+      "name": "Nome",
+      "namePlaceholder": "Seu nome completo",
+      "email": "E-mail",
+      "emailPlaceholder": "voce@exemplo.com",
+      "password": "Senha",
+      "passwordHint": "Mínimo 8 caracteres com letras e números",
+      "terms": "Ao criar uma conta você concorda com nossos",
+      "termsLink": "Termos de Uso",
+      "and": "e",
+      "privacyLink": "Política de Privacidade",
+      "submit": "Criar conta grátis",
+      "withGoogle": "Registrar com Google",
+      "hasAccount": "Já tem conta?",
+      "login": "Entrar"
+    },
+    "forgotPassword": {
+      "title": "Esqueci a senha",
+      "subtitle": "Digite seu e-mail e enviaremos um link para criar uma nova senha.",
+      "email": "E-mail",
+      "emailPlaceholder": "voce@exemplo.com",
+      "submit": "Enviar link de redefinição",
+      "backToLogin": "Voltar para o login",
+      "successTitle": "Verifique seu e-mail",
+      "successSubtitle": "Instruções de redefinição enviadas.",
+      "successMessage": "Se existe uma conta com esse e-mail, você receberá um link de redefinição de senha nos próximos minutos. Verifique também a pasta de spam."
+    },
+    "resetPassword": {
+      "title": "Criar nova senha",
+      "password": "Nova senha",
+      "confirm": "Confirmar nova senha",
+      "submit": "Salvar nova senha"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Bom dia",
+      "afternoon": "Boa tarde",
+      "evening": "Boa noite"
+    },
+    "alerts": {
+      "overdueBills": "Você tem contas atrasadas!",
+      "negativeBalance": "Saldo negativo este mês.",
+      "positiveBalance": "Saldo positivo este mês!"
+    },
+    "sections": {
+      "monthView": "Visão do mês",
+      "attention": "Atenção",
+      "thisMonth": "Este mês",
+      "recentActivity": "Atividade recente",
+      "recentTransactions": "Transações recentes",
+      "activeGoals": "Metas ativas",
+      "upcomingBills": "Próximos vencimentos",
+      "withPeople": "Com pessoas",
+      "monthBudget": "Orçamento do mês",
+      "planning": "Planejamento",
+      "future": "Futuro"
+    },
+    "empty": {
+      "noTransactions": "Nenhuma transação ainda.",
+      "noGoals": "Nenhuma meta criada.",
+      "noBills": "Nenhuma conta próxima.",
+      "noCommitments": "Nenhum compromisso próximo.",
+      "noBudget": "Nenhum orçamento configurado.",
+      "setupBudget": "Configurar orçamento →"
+    },
+    "health": {
+      "savingsRate": "Taxa de poupança",
+      "saved": "Poupou",
+      "spent": "Gastou",
+      "ofIncome": "% da renda",
+      "billsOnTime": "Contas em dia",
+      "noBillsOverdue": "Nenhuma conta atrasada",
+      "billsOverdue": "{count} conta(s) em atraso",
+      "activeGoals": "Metas ativas",
+      "activeGoalsCount": "{count} meta(s) ativa(s)",
+      "noGoals": "Sem metas definidas",
+      "veryGood": "Muito bom",
+      "good": "Bom",
+      "regular": "Regular",
+      "attention": "Atenção",
+      "target": "meta: {amount}"
+    }
+  },
+  "transactions": {
+    "title": "Transações",
+    "description": "Registre todas as entradas e saídas de dinheiro. Use os filtros para buscar por período, tipo ou categoria.",
+    "income": "Receita",
+    "expense": "Despesa",
+    "all": "Todos",
+    "expenses": "Despesas",
+    "incomes": "Receitas",
+    "empty": "Nenhuma transação encontrada",
+    "emptyFilter": "Tente ajustar os filtros",
+    "emptyFirst": "Use o botão acima para adicionar a primeira transação",
+    "incomeTooltip": "Entrada de dinheiro",
+    "expenseTooltip": "Saída de dinheiro",
+    "new": "Nova transação",
+    "delete": "Excluir transação",
+    "deleteConfirm": "Tem certeza que deseja excluir esta transação?"
+  },
+  "bills": {
+    "title": "Contas a pagar",
+    "pending": "A pagar",
+    "paid": "Pagas",
+    "fixed": "Contas Fixas",
+    "perMonth": "/mês",
+    "noFixed": "Nenhuma conta fixa cadastrada",
+    "fixedDescription": "Contas fixas (aluguel, internet, streaming...) se repetem todo mês. Cadastre uma vez e elas aparecem automaticamente.",
+    "empty": "Nenhuma conta cadastrada",
+    "emptyDescription": "Adicione boletos, parcelas e contas fixas para nunca mais perder um vencimento.",
+    "installments": "Parceladas",
+    "perInstallment": "/parcela",
+    "paidCount": "{paid}/{total}",
+    "paidPct": "{pct}% pago",
+    "next": "Próxima: {date}",
+    "status": {
+      "paid": "Pago",
+      "overdue": "Atrasado",
+      "urgent": "Urgente",
+      "pending": "Pendente"
+    },
+    "recurring": "↻ fixa",
+    "noCategory": "Sem categoria",
+    "dueDate": "vence {date}",
+    "history": "Histórico de parcelamentos",
+    "settled": "{total}x de {amount} · quitado",
+    "new": "Nova conta",
+    "delete": "Excluir conta",
+    "markPaid": "Marcar como paga"
+  },
+  "goals": {
+    "title": "Metas",
+    "description": "Defina objetivos financeiros e acompanhe o progresso. Cada aporte registrado vira uma despesa e alimenta o saldo da meta.",
+    "active": "Ativas",
+    "completed": "Concluídas",
+    "completedBadge": "Concluída",
+    "target": "meta: {amount}",
+    "new": "Nova meta",
+    "movements": "Movimentações",
+    "withdrawal": "Retirada",
+    "contribute": "Aportar",
+    "delete": "Excluir meta",
+    "empty": "Nenhuma meta criada ainda.",
+    "emptyDescription": "Crie metas para acompanhar seu progresso financeiro."
+  },
+  "budget": {
+    "title": "Orçamento",
+    "description": "Defina um limite de gasto por categoria para cada mês. Você recebe alertas quando se aproximar ou ultrapassar o limite.",
+    "total": "Orçamento total",
+    "spent": "Gasto até agora",
+    "available": "Disponível",
+    "above": "acima",
+    "empty": "Nenhum orçamento definido",
+    "emptyDescription": "Defina limites por categoria para controlar seus gastos.",
+    "overLimit": "Acima do limite",
+    "warning": "Atenção {pct}%",
+    "categories": "{n} categoria(s) acima do orçamento: {categories}",
+    "new": "Novo orçamento",
+    "proFeature": "Orçamento por categoria"
+  },
+  "people": {
+    "title": "Pessoas",
+    "description": "Controle quem te deve e a quem você deve",
+    "subtitle": "Registre lançamentos avulsos, parcelados ou recorrentes. Ao acertar uma dívida, a transação correspondente é criada automaticamente.",
+    "theyOweMe": "Te devem",
+    "iOweThem": "Você deve",
+    "netBalance": "Saldo líquido",
+    "empty": "Nenhuma pessoa cadastrada",
+    "emptyDescription": "Adicione pessoas para rastrear dívidas e empréstimos",
+    "noResults": "Nenhuma pessoa encontrada para este filtro.",
+    "clickToAdd": "Clique para adicionar lançamentos",
+    "pendingEntries": "{count} lançamento(s) pendente(s)",
+    "theyOweShort": "te deve",
+    "youOweShort": "vc deve",
+    "count": "{count} de {total} pessoa(s)",
+    "new": "Nova pessoa",
+    "addEntry": "Novo lançamento",
+    "settle": "Quitar",
+    "delete": "Excluir pessoa",
+    "iOwe": "Devo a ele(a)",
+    "theyOwe": "Me deve"
+  },
+  "reports": {
+    "title": "Relatórios",
+    "description": "Visualize a evolução das suas finanças ao longo dos meses — receitas, despesas, saldo e gastos por categoria.",
+    "empty": "Nenhum dado para exibir",
+    "emptyDescription": "Registre algumas transações para começar a ver gráficos, tendências e insights sobre suas finanças.",
+    "monthlyEvolution": "Evolução mensal",
+    "bestMonth": "Melhor mês: {month}",
+    "byCategory": "Gastos por categoria",
+    "vsLastMonth": "variação vs mês anterior",
+    "topExpenses": "Maiores despesas",
+    "topInPeriod": "top {count} no período",
+    "spendingPattern": "Padrão de gasto por dia",
+    "accumulated": "acumulado no período",
+    "patternNote": "Dias em vermelho = maiores gastos acumulados. Útil para identificar datas de vencimentos.",
+    "incomeSources": "Fontes de receita",
+    "monthlySummary": "Resumo por mês",
+    "noData": "Sem dados ainda.",
+    "headers": {
+      "month": "Mês",
+      "income": "Receitas",
+      "expenses": "Despesas",
+      "balance": "Saldo",
+      "savingsPct": "% Poupança"
+    },
+    "total": "Total",
+    "proFeature": "Relatórios avançados"
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie sua conta e preferências",
+    "tabs": {
+      "account": "Conta",
+      "preferences": "Preferências",
+      "plan": "Plano",
+      "data": "Dados e privacidade"
+    },
+    "sections": {
+      "profile": "Perfil",
+      "security": "Segurança",
+      "connections": "Conexões",
+      "whatsapp": "WhatsApp",
+      "notifications": "Notificações",
+      "appearance": "Aparência e formato",
+      "usage": "Uso e limites",
+      "privacy": "Privacidade e dados"
+    },
+    "noUsageData": "Dados de uso não disponíveis."
+  },
+  "billing": {
+    "title": "Meu plano",
+    "free": "Plano Grátis",
+    "pro": "Plano PRO",
+    "monthly": "Mensal",
+    "annual": "Anual",
+    "annualDiscount": "2 meses grátis",
+    "perMonth": "/mês",
+    "upgrade": "Assinar PRO",
+    "manage": "Gerenciar assinatura",
+    "cancel": "Cancelar a qualquer momento",
+    "currentPlan": "Plano atual",
+    "proFeatures": "Tudo do Free +",
+    "freeLimits": "Limites do plano Free"
+  },
+  "calendar": {
+    "title": "Calendário",
+    "monthlyEvolution": "Resumo do mês",
+    "expectedIncome": "Entradas previstas",
+    "expectedExpenses": "Saídas previstas",
+    "paidReceived": "pagos/recebidos",
+    "pending": "pendentes",
+    "status": {
+      "paid": "Pago",
+      "received": "Recebido",
+      "overdue": "Vencido",
+      "pending": "Pendente",
+      "expected": "Previsto"
+    },
+    "legend": {
+      "incomeOrPaid": "Renda / Pago",
+      "pendingBill": "Conta pendente",
+      "overdue": "Vencido"
+    },
+    "noEvents": "Nenhum evento neste dia",
+    "weekdays": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+  },
+  "projection": {
+    "title": "Projeção Financeira",
+    "subtitle": "Próximos 6 meses",
+    "cumulativeBalance": "Saldo acumulado",
+    "income": "Entradas",
+    "expenses": "Saídas",
+    "balance": "Saldo",
+    "cumulative": "Acumulado",
+    "actual": "Real",
+    "projected": "prev",
+    "proFeature": "Projeção Financeira",
+    "proDescription": "Veja para onde seu dinheiro vai nos próximos meses com base nas suas rendas, contas e recorrências."
+  },
+  "import": {
+    "title": "Importar transações",
+    "description": "Importe o extrato do seu banco ou escaneie comprovantes com IA.",
+    "tabs": {
+      "ofx": "Extrato do banco (OFX)",
+      "csv": "Importar CSV",
+      "receipt": "Comprovante / Nota"
+    }
+  },
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "start": "Começar",
+    "steps": {
+      "welcome": {
+        "title": "Bem-vindo ao Rook Money",
+        "description": "Seu dinheiro no movimento certo. Controle suas finanças com clareza e inteligência — sem complicação."
+      },
+      "record": {
+        "title": "Registre tudo",
+        "description": "Lançamentos de entrada e saída em segundos. Categorize, filtre por mês e veja o panorama completo."
+      },
+      "bills": {
+        "title": "Contas e vencimentos",
+        "description": "Nunca mais pague multa por esquecimento. Suas contas ficam organizadas por vencimento com alertas de urgência."
+      },
+      "planning": {
+        "title": "Metas e planejamento",
+        "description": "Crie metas financeiras e acompanhe o progresso. Orçamentos por categoria, recorrências automáticas."
+      },
+      "ready": {
+        "title": "Tudo pronto",
+        "description": "Sua conta está configurada. Comece adicionando sua primeira transação ou explorando o dashboard."
+      }
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Funcionalidades",
+      "pricing": "Preços",
+      "support": "Suporte",
+      "login": "Entrar",
+      "cta": "Começar grátis"
+    },
+    "hero": {
+      "badge": "Controle financeiro simplificado",
+      "title": "Suas finanças.",
+      "titleHighlight": "No controle.",
+      "description": "Dashboard inteligente, metas, orçamento por categoria e relatórios detalhados. Simples, bonito e eficiente.",
+      "cta": "Começar grátis",
+      "login": "Já tenho conta"
+    },
+    "features": {
+      "title": "Tudo que você precisa",
+      "subtitle": "para organizar sua vida financeira",
+      "items": {
+        "dashboard": {
+          "title": "Dashboard inteligente",
+          "description": "Visão completa das suas finanças em tempo real. Receitas, despesas, saldo e tendências num só lugar."
+        },
+        "bills": {
+          "title": "Contas a pagar",
+          "description": "Nunca mais esqueça uma conta. Cadastre vencimentos e receba alertas automáticos."
+        },
+        "goals": {
+          "title": "Metas financeiras",
+          "description": "Defina objetivos, acompanhe o progresso e comemore cada conquista no seu caminho à independência financeira."
+        },
+        "income": {
+          "title": "Rendas automáticas",
+          "description": "Registre fontes de renda recorrentes e deixe o Rook calcular automaticamente suas entradas mensais."
+        },
+        "budget": {
+          "title": "Orçamento por categoria",
+          "description": "Estabeleça limites de gastos por categoria e mantenha o controle com alertas visuais em tempo real."
+        },
+        "reports": {
+          "title": "Relatórios detalhados",
+          "description": "Gráficos e tabelas que revelam padrões de consumo. Exporte em CSV e tome decisões embasadas."
+        }
+      }
+    },
+    "footer": {
+      "privacy": "Privacidade",
+      "terms": "Termos de Uso",
+      "contact": "Contato",
+      "rights": "Todos os direitos reservados."
+    }
+  },
+  "errors": {
+    "generic": "Algo deu errado. Tente novamente.",
+    "notFound": "Página não encontrada.",
+    "unauthorized": "Acesso não autorizado.",
+    "sessionExpired": "Sessão expirada. Faça login novamente.",
+    "planLimit": "Você atingiu o limite do plano Free.",
+    "proRequired": "Esta funcionalidade é exclusiva do plano PRO."
+  },
+  "proGate": {
+    "upgrade": "Fazer upgrade",
+    "back": "Voltar"
+  },
+  "limitBanner": {
+    "approaching": "Você está usando {pct}% do limite de {feature} do plano Free.",
+    "upgrade": "Fazer upgrade para PRO"
+  }
+}

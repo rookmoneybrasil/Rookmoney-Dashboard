@@ -4,6 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   LayoutDashboard,
   Target,
@@ -76,55 +77,52 @@ function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { ic
   )
 }
 
-// Grupos de navegação com separadores
-const navGroups = [
+// Nav config without labels — labels injected from translations at render time
+const NAV_GROUPS = [
   {
-    label: 'Visão geral',
+    groupKey: 'overview',
     items: [
-      { href: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard',  color: 'blue',   desc: 'Saldo, metas, contas e projeções do mês',              pro: false },
-      { href: '/calendar',     icon: CalendarDays,    label: 'Calendário', color: 'cyan',   desc: 'Visualize contas, rendas e recorrências por dia',      pro: false },
-      { href: '/projection',   icon: TrendingUp,      label: 'Projeção',   color: 'green',  desc: 'Veja quanto vai ganhar, pagar e sobrar nos próximos meses', pro: true },
+      { href: '/dashboard',  icon: LayoutDashboard, itemKey: 'dashboard',  color: 'blue',   pro: false },
+      { href: '/calendar',   icon: CalendarDays,    itemKey: 'calendar',   color: 'cyan',   pro: false },
+      { href: '/projection', icon: TrendingUp,      itemKey: 'projection', color: 'green',  pro: true  },
     ],
   },
   {
-    label: 'Dinheiro',
+    groupKey: 'money',
     items: [
-      { href: '/income',       icon: Banknote,        label: 'Rendas',     color: 'green',  desc: 'Contas a receber — fontes de renda recorrentes e avulsas', pro: false },
-      { href: '/bills',        icon: FileText,        label: 'Contas',     color: 'red',    desc: 'Contas a pagar, parcelas e vencimentos',                   pro: false },
-      { href: '/people',       icon: Users,           label: 'Pessoas',    color: 'amber',  desc: 'Dívidas, acertos e parcelamentos com pessoas',             pro: false },
+      { href: '/income',  icon: Banknote, itemKey: 'income',  color: 'green', pro: false },
+      { href: '/bills',   icon: FileText, itemKey: 'bills',   color: 'red',   pro: false },
+      { href: '/people',  icon: Users,    itemKey: 'people',  color: 'amber', pro: false },
     ],
   },
   {
-    label: 'Planejamento',
+    groupKey: 'planning',
     items: [
-      { href: '/goals',        icon: Target,          label: 'Metas',      color: 'orange', desc: 'Acompanhe o progresso das suas metas',                 pro: false },
-      { href: '/budget',       icon: PiggyBank,       label: 'Orçamento',  color: 'cyan',   desc: 'Limites de gasto por categoria ao mês',                pro: true  },
+      { href: '/goals',  icon: Target,   itemKey: 'goals',  color: 'orange', pro: false },
+      { href: '/budget', icon: PiggyBank,itemKey: 'budget', color: 'cyan',   pro: true  },
     ],
   },
   {
-    label: 'Análise',
+    groupKey: 'analysis',
     items: [
-      { href: '/reports',      icon: BarChart3,       label: 'Relatórios', color: 'purple', desc: 'Gráficos e insights sobre seus gastos',                pro: true  },
+      { href: '/reports', icon: BarChart3, itemKey: 'reports', color: 'purple', pro: true },
     ],
   },
   {
-    label: 'Organização',
+    groupKey: 'organization',
     items: [
-      { href: '/categories',   icon: Tag,             label: 'Categorias', color: 'indigo', desc: 'Categorias das suas transações',                       pro: false },
-      { href: '/import',       icon: Upload,          label: 'Importar',   color: 'green',  desc: 'Importe extratos bancários em CSV',                    pro: true  },
+      { href: '/categories', icon: Tag,    itemKey: 'categories', color: 'indigo', pro: false },
+      { href: '/import',     icon: Upload, itemKey: 'import',     color: 'green',  pro: true  },
     ],
   },
   {
-    label: 'Ajuda',
+    groupKey: 'help',
     items: [
-      { href: '/billing',      icon: Crown,           label: 'Meu plano',  color: 'amber',  desc: 'Gerencie sua assinatura e limites do plano',            pro: false },
-      { href: '/support',      icon: LifeBuoy,        label: 'Suporte',    color: 'blue',   desc: 'Abra um ticket, reporte bugs ou envie sugestões',      pro: false },
+      { href: '/billing', icon: Crown,    itemKey: 'billing', color: 'amber', pro: false },
+      { href: '/support', icon: LifeBuoy, itemKey: 'support', color: 'blue',  pro: false },
     ],
   },
 ]
-
-// Flat list para collapsed mode
-const navItems = navGroups.flatMap(g => g.items)
 
 interface SidebarProps {
   user?:     { name: string; email: string; image?: string }
@@ -137,6 +135,21 @@ interface SidebarProps {
 export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }: SidebarProps) {
   const pathname = usePathname()
   const isPro    = plan === 'PRO'
+  const t        = useTranslations('nav')
+
+  // Build translated nav groups
+  const navGroups = NAV_GROUPS.map(g => ({
+    label: t(`groups.${g.groupKey}`),
+    items: g.items.map(item => ({
+      href:  item.href,
+      icon:  item.icon,
+      label: t(`items.${item.itemKey}`),
+      desc:  t(`desc.${item.itemKey}`),
+      color: item.color,
+      pro:   item.pro,
+    })),
+  }))
+  const navItems = navGroups.flatMap(g => g.items)
 
   return (
     <aside
