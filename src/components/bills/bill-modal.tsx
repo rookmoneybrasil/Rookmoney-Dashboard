@@ -14,6 +14,7 @@ import { formatCurrency } from '@/lib/utils'
 import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
+import { useTranslations } from 'next-intl'
 
 interface Category { id: string; name: string; icon: string; color: string }
 interface Props { categories: Category[] }
@@ -21,6 +22,8 @@ interface Props { categories: Category[] }
 type Mode = 'avulso' | 'parcelado' | 'recorrente'
 
 export function BillModal({ categories }: Props) {
+  const t = useTranslations('bills')
+  const c = useTranslations('common')
   const [open,         setOpen]       = useState(false)
   const [mode,         setMode]       = useState<Mode>('avulso')
   const [categoryId,   setCatId]      = useState('')
@@ -99,11 +102,11 @@ export function BillModal({ categories }: Props) {
 
   const remaining   = installments - alreadyPaid
   const submitLabel = mode === 'parcelado'
-    ? `Criar ${remaining} parcela${remaining !== 1 ? 's' : ''}`
-    : mode === 'recorrente' ? 'Salvar conta fixa' : 'Adicionar'
+    ? t('createInstallments', { count: remaining })
+    : mode === 'recorrente' ? t('saveFixed') : c('add')
 
-  const dateLabel   = mode === 'parcelado' ? 'Próximo vencimento' : '1º vencimento'
-  const amountLabel = mode === 'parcelado' ? 'Valor por parcela (R$)' : 'Valor (R$)'
+  const dateLabel   = mode === 'parcelado' ? t('nextDue') : t('firstDue')
+  const amountLabel = mode === 'parcelado' ? t('perInstallmentLabel') : t('amountLabel')
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -112,12 +115,12 @@ export function BillModal({ categories }: Props) {
         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"
       >
         <Plus className="size-3.5" />
-        Nova conta
+        {t('new')}
       </button>
 
       <ModalContent size="sm">
         <ModalHeader>
-          <ModalTitle>Nova conta a pagar</ModalTitle>
+          <ModalTitle>{t('newTitle')}</ModalTitle>
         </ModalHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -128,9 +131,9 @@ export function BillModal({ categories }: Props) {
           {/* Mode selector */}
           <div className="flex gap-2">
             {([
-              { key: 'avulso',     label: 'Avulso',     icon: '💸' },
-              { key: 'parcelado',  label: 'Parcelado',  icon: '📅' },
-              { key: 'recorrente', label: 'Recorrente', icon: '🔁' },
+              { key: 'avulso',     label: t('mode.single'),      icon: '💸' },
+              { key: 'parcelado',  label: t('mode.installment'), icon: '📅' },
+              { key: 'recorrente', label: t('mode.recurring'),   icon: '🔁' },
             ] as { key: Mode; label: string; icon: string }[]).map((m) => (
               <button key={m.key} type="button" onClick={() => setMode(m.key)}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
@@ -144,7 +147,7 @@ export function BillModal({ categories }: Props) {
           </div>
 
           {/* Name field */}
-          <FormField label="Nome da conta" htmlFor="name" required>
+          <FormField label={t('billName')} htmlFor="name" required>
             <div className="flex flex-col gap-2">
               {/* Dropdown de serviços */}
               <button
@@ -152,7 +155,7 @@ export function BillModal({ categories }: Props) {
                 onClick={() => setShowSvc(!showServices)}
                 className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:border-ink-500 text-xs text-slate-400 transition-colors"
               >
-                <span>{name ? `Serviço: ${name}` : 'Selecionar serviço rápido...'}</span>
+                <span>{name ? t('serviceName', { name }) : t('selectService')}</span>
                 {showServices ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
               </button>
 
@@ -185,7 +188,7 @@ export function BillModal({ categories }: Props) {
 
               <div className="relative">
                 <Input id="name" name="name" type="text"
-                  placeholder="Ou digite o nome da conta..."
+                  placeholder={t('typeName')}
                   value={name} onChange={(e) => setName(e.target.value)} required />
                 {detectedBrand && (
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
@@ -204,7 +207,7 @@ export function BillModal({ categories }: Props) {
               <CurrencyInput id="amount" name="amount" required onValueChange={setAmountNum} />
             </FormField>
             {mode === 'recorrente' ? (
-              <FormField label="Todo dia" htmlFor="dayOfMonth" required>
+              <FormField label={t('everyDay')} htmlFor="dayOfMonth" required>
                 <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
                   defaultValue={1} placeholder="1-28" required />
               </FormField>
@@ -216,7 +219,7 @@ export function BillModal({ categories }: Props) {
           </div>
           {mode === 'recorrente' && (
             <p className="text-xs text-slate-600 -mt-2 px-1">
-              A conta será gerada automaticamente nesse dia todo mês.
+              {t('autoGenerate')}
             </p>
           )}
 
@@ -224,27 +227,27 @@ export function BillModal({ categories }: Props) {
           {mode === 'parcelado' && (
             <div className="flex flex-col gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-600">
               <div className="grid grid-cols-2 gap-3">
-                <FormField label="Total de parcelas" htmlFor="installments">
+                <FormField label={t('totalInstallments')} htmlFor="installments">
                   <div className="flex items-center gap-2">
                     <input type="number" min={2} max={120} value={installments}
                       onChange={(e) => { const v = Number(e.target.value); setInst(v); if (alreadyPaid >= v) setAlready(v - 1) }}
                       className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
-                    <span className="text-xs text-slate-500 shrink-0">parcelas</span>
+                    <span className="text-xs text-slate-500 shrink-0">{t('installmentsOf')}</span>
                   </div>
                 </FormField>
-                <FormField label="Já pagas" htmlFor="alreadyPaid">
+                <FormField label={t('alreadyPaid')} htmlFor="alreadyPaid">
                   <div className="flex items-center gap-2">
                     <input type="number" min={0} max={installments - 1} value={alreadyPaid}
                       onChange={(e) => setAlready(Math.min(Number(e.target.value), installments - 1))}
                       className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
-                    <span className="text-xs text-slate-500 shrink-0">pagas</span>
+                    <span className="text-xs text-slate-500 shrink-0">{t('paidOf')}</span>
                   </div>
                 </FormField>
               </div>
               {amountNum > 0 && (
                 <div className="flex flex-col gap-1">
                   <p className="text-xs text-slate-400">
-                    <span className="font-medium text-slate-200">{installments - alreadyPaid} parcelas restantes</span>
+                    <span className="font-medium text-slate-200">{t('remainingInstallments', { count: installments - alreadyPaid })}</span>
                     {' '}× {formatCurrency(amountNum)} = <span className="font-medium text-brand-300">{formatCurrency(amountNum * (installments - alreadyPaid))}</span>
                   </p>
                   {alreadyPaid > 0 && (
@@ -258,24 +261,23 @@ export function BillModal({ categories }: Props) {
           {/* Recorrente info */}
           {mode === 'recorrente' && (
             <div className="flex flex-col gap-1 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
-              <p className="text-sm text-brand-300 font-medium">🔁 Pagamento mensal recorrente</p>
+              <p className="text-sm text-brand-300 font-medium">{t('recurringInfo')}</p>
               {amountNum > 0 && (
-                <p className="text-xs text-slate-400">{formatCurrency(amountNum)}/mês · repete todo mês na data informada</p>
+                <p className="text-xs text-slate-400">{formatCurrency(amountNum)}{t('recurringNote')}</p>
               )}
-              <p className="text-[11px] text-slate-500">Para quando quiser nas contas ativas.</p>
             </div>
           )}
 
-          <FormField label="Categoria" htmlFor="categoryId">
-            <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
+          <FormField label={c('category')} htmlFor="categoryId">
+            <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder={c('optional')} />
           </FormField>
 
-          <FormField label="Observações" htmlFor="notes">
-            <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[56px]" />
+          <FormField label={c('notes')} htmlFor="notes">
+            <Textarea id="notes" name="notes" placeholder={c('optional')} className="min-h-[56px]" />
           </FormField>
 
           <ModalFooter>
-            <Button type="button" variant="secondary" onClick={reset}>Cancelar</Button>
+            <Button type="button" variant="secondary" onClick={reset}>{c('cancel')}</Button>
             <Button type="submit" loading={isBusy} disabled={!name.trim()}>{submitLabel}</Button>
           </ModalFooter>
         </form>

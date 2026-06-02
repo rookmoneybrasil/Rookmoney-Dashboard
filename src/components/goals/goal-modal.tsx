@@ -16,6 +16,7 @@ import { CurrencyInput } from '@/components/ui/currency-input'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
+import { useTranslations } from 'next-intl'
 
 const COLORS = [
   { value: '#3B82F6', label: 'Azul'    },
@@ -27,6 +28,8 @@ const COLORS = [
 ]
 
 export function GoalModal() {
+  const t = useTranslations('goals')
+  const c = useTranslations('common')
   const [open, setOpen]   = useState(false)
   const [color, setColor] = useState(COLORS[0].value)
 
@@ -71,13 +74,13 @@ export function GoalModal() {
         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"
       >
         <Plus className="size-3.5" />
-        Nova meta
+        {t('new')}
       </button>
 
       <ModalContent size="sm">
         <ModalHeader>
-          <ModalTitle>Nova meta</ModalTitle>
-          <ModalDescription>Defina o objetivo e o valor alvo.</ModalDescription>
+          <ModalTitle>{t('new')}</ModalTitle>
+          <ModalDescription>{t('description')}</ModalDescription>
         </ModalHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -87,7 +90,7 @@ export function GoalModal() {
             </p>
           )}
 
-          <FormField label="Nome da meta" htmlFor="name" required>
+          <FormField label={t('goalName')} htmlFor="name" required>
             <Input
               id="name"
               name="name"
@@ -98,11 +101,11 @@ export function GoalModal() {
           </FormField>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Valor alvo (R$)" htmlFor="targetAmount" required>
+            <FormField label={t('targetAmount')} htmlFor="targetAmount" required>
               <CurrencyInput id="targetAmount" name="targetAmount" required />
             </FormField>
 
-            <FormField label="Já tenho (R$)" htmlFor="currentAmount">
+            <FormField label={t('currentAmount')} htmlFor="currentAmount">
               <CurrencyInput id="currentAmount" name="currentAmount" />
             </FormField>
           </div>
@@ -118,7 +121,7 @@ export function GoalModal() {
               />
             </FormField>
 
-            <FormField label="Prazo" htmlFor="deadline">
+            <FormField label={t('deadline')} htmlFor="deadline">
               <Input
                 id="deadline"
                 name="deadline"
@@ -127,27 +130,27 @@ export function GoalModal() {
             </FormField>
           </div>
 
-          <FormField label="Cor">
+          <FormField label={t('color')}>
             <div className="flex items-center gap-2 flex-wrap">
-              {COLORS.map((c) => (
+              {COLORS.map((col) => (
                 <button
-                  key={c.value}
+                  key={col.value}
                   type="button"
-                  onClick={() => setColor(c.value)}
+                  onClick={() => setColor(col.value)}
                   className="size-7 rounded-full transition-all focus:outline-none"
-                  style={{ backgroundColor: c.value, outline: color === c.value ? `2px solid ${c.value}` : undefined, outlineOffset: '2px' }}
-                  title={c.label}
+                  style={{ backgroundColor: col.value, outline: color === col.value ? `2px solid ${col.value}` : undefined, outlineOffset: '2px' }}
+                  title={col.label}
                 />
               ))}
             </div>
           </FormField>
 
-          <FormField label="Descrição" htmlFor="description">
+          <FormField label={c('description')} htmlFor="description">
             <Input
               id="description"
               name="description"
               type="text"
-              placeholder="Opcional"
+              placeholder={c('optional')}
             />
           </FormField>
 
@@ -157,10 +160,10 @@ export function GoalModal() {
               variant="secondary"
               onClick={() => setOpen(false)}
             >
-              Cancelar
+              {c('cancel')}
             </Button>
             <Button type="submit" loading={pending}>
-              Criar meta
+              {t('create')}
             </Button>
           </ModalFooter>
         </form>
