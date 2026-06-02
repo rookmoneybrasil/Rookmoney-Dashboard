@@ -135,6 +135,25 @@ export default async function PersonPage({ params }: Props) {
   if (!person) notFound()
 
   const allEntries   = person.entries
+
+  // For each recurring template, find if there's an entry this month (settled or pending)
+  const now          = new Date()
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
+  const monthEnd     = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+
+  // Map: recurringId → matching entry this month (if any)
+  const recurringEntryMap = new Map<string, typeof allEntries[number]>()
+  for (const r of recurring) {
+    const match = allEntries.find(e =>
+      e.description === r.description &&
+      e.type        === r.type &&
+      !e.installmentGroupId &&
+      new Date(e.date) >= monthStart &&
+      new Date(e.date) <= monthEnd
+    )
+    if (match) recurringEntryMap.set(r.id, match)
+  }
   const today        = new Date()
   const cutoff       = new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
 
@@ -162,11 +181,8 @@ export default async function PersonPage({ params }: Props) {
     else                           iOweTotal    += Number(e.amount)
   }
 
-  // Include active recurring templates (monthly expected amounts)
-  const recurringTheyOwe = recurring.filter(r => r.type === 'THEY_OWE_ME').reduce((s, r) => s + Number(r.amount), 0)
-  const recurringIOwe    = recurring.filter(r => r.type === 'I_OWE_THEM').reduce((s, r) => s + Number(r.amount), 0)
-  theyOweTotal += recurringTheyOwe
-  iOweTotal    += recurringIOwe
+  // Recurring templates are NOT added to balance — they generate PersonEntry
+  // instances each month which are already counted in openEntries above.
   const balance = theyOweTotal - iOweTotal
 
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
@@ -270,9 +286,18 @@ export default async function PersonPage({ params }: Props) {
           <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
             Recorrentes ativos
           </h2>
-          {recurring.map(item => (
-            <RecurringEntryCard key={item.id} item={item} />
-          ))}
+          {recurring.map(item => {
+            const monthEntry = recurringEntryMap.get(item.id)
+            return (
+              <RecurringEntryCard
+                key={item.id}
+                item={item}
+                categories={categories}
+                monthEntryId={monthEntry?.id ?? null}
+                paidThisMonth={monthEntry?.isSettled ?? false}
+              />
+            )
+          })}
         </div>
       )}
 

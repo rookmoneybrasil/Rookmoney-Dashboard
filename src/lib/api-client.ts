@@ -226,6 +226,8 @@ export const clientApi = {
   // Person Entry Recurring
   createPersonRecurring: (data: { personId: string; type: string; description: string; amount: number; dayOfMonth?: number; notes?: string | null; categoryId?: string | null }) =>
     clientFetch<PersonEntryRecurringItem>('/people/recurring', { method: 'POST', body: JSON.stringify(data) }),
+  updatePersonRecurring: (id: string, data: { description?: string; amount?: number; dayOfMonth?: number; categoryId?: string | null; notes?: string | null; isActive?: boolean }) =>
+    clientFetch<PersonEntryRecurringItem>(`/people/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   stopPersonRecurring: (id: string) =>
     clientFetch<void>(`/people/recurring/${id}`, { method: 'DELETE' }),
   migratePersonRecurring: () =>
