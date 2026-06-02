@@ -1,42 +1,80 @@
 'use client'
 
-import { Crown, Lock } from 'lucide-react'
+import { Crown, Lock, Check, Minus } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Props {
-  feature:  string
+  feature:   string
   children?: React.ReactNode
-  locked?:  boolean   // if false, renders children normally
+  locked?:   boolean
+  perks?:    string[]   // feature-specific benefits to highlight
 }
 
-export function ProGate({ feature, children, locked = true }: Props) {
+const DEFAULT_PERKS = [
+  'Transações, metas e contas ilimitadas',
+  'Relatórios e projeção financeira',
+  'Chat com Rookinho (IA)',
+  'Importação de extratos CSV',
+  'Orçamento por categoria',
+]
+
+export function ProGate({ feature, children, locked = true, perks = DEFAULT_PERKS }: Props) {
   if (!locked) return <>{children}</>
 
   return (
-    <div className="relative">
+    <div className="relative min-h-[320px]">
       {/* Blurred preview */}
       {children && (
-        <div className="pointer-events-none select-none opacity-30 blur-sm" aria-hidden>
+        <div className="pointer-events-none select-none opacity-20 blur-sm" aria-hidden>
           {children}
         </div>
       )}
 
       {/* Overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-900/60 rounded-xl">
-        <div className="size-12 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center">
-          <Crown className="size-6 text-amber-400 fill-amber-400/20" />
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl bg-ink-800/95 border border-amber-400/20 rounded-2xl overflow-hidden shadow-2xl flex backdrop-blur-sm">
+          {/* Image side */}
+          <div className="hidden md:flex w-48 shrink-0 items-end justify-center bg-gradient-to-b from-amber-400/5 to-ink-800 overflow-hidden">
+            <Image
+              src="/rookinho-organizando.png"
+              alt="Rookinho"
+              width={160}
+              height={200}
+              className="object-contain w-full"
+            />
+          </div>
+
+          {/* Content side */}
+          <div className="flex-1 p-6 flex flex-col gap-4 min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="size-8 rounded-xl bg-amber-400/15 flex items-center justify-center shrink-0">
+                <Crown className="size-4 text-amber-400 fill-amber-400/30" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">{feature} é exclusivo do PRO</p>
+                <p className="text-xs text-slate-500">Desbloqueie por R$19,90/mês</p>
+              </div>
+            </div>
+
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {perks.map(p => (
+                <li key={p} className="flex items-center gap-2 text-xs text-slate-300">
+                  <Check className="size-3 text-success shrink-0" />
+                  {p}
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/billing"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-ink-900 font-bold text-sm px-5 py-2.5 rounded-xl transition-all self-start shadow-lg shadow-amber-500/20"
+            >
+              <Crown className="size-4 fill-ink-900/20" />
+              Assinar PRO
+            </Link>
+          </div>
         </div>
-        <div className="text-center px-6">
-          <p className="text-sm font-semibold text-slate-100">{feature} é PRO</p>
-          <p className="text-xs text-slate-500 mt-1">Faça upgrade para desbloquear</p>
-        </div>
-        <Link
-          href="/settings?tab=billing"
-          className="inline-flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-ink-900 font-bold text-xs px-4 py-2 rounded-lg transition-colors"
-        >
-          <Crown className="size-3.5 fill-ink-900" />
-          Assinar PRO — R$19,90/mês
-        </Link>
       </div>
     </div>
   )
@@ -46,7 +84,7 @@ export function ProGate({ feature, children, locked = true }: Props) {
 export function ProLock({ feature }: { feature: string }) {
   return (
     <Link
-      href="/settings?tab=billing"
+      href="/billing"
       title={`${feature} é exclusivo do plano PRO`}
       className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors"
     >
