@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { Poppins } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
-import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from '@/components/theme-provider'
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import './globals.css'
 
 const poppins = Poppins({
@@ -22,22 +22,24 @@ export const metadata: Metadata = {
   other: { 'theme-color': '#020f21', 'mobile-web-app-capable': 'yes' },
 }
 
+const LOCALES = ['pt', 'en', 'es'] as const
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  // getLocale/getMessages may throw if called outside a request context (static build).
-  // Fallback to 'pt' so the root layout always renders correctly.
-  let locale = 'pt'
+  const cookieStore = await cookies()
+  const raw    = cookieStore.get('NEXT_LOCALE')?.value ?? 'pt'
+  const locale = LOCALES.includes(raw as any) ? raw : 'pt'
+
   let messages: Record<string, unknown> = {}
   try {
-    locale   = await getLocale()
-    messages = await getMessages() as Record<string, unknown>
-  } catch { /* static render / no request context */ }
+    messages = (await import(`../../messages/${locale}.json`)).default
+  } catch { /* fallback to empty messages */ }
 
   const htmlLang = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es' : 'en'
 
   return (
     <html lang={htmlLang} className={`${poppins.variable} h-full`} suppressHydrationWarning>
       <body className="h-full antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
             {children}
           </ThemeProvider>

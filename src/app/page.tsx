@@ -1,5 +1,3 @@
-// Root — next-intl middleware rewrites / to /pt internally with localePrefix: 'never'
-// URL never changes. This file is never rendered directly.
-export default function RootPage() {
-  return null
-}
+// Landing page — serves app/[locale]/page.tsx content directly.
+// Locale comes from NEXT_LOCALE cookie (set by middleware), read via getRequestConfig.
+export { default } from './[locale]/page'
