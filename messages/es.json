@@ -531,7 +531,11 @@
       "titleHighlight": "Bajo control.",
       "description": "Panel inteligente, metas, presupuesto por categoría e informes detallados. Simple, hermoso y eficiente.",
       "cta": "Empezar gratis",
-      "login": "Ya tengo cuenta"
+      "login": "Ya tengo cuenta",
+      "freeNote": "Gratis para empezar · Sin tarjeta de crédito",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "balance": "Saldo"
     },
     "features": {
       "title": "Todo lo que necesitas",
@@ -568,12 +572,6 @@
       "terms": "Términos de uso",
       "contact": "Contacto",
       "rights": "Todos los derechos reservados."
-    },
-    "hero": {
-      "freeNote": "Gratis para empezar · Sin tarjeta de crédito",
-      "income": "Ingresos",
-      "expenses": "Gastos",
-      "balance": "Saldo"
     },
     "trust": [
       { "value": "Gratis",   "label": "para empezar, sin tarjeta" },

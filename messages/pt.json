@@ -531,7 +531,11 @@
       "titleHighlight": "No controle.",
       "description": "Dashboard inteligente, metas, orçamento por categoria e relatórios detalhados. Simples, bonito e eficiente.",
       "cta": "Começar grátis",
-      "login": "Já tenho conta"
+      "login": "Já tenho conta",
+      "freeNote": "Gratuito para começar · Sem cartão de crédito",
+      "income": "Receitas",
+      "expenses": "Gastos",
+      "balance": "Saldo"
     },
     "features": {
       "title": "Tudo que você precisa",
@@ -568,12 +572,6 @@
       "terms": "Termos de Uso",
       "contact": "Contato",
       "rights": "Todos os direitos reservados."
-    },
-    "hero": {
-      "freeNote": "Gratuito para começar · Sem cartão de crédito",
-      "income": "Receitas",
-      "expenses": "Gastos",
-      "balance": "Saldo"
     },
     "trust": [
       { "value": "Grátis",   "label": "para começar, sem cartão" },

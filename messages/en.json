@@ -531,7 +531,11 @@
       "titleHighlight": "In control.",
       "description": "Smart dashboard, goals, category budgets and detailed reports. Simple, beautiful and efficient.",
       "cta": "Get started free",
-      "login": "I already have an account"
+      "login": "I already have an account",
+      "freeNote": "Free to start · No credit card required",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance"
     },
     "features": {
       "title": "Everything you need",
@@ -568,12 +572,6 @@
       "terms": "Terms of Service",
       "contact": "Contact",
       "rights": "All rights reserved."
-    },
-    "hero": {
-      "freeNote": "Free to start · No credit card required",
-      "income": "Income",
-      "expenses": "Expenses",
-      "balance": "Balance"
     },
     "trust": [
       { "value": "Free",     "label": "to start, no card needed" },
