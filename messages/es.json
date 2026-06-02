@@ -568,7 +568,45 @@
       "terms": "Términos de uso",
       "contact": "Contacto",
       "rights": "Todos los derechos reservados."
-    }
+    },
+    "hero": {
+      "freeNote": "Gratis para empezar · Sin tarjeta de crédito",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "balance": "Saldo"
+    },
+    "trust": [
+      { "value": "Gratis",   "label": "para empezar, sin tarjeta" },
+      { "value": "RGPD",     "label": "datos protegidos por ley" },
+      { "value": "TLS 256",  "label": "cifrado en tránsito" },
+      { "value": "Cancela",  "label": "cuando quieras, sin penalización" }
+    ],
+    "testimonials": [
+      { "name": "Mariana S.", "role": "Diseñadora freelance", "text": "Por fin una app que entiende los ingresos variables. Puedo ver exactamente lo que sobra al final del mes.", "initials": "MS", "color": "#6366f1" },
+      { "name": "Rafael T.",  "role": "Desarrollador",        "text": "El seguimiento visual de metas me motivó a ahorrar de verdad. Simple y directo.",                         "initials": "RT", "color": "#3b82f6" },
+      { "name": "Camila F.",  "role": "Autónoma",             "text": "El panel de facturas me salvó de olvidar pagos. Lo recomiendo mucho.",                                     "initials": "CF", "color": "#8b5cf6" }
+    ],
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "subtitle": "¿Aún tienes dudas? Escríbenos.",
+      "items": [
+        { "q": "¿Es seguro guardar mis datos financieros aquí?", "a": "Sí. Todos los datos se transmiten con cifrado TLS y se almacenan en servidores seguros. Las contraseñas están protegidas con hash bcrypt y nunca son visibles — ni para nosotros." },
+        { "q": "¿Puedo cancelar cuando quiera?", "a": "Sí, sin penalización ni burocracia. Cancela el plan Pro en cualquier momento en Configuración. Mantienes el acceso hasta el fin del período pagado y luego pasas automáticamente al plan gratuito." },
+        { "q": "¿Necesito tarjeta de crédito para empezar?", "a": "No. El plan gratuito es 100% gratis y no requiere tarjeta. Solo pedimos datos de pago si decides suscribirte al Pro." },
+        { "q": "¿Cómo funciona el plan gratuito?", "a": "Tienes acceso al panel completo, calendario, facturas (hasta 5), hasta 2 metas y 50 transacciones/mes. Para uso intensivo — transacciones ilimitadas, proyección financiera, presupuestos, informes y chat con IA — existe el PRO por $9.90/mes." },
+        { "q": "¿Funciona en móvil?", "a": "Sí. La interfaz es totalmente responsiva y funciona bien en cualquier dispositivo. App nativa para Android e iOS próximamente." },
+        { "q": "¿Mis datos están disponibles si cancelo?", "a": "Puedes exportar todos tus datos en CSV en cualquier momento desde Configuración. Al eliminar la cuenta, los datos se eliminan permanentemente en un máximo de 30 días." }
+      ]
+    },
+    "cta": {
+      "title": "¿Listo para tomar\nel control?",
+      "description": "Crea tu cuenta gratis y empieza a organizar tus finanzas hoy mismo.",
+      "primary": "Empezar gratis",
+      "secondary": "Ya tengo una cuenta"
+    },
+    "spendingByCategory": "Gastos por categoría",
+    "chartIncome": "Ingresos",
+    "chartExpenses": "Gastos"
   },
   "financialHealth": {
     "title": "Salud financiera",

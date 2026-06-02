@@ -568,7 +568,45 @@
       "terms": "Terms of Service",
       "contact": "Contact",
       "rights": "All rights reserved."
-    }
+    },
+    "hero": {
+      "freeNote": "Free to start · No credit card required",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance"
+    },
+    "trust": [
+      { "value": "Free",     "label": "to start, no card needed" },
+      { "value": "GDPR",     "label": "data protected by law" },
+      { "value": "TLS 256",  "label": "encryption in transit" },
+      { "value": "Cancel",   "label": "anytime, no penalty" }
+    ],
+    "testimonials": [
+      { "name": "Mariana S.", "role": "Freelance designer", "text": "Finally an app that understands variable income. I can see exactly what's left at the end of the month.", "initials": "MS", "color": "#6366f1" },
+      { "name": "Rafael T.",  "role": "Developer",          "text": "The visual goal tracking motivated me to actually save money. Simple and straightforward.",              "initials": "RT", "color": "#3b82f6" },
+      { "name": "Camila F.",  "role": "Freelancer",         "text": "The bills dashboard saved me from missing payments. Highly recommend.",                                  "initials": "CF", "color": "#8b5cf6" }
+    ],
+    "faq": {
+      "title": "Frequently asked questions",
+      "subtitle": "Still have questions? Talk to us.",
+      "items": [
+        { "q": "Is it safe to store my financial data here?", "a": "Yes. All data is transmitted with TLS encryption and stored on secure servers. Passwords are hashed with bcrypt and never visible — not even to us." },
+        { "q": "Can I cancel anytime?", "a": "Yes, no penalties or hassle. Cancel the Pro plan anytime in Settings. You keep access until the end of the paid period, then automatically switch to the free plan." },
+        { "q": "Do I need a credit card to start?", "a": "No. The free plan is 100% free and doesn't require a card. We only ask for payment info if you decide to subscribe to Pro." },
+        { "q": "How does the free plan work?", "a": "You get access to the full dashboard, calendar, bills (up to 5), up to 2 goals and 50 transactions/month. For heavy use — unlimited transactions, financial projection, budgets, reports and AI chat — there's PRO at $9.90/month." },
+        { "q": "Does it work on mobile?", "a": "Yes. The interface is fully responsive and works great on any device. Native Android and iOS app coming soon." },
+        { "q": "Is my data available if I cancel?", "a": "You can export all your data as CSV at any time in Settings. When you delete your account, data is permanently removed within 30 days." }
+      ]
+    },
+    "cta": {
+      "title": "Ready to take\ncontrol?",
+      "description": "Create your account for free and start organizing your finances today.",
+      "primary": "Get started free",
+      "secondary": "I already have an account"
+    },
+    "spendingByCategory": "Spending by category",
+    "chartIncome": "Income",
+    "chartExpenses": "Expenses"
   },
   "financialHealth": {
     "title": "Financial health",

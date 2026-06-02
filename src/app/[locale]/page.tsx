@@ -185,7 +185,7 @@ export default async function LandingPage() {
               </FadeIn>
 
               <FadeIn delay={540}>
-                <p className="mt-5 text-sm text-slate-600">Gratuito para começar · Sem cartão de crédito</p>
+                <p className="mt-5 text-sm text-slate-600">{t('hero.freeNote')}</p>
               </FadeIn>
 
               {/* Mini stat cards */}
@@ -202,7 +202,7 @@ export default async function LandingPage() {
                   <div className="p-3 flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500">
                       <TrendingUp className="size-3 text-success shrink-0" />
-                      <span className="hidden sm:inline">Receitas</span>
+                      <span className="hidden sm:inline">{t('hero.income')}</span>
                     </div>
                     <p className="text-sm sm:text-base font-bold text-success leading-none">+R$&nbsp;6.200</p>
                   </div>
@@ -219,7 +219,7 @@ export default async function LandingPage() {
                   <div className="p-3 flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500">
                       <TrendingDown className="size-3 text-danger shrink-0" />
-                      <span className="hidden sm:inline">Gastos</span>
+                      <span className="hidden sm:inline">{t('hero.expenses')}</span>
                     </div>
                     <p className="text-sm sm:text-base font-bold text-danger leading-none">-R$&nbsp;3.840</p>
                   </div>
@@ -236,7 +236,7 @@ export default async function LandingPage() {
                   <div className="p-3 flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500">
                       <Wallet className="size-3 text-brand-400 shrink-0" />
-                      <span className="hidden sm:inline">Saldo</span>
+                      <span className="hidden sm:inline">{t('hero.balance')}</span>
                     </div>
                     <p className="text-sm sm:text-base font-bold text-brand-300 leading-none">+R$&nbsp;2.360</p>
                   </div>
@@ -253,12 +253,7 @@ export default async function LandingPage() {
       <section className="py-12 px-4 sm:px-6 border-y border-white/5 bg-ink-800/20">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-14 text-center">
-            {[
-              { value: 'Grátis',     label: 'para começar, sem cartão' },
-              { value: 'LGPD',       label: 'dados protegidos por lei' },
-              { value: 'TLS 256',    label: 'criptografia em trânsito'  },
-              { value: 'Cancela',    label: 'quando quiser, sem multa'  },
-            ].map(({ value, label }) => (
+            {(t.raw('trust') as { value: string; label: string }[]).map(({ value, label }) => (
               <div key={value} className="flex flex-col items-center gap-1">
                 <span className="text-2xl font-black text-white tracking-tight">{value}</span>
                 <span className="text-xs text-slate-500">{label}</span>
@@ -266,31 +261,9 @@ export default async function LandingPage() {
             ))}
           </FadeIn>
 
-          {/* Depoimentos beta */}
+          {/* Testimonials */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              {
-                name: 'Mariana S.',
-                role: 'Designer freelancer',
-                text: 'Finalmente um app que entende renda variável. Consigo ver exatamente o que sobra no mês.',
-                initials: 'MS',
-                color: '#6366f1',
-              },
-              {
-                name: 'Rafael T.',
-                role: 'Desenvolvedor',
-                text: 'As metas com acompanhamento visual me motivaram a poupar de verdade. Simples e direto.',
-                initials: 'RT',
-                color: '#3b82f6',
-              },
-              {
-                name: 'Camila F.',
-                role: 'Autônoma',
-                text: 'O dashboard de contas a pagar me salvou de esquecer boletos. Recomendo demais.',
-                initials: 'CF',
-                color: '#8b5cf6',
-              },
-            ].map(({ name, role, text, initials, color }, i) => (
+            {(t.raw('testimonials') as { name: string; role: string; text: string; initials: string; color: string }[]).map(({ name, role, text, initials, color }, i) => (
               <FadeIn key={name} delay={i * 100} from="bottom">
                 <div className="bg-ink-800 border border-white/6 rounded-2xl p-5 flex flex-col gap-4">
                   <p className="text-sm text-slate-300 leading-relaxed flex-1">"{text}"</p>
@@ -359,9 +332,9 @@ export default async function LandingPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { label: 'Receitas',  value: '+R$ 6.200', color: '#22c55e' },
-                        { label: 'Gastos',    value: '-R$ 3.840', color: '#f43f5e' },
-                        { label: 'Saldo',     value: '+R$ 2.360', color: '#60a5fa' },
+                        { label: t('hero.income'),   value: '+R$ 6.200', color: '#22c55e' },
+                        { label: t('hero.expenses'), value: '-R$ 3.840', color: '#f43f5e' },
+                        { label: t('hero.balance'),  value: '+R$ 2.360', color: '#60a5fa' },
                       ].map(s => (
                         <div key={s.label} className="bg-ink-700/80 rounded-xl p-3 flex flex-col gap-1">
                           <span className="text-[10px] text-slate-500">{s.label}</span>
@@ -370,7 +343,7 @@ export default async function LandingPage() {
                       ))}
                     </div>
                     <div className="flex-1 bg-ink-700/50 rounded-xl p-3 flex flex-col gap-2">
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wide">Gastos por categoria</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wide">{t('spendingByCategory')}</span>
                       <div className="flex flex-col gap-1.5 mt-1">
                         {[
                           { label: 'Alimentação', pct: 72, color: '#f97316' },
@@ -445,8 +418,8 @@ export default async function LandingPage() {
                         ))}
                       </div>
                       <div className="flex items-center gap-4 justify-center">
-                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-brand-500"/><span className="text-[10px] text-slate-500">Receitas</span></div>
-                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-danger"/><span className="text-[10px] text-slate-500">Gastos</span></div>
+                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-brand-500"/><span className="text-[10px] text-slate-500">{t('chartIncome')}</span></div>
+                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-danger"/><span className="text-[10px] text-slate-500">{t('chartExpenses')}</span></div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="bg-ink-700/60 rounded-xl p-2.5">
@@ -583,37 +556,12 @@ export default async function LandingPage() {
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
           <FadeIn className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-100">Perguntas frequentes</h2>
-            <p className="mt-2 text-slate-500 text-sm">Ainda com dúvidas? Fala com a gente.</p>
+            <h2 className="text-3xl font-bold text-slate-100">{t('faq.title')}</h2>
+            <p className="mt-2 text-slate-500 text-sm">{t('faq.subtitle')}</p>
           </FadeIn>
 
           <div className="flex flex-col gap-3">
-            {[
-              {
-                q: 'É seguro guardar meus dados financeiros aqui?',
-                a: 'Sim. Todos os dados são transmitidos com criptografia TLS e armazenados em servidores seguros. Senhas são protegidas com hash bcrypt e nunca ficam visíveis — nem pra gente. Seguimos a LGPD.',
-              },
-              {
-                q: 'Posso cancelar quando quiser?',
-                a: 'Sim, sem multa ou burocracia. Cancele o plano Pro a qualquer momento nas Configurações. Você continua com acesso até o fim do período já pago e depois migra pro plano gratuito automaticamente.',
-              },
-              {
-                q: 'Preciso de cartão de crédito para começar?',
-                a: 'Não. O plano gratuito é 100% gratuito e não exige cartão. Só pedimos dados de pagamento se você decidir assinar o Pro.',
-              },
-              {
-                q: 'Como funciona o plano gratuito?',
-                a: 'Você tem acesso ao dashboard completo, calendário, contas a pagar (até 5), até 2 metas e 50 transações/mês. Para uso intenso — transações ilimitadas, projeção financeira, orçamento, relatórios avançados, chat com IA e importação CSV — existe o PRO por R$19,90/mês (ou R$15,90/mês no anual).',
-              },
-              {
-                q: 'Funciona no celular?',
-                a: 'Sim. A interface é totalmente responsiva e funciona bem em qualquer dispositivo. Navegação mobile com abas inferiores para acesso rápido às principais seções.',
-              },
-              {
-                q: 'Meus dados ficam disponíveis se eu cancelar?',
-                a: 'Você pode exportar todos os seus dados em CSV a qualquer momento nas Configurações. Ao excluir a conta, os dados são removidos permanentemente em até 30 dias.',
-              },
-            ].map(({ q, a }, i) => (
+            {(t.raw('faq.items') as { q: string; a: string }[]).map(({ q, a }, i) => (
               <FadeIn key={q} delay={i * 60} from="bottom">
                 <details className="group bg-ink-800 border border-white/6 rounded-xl overflow-hidden">
                   <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none text-slate-200 font-medium text-sm hover:text-white transition-colors">
@@ -664,12 +612,12 @@ export default async function LandingPage() {
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-28 gap-7">
           <FadeIn>
             <h2 className="text-3xl sm:text-5xl font-bold text-slate-100 max-w-xl leading-tight">
-              Pronto para assumir<br />o controle?
+              {t('cta.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 ? <br /> : ''}</span>)}
             </h2>
           </FadeIn>
           <FadeIn delay={150}>
             <p className="text-slate-400 text-lg max-w-md leading-relaxed">
-              Crie sua conta gratuitamente e comece a organizar suas finanças hoje mesmo.
+              {t('cta.description')}
             </p>
           </FadeIn>
           <FadeIn delay={280}>
@@ -678,11 +626,11 @@ export default async function LandingPage() {
               href="/register"
               className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-brand-600/30 hover:shadow-brand-500/35"
             >
-              Começar grátis agora
+              {t('cta.primary')}
               <ArrowRight className="size-4" />
             </Link>
             <Link href="/login" className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
-              Já tenho uma conta
+              {t('cta.secondary')}
             </Link>
           </div>
           </FadeIn>
