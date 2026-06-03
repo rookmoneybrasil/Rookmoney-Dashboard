@@ -267,10 +267,15 @@ export default async function BillsPage() {
                       : status === 'urgent' ? 'bg-warning/5 border-warning/20 hover:bg-warning/8'
                       : 'bg-ink-800 border-ink-700 hover:bg-ink-700/80'
                     }`}>
-                      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        status === 'overdue' || status === 'urgent' ? 'bg-danger/15 text-danger' : 'bg-ink-600 text-slate-500'
+                      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 text-sm ${
+                        status === 'overdue' ? 'bg-danger/15' : status === 'urgent' ? 'bg-warning/15' : 'bg-ink-600'
                       }`}>
-                        {bill.recurringBillId ? <RefreshCw className="size-3.5" /> : <Icon className="size-3.5" />}
+                        {bill.category?.icon
+                          ? <span>{bill.category.icon}</span>
+                          : bill.recurringBillId
+                          ? <RefreshCw className="size-3.5 text-brand-400" />
+                          : <Icon className={`size-3.5 ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-500'}`} />
+                        }
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
