@@ -68,18 +68,46 @@ export default async function BillsPage() {
   const overdueList = pending.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
   const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
 
-  // Mini projection: next 3 months based on recurring bills
+  // Projection: next 3 months — fixed + avulsos agendados + parcelas
   const projection = Array.from({ length: 3 }, (_, i) => {
-    const d = addMonths(now, i)
+    const d  = addMonths(now, i)
+    const yr = d.getFullYear()
+    const mo = d.getMonth()
     const label = format(d, "MMM/yy", { locale: ptBR })
-    // For current month: pending bills; for future: recurring amount
-    const amount = i === 0
-      ? pending.filter(b => {
-          const dd = new Date(b.dueDate)
-          return dd.getFullYear() === d.getFullYear() && dd.getMonth() === d.getMonth()
-        }).reduce((s, b) => s + Number(b.amount), 0)
-      : monthlyFixed
-    return { label, amount, isCurrent: i === 0 }
+
+    const inMonth = (dateStr: string) => {
+      const dd = new Date(dateStr)
+      return dd.getFullYear() === yr && dd.getMonth() === mo
+    }
+
+    // Avulsos agendados para este mês (sem recurringBillId)
+    const avulsoAmount = pending
+      .filter(b => !b.recurringBillId && inMonth(b.dueDate))
+      .reduce((s, b) => s + Number(b.amount), 0)
+
+    // Parcelas devidas neste mês (installment groups)
+    const installmentAmount = activeGroups
+      .flatMap(g => g.items)
+      .filter(inst => !inst.isPaid && inMonth(inst.dueDate))
+      .reduce((s, inst) => s + Number(inst.amount), 0)
+
+    let fixedAmount: number
+    if (i === 0) {
+      // Mês atual: contas fixas JÁ aparecem em pending como bills geradas
+      fixedAmount = pending
+        .filter(b => !!b.recurringBillId && inMonth(b.dueDate))
+        .reduce((s, b) => s + Number(b.amount), 0)
+    } else {
+      // Meses futuros: usar o valor mensal das fixas ativas
+      fixedAmount = monthlyFixed
+    }
+
+    return {
+      label,
+      amount: fixedAmount + avulsoAmount + installmentAmount,
+      isCurrent: i === 0,
+      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount },
+    }
   })
 
   return (
@@ -170,29 +198,36 @@ export default async function BillsPage() {
         )}
 
         {/* Mini projeção dos próximos meses */}
-        {activeRecurring.length > 0 && (
+        {(activeRecurring.length > 0 || pending.length > 0 || activeGroups.length > 0) && (
           <div className="bg-ink-800 rounded-xl border border-ink-700 p-4 mt-1">
             <div className="flex items-center gap-2 mb-3">
               <CalendarDays className="size-4 text-brand-400" />
-              <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos fixos</h3>
+              <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos</h3>
             </div>
             <div className="grid grid-cols-3 gap-3">
               {projection.map((m) => (
                 <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
-                  <p className="text-[11px] text-slate-500 capitalize mb-2 flex items-center gap-1">
+                  <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
                     {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
                     {m.label}
                   </p>
-                  <p className="text-sm font-bold text-danger">-{formatCurrency(m.amount)}</p>
-                  {!m.isCurrent && (
-                    <p className="text-[10px] text-slate-600 mt-0.5">só fixas</p>
-                  )}
+                  <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
+                  <div className="flex flex-col gap-0.5">
+                    {m.breakdown.fixed > 0 && (
+                      <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>
+                    )}
+                    {m.breakdown.avulso > 0 && (
+                      <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>
+                    )}
+                    {m.breakdown.installment > 0 && (
+                      <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
             <p className="text-[11px] text-slate-600 mt-2">
-              {projection[0].isCurrent ? 'Mês atual inclui todas as contas pendentes. ' : ''}
-              Meses futuros baseados nas contas fixas ativas.
+              Fixas + avulsos agendados + parcelas vencendo em cada mês.
             </p>
           </div>
         )}
