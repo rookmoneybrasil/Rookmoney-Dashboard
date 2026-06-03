@@ -22,7 +22,8 @@ const TYPES = [
 interface Category { id: string; name: string; icon: string; color: string }
 interface Source {
   id: string; name: string; type: string; amount: number
-  isRecurring: boolean; dayOfMonth: number | null; categoryId: string | null; notes: string | null
+  isRecurring: boolean; dayOfMonth: number | null; startDate?: string | null
+  categoryId: string | null; notes: string | null
 }
 interface Props { source?: Source; categories?: Category[]; className?: string; title?: string; disabled?: boolean }
 
@@ -69,16 +70,18 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
           onSubmit={(e) => {
             e.preventDefault()
             const fd = new FormData(e.currentTarget)
-            const dayRaw = fd.get('dayOfMonth') as string
+            const dayRaw       = fd.get('dayOfMonth') as string
+            const startDateRaw = fd.get('startDate')  as string
             mutate({
               name:        fd.get('name') as string,
               type,
               amount:      parseFloat(fd.get('amount') as string),
               isRecurring,
-              dayOfMonth:  dayRaw ? parseInt(dayRaw, 10) : null,
+              dayOfMonth:  dayRaw       ? parseInt(dayRaw, 10) : null,
+              startDate:   startDateRaw || null,
               notes:       (fd.get('notes') as string) || null,
               categoryId:  categoryId || null,
-            })
+            } as any)
           }}
           className="flex flex-col gap-4"
         >
@@ -127,11 +130,27 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
           </div>
 
           {isRecurring && (
-            <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
-              <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
-                placeholder="Ex.: 5 (todo dia 5)"
-                defaultValue={source?.dayOfMonth ?? undefined} />
-            </FormField>
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
+                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                  placeholder="Ex.: 5"
+                  defaultValue={source?.dayOfMonth ?? undefined} />
+              </FormField>
+              <FormField
+                label="Primeiro pagamento"
+                htmlFor="startDate"
+                hint="Deixe vazio para começar este mês"
+              >
+                <Input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  defaultValue={source?.startDate
+                    ? new Date(source.startDate).toISOString().slice(0, 10)
+                    : undefined}
+                />
+              </FormField>
+            </div>
           )}
 
           <FormField label="Categoria" htmlFor="categoryId">

@@ -195,6 +195,7 @@ model IncomeSource {
   amount           Decimal          @db.Decimal(12, 2)
   isRecurring      Boolean          @default(true)
   dayOfMonth       Int?
+  startDate        DateTime?
   lastAutoPayMonth String?
   notes            String?
   createdAt        DateTime         @default(now())
