@@ -200,7 +200,7 @@ export default async function PersonPage({ params }: Props) {
   const monthLabel = format(now, 'MMMM', { locale: ptBR })
   const projection = Array.from({ length: 3 }, (_, i) => {
     const d = addMonths(now, i)
-    const label = format(d, "MMM 'yy", { locale: ptBR })
+    const label = format(d, "MMM/yy", { locale: ptBR })
 
     // Installment groups: which entries are due in this month?
     const dueEntries = openEntries.filter(e => {

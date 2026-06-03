@@ -199,11 +199,16 @@ export default async function PersonPage({ params }: Props) {
   const iOweTotalWithRecurring    = iOweTotal    + recurringIOwe
   const balance = theyOweTotalWithRecurring - iOweTotalWithRecurring
 
+  // Total quitado este mês — exibido no card "Quitado 🎉"
+  const settledThisMonth = settledEntries
+    .filter(e => new Date(e.date) >= monthStart && new Date(e.date) <= monthEnd)
+    .reduce((s, e) => s + Number(e.amount), 0)
+
   // ── Mini projeção: próximos 3 meses ───────────────────────────────────────
   const monthLabel = format(now, 'MMMM', { locale: ptBR })
   const projection = Array.from({ length: 3 }, (_, i) => {
     const d = addMonths(now, i)
-    const label = format(d, "MMM 'yy", { locale: ptBR })
+    const label = format(d, "MMM/yy", { locale: ptBR })
 
     // Installment groups: which entries are due in this month?
     const dueEntries = openEntries.filter(e => {
@@ -361,6 +366,11 @@ export default async function PersonPage({ params }: Props) {
               ? `${formatCurrency(balance)} a receber`
               : `${formatCurrency(-balance)} a pagar`}
           </p>
+          {balance === 0 && settledThisMonth > 0 && (
+            <p className="text-[11px] text-slate-600 mt-1">
+              {formatCurrency(settledThisMonth)} quitado este mês
+            </p>
+          )}
         </div>
       </div>
 
@@ -400,9 +410,14 @@ export default async function PersonPage({ params }: Props) {
       {/* ── Recorrentes ativos ──────────────────────── */}
       {recurring.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
-            Recorrentes ativos
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
+              Recorrentes ativos
+            </h2>
+          </div>
+          <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
+            🔁 <strong className="text-slate-300">Como funciona:</strong> cada recorrente gera automaticamente uma conta pendente no dia configurado, todo mês. Clique em <strong className="text-slate-300">Pago</strong> para quitar o mês atual, ou acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> abaixo. Meses não pagos acumulam em Pendentes.
+          </div>
           {recurring.map(item => {
             const monthEntry = recurringEntryMap.get(item.id)
             return (
