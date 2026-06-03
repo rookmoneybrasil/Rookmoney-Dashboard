@@ -1,4 +1,6 @@
-import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw } from 'lucide-react'
+import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw, CalendarDays } from 'lucide-react'
+import { addMonths, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -62,6 +64,24 @@ export default async function BillsPage() {
   const pausedRecurring = recurringBills.filter(r => !r.isActive)
   const monthlyFixed    = activeRecurring.reduce((s, r) => s + Number(r.amount), 0)
 
+  const now = new Date()
+  const overdueList = pending.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
+  const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
+
+  // Mini projection: next 3 months based on recurring bills
+  const projection = Array.from({ length: 3 }, (_, i) => {
+    const d = addMonths(now, i)
+    const label = format(d, "MMM/yy", { locale: ptBR })
+    // For current month: pending bills; for future: recurring amount
+    const amount = i === 0
+      ? pending.filter(b => {
+          const dd = new Date(b.dueDate)
+          return dd.getFullYear() === d.getFullYear() && dd.getMonth() === d.getMonth()
+        }).reduce((s, b) => s + Number(b.amount), 0)
+      : monthlyFixed
+    return { label, amount, isCurrent: i === 0 }
+  })
+
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       {/* Header */}
@@ -78,23 +98,35 @@ export default async function BillsPage() {
 
       {/* Summary */}
       {bills.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
-          <Card variant="outline" padding="sm">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-slate-500">A pagar</span>
-              <span className="text-xl font-bold text-danger tabular-nums">{formatCurrency(totalPending)}</span>
-              <span className="text-xs text-slate-600">
-                {pending.length} avulsa{pending.length !== 1 ? 's' : ''} + {activeGroups.length} parcelada{activeGroups.length !== 1 ? 's' : ''}
-              </span>
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-4">
+            <Card variant="outline" padding="sm">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-slate-500">A pagar</span>
+                <span className="text-xl font-bold text-danger tabular-nums">{formatCurrency(totalPending)}</span>
+                <span className="text-xs text-slate-600">
+                  {pending.length} avulsa{pending.length !== 1 ? 's' : ''} + {activeGroups.length} parcelada{activeGroups.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </Card>
+            <Card variant="outline" padding="sm">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-slate-500">Pagas</span>
+                <span className="text-xl font-bold text-success tabular-nums">{formatCurrency(totalPaid)}</span>
+                <span className="text-xs text-slate-600">{paid.length} conta{paid.length !== 1 ? 's' : ''}</span>
+              </div>
+            </Card>
+          </div>
+          {/* Alerta de atrasadas */}
+          {overdueList.length > 0 && (
+            <div className="flex items-center gap-3 bg-danger/10 border border-danger/25 rounded-xl px-4 py-3">
+              <AlertCircle className="size-4 text-danger shrink-0" />
+              <p className="text-sm text-danger flex-1">
+                <span className="font-semibold">{overdueList.length} conta{overdueList.length !== 1 ? 's' : ''} em atraso</span>
+                {' '}— total de {formatCurrency(overdueTotal)}. Quite o mais rápido possível para evitar juros.
+              </p>
             </div>
-          </Card>
-          <Card variant="outline" padding="sm">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-slate-500">Pagas</span>
-              <span className="text-xl font-bold text-success tabular-nums">{formatCurrency(totalPaid)}</span>
-              <span className="text-xs text-slate-600">{paid.length} conta{paid.length !== 1 ? 's' : ''}</span>
-            </div>
-          </Card>
+          )}
         </div>
       )}
 
@@ -112,31 +144,54 @@ export default async function BillsPage() {
           </h2>
         </div>
 
+        {/* Explicação para o usuário */}
+        <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
+          🔁 <strong className="text-slate-300">Como funciona:</strong> contas fixas se repetem automaticamente todo mês no dia configurado, gerando um lançamento pendente. Você só precisa cadastrar uma vez — aluguel, internet, academia, streaming etc.
+        </div>
+
         {recurringBills.length === 0 ? (
-          <Card padding="none">
-            <CardContent>
-              <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <RefreshCw className="size-5 text-slate-700" />
-                <p className="text-sm text-slate-600">Nenhuma conta fixa cadastrada</p>
-                <p className="text-xs text-slate-700 max-w-xs">
-                  Contas fixas (aluguel, internet, streaming...) se repetem todo mês. Cadastre uma vez e elas aparecem automaticamente.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-center gap-2 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+            <RefreshCw className="size-5 text-slate-700" />
+            <p className="text-sm text-slate-600">Nenhuma conta fixa cadastrada</p>
+            <p className="text-xs text-slate-700 max-w-xs">Cadastre uma vez e ela aparece automaticamente todo mês.</p>
+          </div>
         ) : (
-          <Card padding="none">
-            <CardContent>
-              <div className="divide-y divide-white/5">
-                {activeRecurring.map((r) => (
-                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
-                ))}
-                {pausedRecurring.map((r) => (
-                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col gap-2">
+            {activeRecurring.map((r) => (
+              <RecurringBillRow key={r.id} bill={r} categories={categories} />
+            ))}
+            {pausedRecurring.map((r) => (
+              <RecurringBillRow key={r.id} bill={r} categories={categories} />
+            ))}
+          </div>
+        )}
+
+        {/* Mini projeção dos próximos meses */}
+        {activeRecurring.length > 0 && (
+          <div className="bg-ink-800 rounded-xl border border-ink-700 p-4 mt-1">
+            <div className="flex items-center gap-2 mb-3">
+              <CalendarDays className="size-4 text-brand-400" />
+              <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos fixos</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {projection.map((m) => (
+                <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
+                  <p className="text-[11px] text-slate-500 capitalize mb-2 flex items-center gap-1">
+                    {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
+                    {m.label}
+                  </p>
+                  <p className="text-sm font-bold text-danger">-{formatCurrency(m.amount)}</p>
+                  {!m.isCurrent && (
+                    <p className="text-[10px] text-slate-600 mt-0.5">só fixas</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-slate-600 mt-2">
+              {projection[0].isCurrent ? 'Mês atual inclui todas as contas pendentes. ' : ''}
+              Meses futuros baseados nas contas fixas ativas.
+            </p>
+          </div>
         )}
       </div>
 
