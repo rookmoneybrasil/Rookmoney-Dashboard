@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, X, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { RefreshCw, X, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 import { EditRecurringModal } from './edit-recurring-modal'
@@ -94,7 +94,20 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
       <div className="flex items-center gap-1 shrink-0">
         {!confirming && <EditRecurringModal item={item} categories={categories} />}
 
-        {/* Botão removido — o "Acertar" no bloco Pendentes cobre essa ação */}
+        {!confirming && (
+          <button
+            onClick={handleTogglePaid}
+            disabled={marking}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors disabled:opacity-50 ${
+              paid
+                ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700'
+                : 'text-success hover:bg-success/10'
+            }`}
+          >
+            <Circle className="size-3.5" />
+            {marking ? '...' : paid ? 'Desfazer' : 'Pago'}
+          </button>
+        )}
 
         {!confirming ? (
           <button
