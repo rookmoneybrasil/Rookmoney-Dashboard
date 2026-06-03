@@ -26,12 +26,12 @@ export function RecurringBillRow({ bill, categories }: Props) {
   return (
     <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors ${
       bill.isActive
-        ? 'bg-danger/5 border-danger/20 hover:bg-danger/8'
+        ? 'bg-brand-900/20 border-brand-700/30 hover:bg-brand-900/30'
         : 'bg-ink-800/50 border-ink-700/50 opacity-50'
     }`}>
       {/* Icon */}
-      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${bill.isActive ? 'bg-danger/15' : 'bg-ink-700'}`}>
-        <RefreshCw className={`size-3.5 ${bill.isActive ? 'text-danger' : 'text-slate-500'}`} />
+      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${bill.isActive ? 'bg-brand-800/60' : 'bg-ink-700'}`}>
+        <RefreshCw className={`size-3.5 ${bill.isActive ? 'text-brand-400' : 'text-slate-500'}`} />
       </div>
 
       {/* Info */}
@@ -45,7 +45,7 @@ export function RecurringBillRow({ bill, categories }: Props) {
           )}
         </div>
         <p className="text-xs text-slate-500 mt-0.5">
-          <span className="text-danger font-medium">-{formatCurrency(bill.amount)}/mês</span>
+          <span className="text-slate-300 font-medium">-{formatCurrency(bill.amount)}/mês</span>
           {' '}· dia {bill.dayOfMonth}
           {bill.category && ` · ${bill.category.icon} ${bill.category.name}`}
         </p>
