@@ -125,127 +125,144 @@ export default async function IncomePage() {
         </div>
       )}
 
-      {/* ── Recorrentes ─────────────────────────────────────── */}
-      {recurring.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <RefreshCw className="size-3.5" /> Recorrentes
-              <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
-                {formatCurrency(totalRecorrente)}/mês
-              </span>
-            </h2>
+      {/* ── Projeção (topo) ─────────────────────────────────── */}
+      {sources.length > 0 && (
+        <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDays className="size-4 text-success" />
+            <h3 className="text-sm font-semibold text-slate-300">Projeção de receitas</h3>
           </div>
-
-          {/* Explicação */}
-          <div className="bg-success/5 border border-success/20 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
-            💰 <strong className="text-slate-300">Como funciona:</strong> rendas recorrentes são lançadas automaticamente como transação no dia configurado. Você vê o status <strong className="text-slate-300">A receber</strong> até o dia chegar, depois <strong className="text-slate-300">Recebido este mês</strong>.
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {recurring.map((source) => {
-              const cfg      = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
-              const received = source.lastAutoPayMonth === currentMonth
-              const isFuture = source.startDate && new Date(source.startDate) > now
-              const startLabel = isFuture ? format(new Date(source.startDate!), "MMMM 'de' yyyy", { locale: ptBR }) : null
-
-              return (
-                <div key={source.id} className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors group ${
-                  received  ? 'bg-success/5 border-success/20 opacity-70'
-                  : isFuture ? 'bg-ink-800/50 border-ink-700/50 opacity-50'
-                  : 'bg-success/5 border-success/15 hover:bg-success/8'
-                }`}>
-                  <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 text-base ${received ? 'bg-success/15' : 'bg-success/10'}`}>
-                    {cfg.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
-                      <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
-                      {isFuture  && <Badge variant="default" size="sm" dot>Começa em {startLabel}</Badge>}
-                      {!isFuture && received  && <Badge variant="success" size="sm" dot>Recebido este mês</Badge>}
-                      {!isFuture && !received && <Badge variant="warning" size="sm" dot>A receber</Badge>}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      <span className="text-success font-medium">+{formatCurrency(source.amount)}/mês</span>
-                      {source.dayOfMonth && ` · dia ${source.dayOfMonth}`}
-                      {received && ` · Recebido em ${receivedDateLabel(source)}`}
-                      {isFuture && source.startDate && ` · Primeiro: ${format(new Date(source.startDate), 'dd/MM/yyyy')}`}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <IncomeSourceModal source={source} categories={categories} disabled={!!received} />
-                    <DeleteIncomeSourceButton id={source.id} />
-                  </div>
+          <div className="grid grid-cols-3 gap-3">
+            {projection.map((m) => (
+              <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-success/30 bg-success/5' : 'border-ink-600 bg-ink-700/50'}`}>
+                <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
+                  {m.isCurrent && <span className="size-1.5 rounded-full bg-success inline-block" />}
+                  {m.label}
+                </p>
+                <p className="text-sm font-bold text-success mb-1.5">+{formatCurrency(m.total)}</p>
+                <div className="flex flex-col gap-0.5">
+                  {m.recAmount > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.recAmount)} fixas</p>}
+                  {m.evAmount > 0  && <p className="text-[10px] text-slate-600">⚡ {formatCurrency(m.evAmount)} eventuais</p>}
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
-
-          {/* Projeção de receitas */}
-          <div className="bg-ink-800 rounded-xl border border-ink-700 p-4 mt-1">
-            <div className="flex items-center gap-2 mb-3">
-              <CalendarDays className="size-4 text-success" />
-              <h3 className="text-sm font-semibold text-slate-300">Projeção de receitas</h3>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {projection.map((m) => (
-                <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-success/30 bg-success/5' : 'border-ink-600 bg-ink-700/50'}`}>
-                  <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
-                    {m.isCurrent && <span className="size-1.5 rounded-full bg-success inline-block" />}
-                    {m.label}
-                  </p>
-                  <p className="text-sm font-bold text-success mb-1.5">+{formatCurrency(m.total)}</p>
-                  <div className="flex flex-col gap-0.5">
-                    {m.recAmount > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.recAmount)} fixas</p>}
-                    {m.evAmount > 0  && <p className="text-[10px] text-slate-600">⚡ {formatCurrency(m.evAmount)} eventuais</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="text-[11px] text-slate-600 mt-2">Recorrentes confirmadas + eventuais pendentes deste mês.</p>
-          </div>
+          <p className="text-[11px] text-slate-600 mt-2">Recorrentes confirmadas + eventuais pendentes deste mês.</p>
         </div>
       )}
 
-      {/* ── Eventuais ─────────────────────────────────────────── */}
-      {eventualPending.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <Zap className="size-3.5" /> Eventuais pendentes
-          </h2>
-          <div className="bg-warning/5 border border-warning/20 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
-            ⚡ <strong className="text-slate-300">Como funciona:</strong> rendas eventuais ficam aguardando até você clicar em <strong className="text-slate-300">Recebi</strong> — isso gera a transação na data informada.
-          </div>
+      {/* ── Blocos horizontais: Recorrentes | Eventuais ──────── */}
+      {sources.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+
+          {/* Recorrentes */}
           <div className="flex flex-col gap-2">
-            {eventualPending.map((source) => {
-              const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
-              return (
-                <div key={source.id} className="flex items-center gap-3 p-3.5 rounded-xl border bg-warning/5 border-warning/15 hover:bg-warning/8 transition-colors group">
-                  <div className="size-8 rounded-lg flex items-center justify-center shrink-0 text-base bg-warning/10">
-                    {cfg.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
-                      <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+              <RefreshCw className="size-3.5" /> Recorrentes
+              {totalRecorrente > 0 && (
+                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
+                  {formatCurrency(totalRecorrente)}/mês
+                </span>
+              )}
+            </h2>
+            <div className="bg-success/5 border border-success/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+              💰 <strong className="text-slate-300">Recorrentes</strong> são lançadas automaticamente no dia configurado — aparece <strong className="text-slate-300">A receber</strong> até o dia chegar.
+            </div>
+            {recurring.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+                <p className="text-xs text-slate-600">Nenhuma renda recorrente</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {recurring.map((source) => {
+                  const cfg      = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
+                  const received = source.lastAutoPayMonth === currentMonth
+                  const isFuture = source.startDate && new Date(source.startDate) > now
+                  const startLabel = isFuture ? format(new Date(source.startDate!), "MMMM 'de' yyyy", { locale: ptBR }) : null
+
+                  return (
+                    <div key={source.id} className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors group ${
+                      received  ? 'bg-success/5 border-success/20 opacity-70'
+                      : isFuture ? 'bg-ink-800/50 border-ink-700/50 opacity-50'
+                      : 'bg-success/5 border-success/15 hover:bg-success/8'
+                    }`}>
+                      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 text-base ${received ? 'bg-success/15' : 'bg-success/10'}`}>
+                        {cfg.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
+                          {isFuture  && <Badge variant="default" size="sm" dot>Começa em {startLabel}</Badge>}
+                          {!isFuture && received  && <Badge variant="success" size="sm" dot>Recebido</Badge>}
+                          {!isFuture && !received && <Badge variant="warning" size="sm" dot>A receber</Badge>}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          <span className="text-success font-medium">+{formatCurrency(source.amount)}/mês</span>
+                          {source.dayOfMonth && ` · dia ${source.dayOfMonth}`}
+                          {received && ` · ${receivedDateLabel(source)}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <IncomeSourceModal source={source} categories={categories} disabled={!!received} />
+                        <DeleteIncomeSourceButton id={source.id} />
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      <span className="text-success font-medium">+{formatCurrency(source.amount)}</span>
-                      {source.notes ? ` · ${source.notes}` : ' · Pontual'}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <RegisterReceiptModal source={source} categories={categories} />
-                    <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      <IncomeSourceModal source={source} categories={categories} />
-                      <DeleteIncomeSourceButton id={source.id} />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+                  )
+                })}
+              </div>
+            )}
           </div>
+
+          {/* Eventuais */}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+              <Zap className="size-3.5" /> Eventuais
+              {totalEventual > 0 && (
+                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
+                  {formatCurrency(totalEventual)}
+                </span>
+              )}
+            </h2>
+            <div className="bg-warning/5 border border-warning/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+              ⚡ <strong className="text-slate-300">Eventuais</strong> ficam aguardando até você clicar em <strong className="text-slate-300">Recebi</strong> — gera a transação na data informada.
+            </div>
+            {eventualPending.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+                <p className="text-xs text-slate-600">Nenhuma renda eventual pendente</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {eventualPending.map((source) => {
+                  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
+                  return (
+                    <div key={source.id} className="flex items-center gap-3 p-3.5 rounded-xl border bg-warning/5 border-warning/15 hover:bg-warning/8 transition-colors group">
+                      <div className="size-8 rounded-lg flex items-center justify-center shrink-0 text-base bg-warning/10">
+                        {cfg.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
+                          <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          <span className="text-success font-medium">+{formatCurrency(source.amount)}</span>
+                          {source.notes ? ` · ${source.notes}` : ' · Pontual'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <RegisterReceiptModal source={source} categories={categories} />
+                        <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                          <IncomeSourceModal source={source} categories={categories} />
+                          <DeleteIncomeSourceButton id={source.id} />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
         </div>
       )}
 
