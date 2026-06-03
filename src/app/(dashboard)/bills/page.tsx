@@ -287,11 +287,13 @@ export default async function BillsPage() {
                           {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
+                        {/* Botão de pagar sempre visível */}
+                        <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
+                        {/* Editar e excluir só no hover */}
                         <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <EditBillModal bill={bill} categories={categories} />
-                          <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
                           <DeleteBillButton id={bill.id} />
                         </div>
                       </div>
