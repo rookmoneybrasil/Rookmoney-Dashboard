@@ -105,7 +105,7 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
             }`}
           >
             <Circle className="size-3.5" />
-            {marking ? '...' : paid ? 'Desfazer' : 'Pago'}
+            {marking ? '...' : paid ? 'Desfazer' : 'Registrar mês'}
           </button>
         )}
 
