@@ -165,10 +165,12 @@ function IncomeSection({
         <CardContent>
           <div className="divide-y divide-white/5">
             {sources.map((source) => {
-              const cfg       = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
-              const received  = currentMonth && source.lastAutoPayMonth === currentMonth
+              const cfg        = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
+              const received   = currentMonth && source.lastAutoPayMonth === currentMonth
+              const isFuture   = source.startDate && new Date(source.startDate) > new Date()
+              const startLabel = isFuture ? format(new Date(source.startDate!), "MMMM 'de' yyyy", { locale: ptBR }) : null
               return (
-                <div key={source.id} className={`flex items-center gap-4 px-5 py-4 group hover:bg-ink-600/20 transition-colors ${received ? 'opacity-60' : ''}`}>
+                <div key={source.id} className={`flex items-center gap-4 px-5 py-4 group hover:bg-ink-600/20 transition-colors ${received ? 'opacity-60' : isFuture ? 'opacity-50' : ''}`}>
                   <div className={`size-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${received ? 'bg-success/10' : 'bg-brand-900/60'}`}>
                     {cfg.icon}
                   </div>
@@ -176,14 +178,17 @@ function IncomeSection({
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
                       <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
-                      {received && <Badge variant="success" size="sm" dot>Recebido este mês</Badge>}
-                      {!received && !showReceive && <Badge variant="warning" size="sm" dot>A receber</Badge>}
+                      {isFuture  && <Badge variant="default" size="sm" dot>Começa em {startLabel}</Badge>}
+                      {!isFuture && received  && <Badge variant="success" size="sm" dot>Recebido este mês</Badge>}
+                      {!isFuture && !received && !showReceive && <Badge variant="warning" size="sm" dot>A receber</Badge>}
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
                       {source.isRecurring
                         ? source.dayOfMonth
                           ? received
                             ? `Recebido em ${receivedDateLabel(source)} · Repete dia ${source.dayOfMonth}`
+                            : isFuture
+                            ? `Primeiro pagamento: ${format(new Date(source.startDate!), 'dd/MM/yyyy')}`
                             : `Todo dia ${source.dayOfMonth}`
                           : 'Mensal'
                         : source.notes ?? ''}
