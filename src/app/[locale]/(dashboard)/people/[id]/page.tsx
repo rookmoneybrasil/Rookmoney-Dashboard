@@ -148,7 +148,6 @@ export default async function PersonPage({ params }: Props) {
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
     const match = allEntries.find(e =>
-      !e.isSettled &&
       e.description === r.description &&
       e.type        === r.type &&
       !e.installmentGroupId &&
@@ -188,10 +187,9 @@ export default async function PersonPage({ params }: Props) {
   let recurringTheyOwe = 0
   let recurringIOwe    = 0
   for (const r of recurring) {
-    if (!recurringEntryMap.has(r.id)) {
-      if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
-      else                           recurringIOwe    += Number(r.amount)
-    }
+    if (recurringEntryMap.has(r.id)) continue // any entry exists (settled or not) — skip
+    if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
+    else                           recurringIOwe    += Number(r.amount)
   }
 
   const theyOweTotalWithRecurring = theyOweTotal + recurringTheyOwe

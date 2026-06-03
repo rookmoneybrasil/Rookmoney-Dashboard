@@ -144,12 +144,11 @@ export default async function PersonPage({ params }: Props) {
   const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd     = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
-  // Map: recurringId → matching UNSETTLED entry this month (if any)
-  // Only unsettled entries count — settled ones were already received/paid, not pending
+  // Map: recurringId → ANY entry this month (settled or not)
+  // Used for: monthEntryId (card tracking) + balance (if settled → payment done, don't add again)
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
     const match = allEntries.find(e =>
-      !e.isSettled &&
       e.description === r.description &&
       e.type        === r.type &&
       !e.installmentGroupId &&
@@ -184,15 +183,16 @@ export default async function PersonPage({ params }: Props) {
     else                           iOweTotal    += Number(e.amount)
   }
 
-  // Add recurring templates that DON'T have a generated entry this month yet
-  // (if there IS a generated entry, it's already counted in openEntries above)
+  // Add recurring templates only if NO entry exists this month (settled or pending).
+  // - If unsettled entry exists → already counted in openEntries/iOweTotal
+  // - If settled entry exists → payment done, nothing owed
+  // - If no entry at all → still pending payment, add to balance
   let recurringTheyOwe = 0
   let recurringIOwe    = 0
   for (const r of recurring) {
-    if (!recurringEntryMap.has(r.id)) {
-      if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
-      else                           recurringIOwe    += Number(r.amount)
-    }
+    if (recurringEntryMap.has(r.id)) continue // entry exists (settled or not) — skip
+    if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
+    else                           recurringIOwe    += Number(r.amount)
   }
 
   const theyOweTotalWithRecurring = theyOweTotal + recurringTheyOwe
