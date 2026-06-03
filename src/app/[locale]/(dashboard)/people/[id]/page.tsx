@@ -223,8 +223,21 @@ export default async function PersonPage({ params }: Props) {
       else                           projIOwe    += Number(e.amount)
     }
 
-    // Add recurring monthly amounts (always apply each month)
+    // Add recurring amounts only if no PersonEntry was already generated for this month
+    const dStart = new Date(d.getFullYear(), d.getMonth(), 1)
+    const dEnd   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
+
     for (const r of recurring) {
+      const alreadyHasEntry = allEntries.some(e =>
+        !e.isSettled &&
+        e.description === r.description &&
+        e.type        === r.type &&
+        !e.installmentGroupId &&
+        new Date(e.date) >= dStart &&
+        new Date(e.date) <= dEnd
+      )
+      if (alreadyHasEntry) continue
+
       if (r.type === 'THEY_OWE_ME') projTheyOwe += Number(r.amount)
       else                           projIOwe    += Number(r.amount)
     }
