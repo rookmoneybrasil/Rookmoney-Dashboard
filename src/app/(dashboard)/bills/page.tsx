@@ -111,7 +111,7 @@ export default async function BillsPage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -202,18 +202,22 @@ export default async function BillsPage() {
 
       {/* ── Blocos horizontais: Fixas | Pendentes ───────────── */}
       {(bills.length > 0 || recurringBills.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        <>
+          <div className="border-t border-white/6" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
           {/* Contas Fixas */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <RefreshCw className="size-3.5" /> Contas Fixas
-              {activeRecurring.length > 0 && (
-                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
-                  {formatCurrency(monthlyFixed)}/mês
-                </span>
-              )}
-            </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-brand-400 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <RefreshCw className="size-4 text-brand-400" /> Contas Fixas
+                {activeRecurring.length > 0 && (
+                  <span className="text-xs font-normal text-slate-500">{formatCurrency(monthlyFixed)}/mês</span>
+                )}
+              </h2>
+            </div>
             <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               🔁 <strong className="text-slate-300">Fixas</strong> se repetem todo mês no dia configurado — cadastre uma vez e aparecem automaticamente.
             </div>
@@ -234,15 +238,16 @@ export default async function BillsPage() {
           </div>
 
           {/* Pendentes */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <Clock className="size-3.5" /> Pendentes
-              {pending.length > 0 && (
-                <span className="normal-case font-medium text-danger bg-danger/10 px-1.5 py-0.5 rounded-full text-[10px]">
-                  {formatCurrency(totalPending)}
-                </span>
-              )}
-            </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-danger shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <Clock className="size-4 text-danger" /> Pendentes
+                {pending.length > 0 && (
+                  <span className="text-xs font-normal text-danger">{formatCurrency(totalPending)}</span>
+                )}
+              </h2>
+            </div>
             <div className="bg-danger/5 border border-danger/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e as parcelas geradas pelas contas fixas — marque como pago quando quitar.
             </div>
@@ -292,15 +297,22 @@ export default async function BillsPage() {
             )}
           </div>
 
-        </div>
+          </div>
+        </>
       )}
 
       {/* ── Parceladas ──────────────────────────────────────── */}
       {activeGroups.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <Layers className="size-3.5" /> Parceladas
-          </h2>
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-brand-500 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <Layers className="size-4 text-brand-400" /> Parceladas
+              </h2>
+            </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {activeGroups.map((group) => {
               const pct = Math.round((group.paidCount / group.total) * 100)
@@ -357,14 +369,21 @@ export default async function BillsPage() {
               )
             })}
           </div>
-        </div>
+          </div>
+        </>
       )}
-
 
       {/* ── Pagas ───────────────────────────────────────────── */}
       {paid.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pagas</h2>
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-success shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <Check className="size-4 text-success" /> Pagas
+              </h2>
+            </div>
           <Card padding="none">
             <CardContent>
               <div className="divide-y divide-white/5">
@@ -390,15 +409,21 @@ export default async function BillsPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
+          </div>
+        </>
       )}
 
       {/* ── Histórico de parcelamentos ──────────────────────── */}
       {completedGroups.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <Archive className="size-3.5" /> Histórico de parcelamentos
-          </h2>
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-slate-600 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-400 flex items-center gap-2">
+                <Archive className="size-4 text-slate-500" /> Histórico de parcelamentos
+              </h2>
+            </div>
           <Card padding="none">
             <CardContent>
               <div className="divide-y divide-white/5">
@@ -421,7 +446,8 @@ export default async function BillsPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
+          </div>
+        </>
       )}
     </div>
   )
