@@ -134,7 +134,7 @@ export default async function BillsPage() {
             <Card variant="outline" padding="sm">
               <div className="flex flex-col gap-0.5">
                 <span className="text-xs text-slate-500">A pagar</span>
-                <span className="text-xl font-bold text-danger tabular-nums">{formatCurrency(totalPending)}</span>
+                <span className="text-xl font-bold text-slate-100 tabular-nums">{formatCurrency(totalPending)}</span>
                 <span className="text-xs text-slate-600">
                   {pending.length} avulsa{pending.length !== 1 ? 's' : ''} + {activeGroups.length} parcelada{activeGroups.length !== 1 ? 's' : ''}
                 </span>
@@ -240,15 +240,15 @@ export default async function BillsPage() {
           {/* Pendentes */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-1 h-5 rounded-full bg-danger shrink-0" />
+              <div className="w-1 h-5 rounded-full bg-slate-500 shrink-0" />
               <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <Clock className="size-4 text-danger" /> Pendentes
+                <Clock className="size-4 text-slate-400" /> Pendentes
                 {pending.length > 0 && (
-                  <span className="text-xs font-normal text-danger">{formatCurrency(totalPending)}</span>
+                  <span className="text-xs font-normal text-slate-500">{formatCurrency(totalPending)}</span>
                 )}
               </h2>
             </div>
-            <div className="bg-danger/5 border border-danger/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+            <div className="bg-ink-800 border border-ink-600 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e as parcelas geradas pelas contas fixas — marque como pago quando quitar.
             </div>
             {pending.length === 0 ? (
