@@ -54,6 +54,9 @@ export default async function IncomePage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
+          <p className="text-2xl font-black text-brand-400 capitalize tracking-tight leading-none mb-1">
+            {format(new Date(), "MMMM 'de' yyyy", { locale: ptBR })}
+          </p>
           <h1 className="text-xl font-semibold text-slate-100">Rendas</h1>
           <p className="text-sm text-slate-500">
             {sources.length} fonte{sources.length !== 1 ? 's' : ''} cadastrada{sources.length !== 1 ? 's' : ''}

@@ -87,6 +87,9 @@ export default async function BillsPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
+          <p className="text-2xl font-black text-brand-400 capitalize tracking-tight leading-none mb-1">
+            {format(now, "MMMM 'de' yyyy", { locale: ptBR })}
+          </p>
           <h1 className="text-xl font-semibold text-slate-100">Contas a pagar</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {pending.length + activeGroups.length} pendente{pending.length + activeGroups.length !== 1 ? 's' : ''} ·{' '}

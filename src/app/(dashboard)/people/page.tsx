@@ -6,6 +6,8 @@ import { PersonModal } from '@/components/people/person-modal'
 import { PeopleFilters } from '@/components/people/people-filters'
 import { formatCurrency } from '@/lib/utils'
 import type { Person as PersonWithBalance } from '@/lib/api-client'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -60,6 +62,9 @@ export default async function PeoplePage({ searchParams }: { searchParams: Searc
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
+          <p className="text-2xl font-black text-brand-400 capitalize tracking-tight leading-none mb-1">
+            {format(new Date(), "MMMM 'de' yyyy", { locale: ptBR })}
+          </p>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <Users className="size-6 text-brand-400" />
             Pessoas
