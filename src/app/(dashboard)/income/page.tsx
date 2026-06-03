@@ -71,7 +71,7 @@ export default async function IncomePage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-8 max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
@@ -153,18 +153,22 @@ export default async function IncomePage() {
 
       {/* ── Blocos horizontais: Recorrentes | Eventuais ──────── */}
       {sources.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        <>
+          <div className="border-t border-white/6" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
           {/* Recorrentes */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <RefreshCw className="size-3.5" /> Recorrentes
-              {totalRecorrente > 0 && (
-                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
-                  {formatCurrency(totalRecorrente)}/mês
-                </span>
-              )}
-            </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-success shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <RefreshCw className="size-4 text-success" /> Recorrentes
+                {totalRecorrente > 0 && (
+                  <span className="text-xs font-normal text-slate-500">{formatCurrency(totalRecorrente)}/mês</span>
+                )}
+              </h2>
+            </div>
             <div className="bg-success/5 border border-success/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               💰 <strong className="text-slate-300">Recorrentes</strong> são lançadas automaticamente no dia configurado — aparece <strong className="text-slate-300">A receber</strong> até o dia chegar.
             </div>
@@ -214,15 +218,16 @@ export default async function IncomePage() {
           </div>
 
           {/* Eventuais */}
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <Zap className="size-3.5" /> Eventuais
-              {totalEventual > 0 && (
-                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
-                  {formatCurrency(totalEventual)}
-                </span>
-              )}
-            </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-warning shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <Zap className="size-4 text-warning" /> Eventuais
+                {totalEventual > 0 && (
+                  <span className="text-xs font-normal text-slate-500">{formatCurrency(totalEventual)}</span>
+                )}
+              </h2>
+            </div>
             <div className="bg-warning/5 border border-warning/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               ⚡ <strong className="text-slate-300">Eventuais</strong> ficam aguardando até você clicar em <strong className="text-slate-300">Recebi</strong> — gera a transação na data informada.
             </div>
@@ -263,8 +268,12 @@ export default async function IncomePage() {
             )}
           </div>
 
-        </div>
+          </div>
+        </>
       )}
+
+      {/* Divisor antes do histórico */}
+      {sources.length > 0 && <div className="border-t border-white/6" />}
 
       {/* Histórico */}
       <IncomeHistory
