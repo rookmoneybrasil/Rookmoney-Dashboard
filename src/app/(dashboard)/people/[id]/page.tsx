@@ -144,10 +144,12 @@ export default async function PersonPage({ params }: Props) {
   const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd     = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
-  // Map: recurringId → matching entry this month (if any)
+  // Map: recurringId → matching UNSETTLED entry this month (if any)
+  // Only unsettled entries count — settled ones were already received/paid, not pending
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
     const match = allEntries.find(e =>
+      !e.isSettled &&
       e.description === r.description &&
       e.type        === r.type &&
       !e.installmentGroupId &&

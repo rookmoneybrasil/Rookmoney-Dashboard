@@ -148,6 +148,7 @@ export default async function PersonPage({ params }: Props) {
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
     const match = allEntries.find(e =>
+      !e.isSettled &&
       e.description === r.description &&
       e.type        === r.type &&
       !e.installmentGroupId &&
