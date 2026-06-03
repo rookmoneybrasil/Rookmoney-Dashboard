@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { RefreshCw, X, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
@@ -21,19 +21,27 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
   const [paid,       setPaid]       = useState(paidThisMonth)
   const [marking,    setMarking]    = useState(false)
 
+  // Prevent concurrent/duplicate clicks — blocks any new action until reload
+  const processing = useRef(false)
+
   const isTheyOwe = item.type === 'THEY_OWE_ME'
 
   async function handleStop() {
+    if (processing.current) return
+    processing.current = true
     setStopping(true)
     await clientApi.stopPersonRecurring(item.id)
     window.location.reload()
   }
 
   async function handleTogglePaid() {
+    if (processing.current) return // already handling a click
+    processing.current = true
     setMarking(true)
+
     try {
       if (paid) {
-        // Undo: unsettle the existing entry
+        // Desfazer: reabrir a entrada quitada
         if (monthEntryId) {
           await clientApi.unsettleEntry(monthEntryId)
           setPaid(false)
@@ -41,10 +49,10 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         }
       } else {
         if (monthEntryId) {
-          // Settle the already-generated entry for this month
+          // Entrada já existe — só acerta
           await clientApi.settleEntry(monthEntryId)
         } else {
-          // No entry generated yet — create and settle in one go
+          // Nenhuma entrada gerada ainda — cria e acerta em uma operação
           const entry = await clientApi.createEntry(item.personId, {
             type:        item.type,
             description: item.description,
@@ -58,6 +66,8 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         window.location.reload()
       }
     } catch {
+      // Em caso de erro, libera o guard para tentar novamente
+      processing.current = false
       setMarking(false)
     }
   }
@@ -97,8 +107,8 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         {!confirming && (
           <button
             onClick={handleTogglePaid}
-            disabled={marking}
-            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors disabled:opacity-50 ${
+            disabled={marking || processing.current}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               paid
                 ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700'
                 : 'text-success hover:bg-success/10'
@@ -119,14 +129,13 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         ) : (
           <div className="flex items-center gap-1">
             <span className="text-xs text-slate-500 flex items-center gap-0.5">
-              <AlertTriangle className="size-3 text-warning" /> Parar?
-            </span>
+              <AlertTriangle className="size-3 text-warning" /> Parar?</span>
             <button onClick={handleStop} disabled={stopping}
-              className="h-6 px-2 rounded text-xs bg-danger/15 text-danger hover:bg-danger/25 border border-danger/20 disabled:opacity-50">
+              className="text-xs text-danger hover:text-danger/80 px-1.5 py-1 rounded hover:bg-danger/10 transition-colors disabled:opacity-50">
               {stopping ? '...' : 'Sim'}
             </button>
             <button onClick={() => setConfirming(false)}
-              className="h-6 px-2 rounded text-xs bg-ink-600 text-slate-400 hover:text-slate-200">
+              className="text-xs text-slate-500 hover:text-slate-300 px-1.5 py-1 rounded hover:bg-ink-700 transition-colors">
               Não
             </button>
           </div>
