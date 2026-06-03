@@ -161,77 +161,32 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {/* ── Contas Fixas ────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-            <RefreshCw className="size-3.5" />
-            Contas Fixas
-            {activeRecurring.length > 0 && (
-              <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px] ml-1">
-                {formatCurrency(monthlyFixed)}/mês
-              </span>
-            )}
-          </h2>
-        </div>
-
-        {/* Explicação para o usuário */}
-        <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
-          🔁 <strong className="text-slate-300">Como funciona:</strong> contas fixas se repetem automaticamente todo mês no dia configurado, gerando um lançamento pendente. Você só precisa cadastrar uma vez — aluguel, internet, academia, streaming etc.
-        </div>
-
-        {recurringBills.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
-            <RefreshCw className="size-5 text-slate-700" />
-            <p className="text-sm text-slate-600">Nenhuma conta fixa cadastrada</p>
-            <p className="text-xs text-slate-700 max-w-xs">Cadastre uma vez e ela aparece automaticamente todo mês.</p>
+      {/* ── Projeção (topo) ─────────────────────────────────── */}
+      {(activeRecurring.length > 0 || pending.length > 0 || activeGroups.length > 0) && (
+        <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarDays className="size-4 text-brand-400" />
+            <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos</h3>
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {activeRecurring.map((r) => (
-              <RecurringBillRow key={r.id} bill={r} categories={categories} />
-            ))}
-            {pausedRecurring.map((r) => (
-              <RecurringBillRow key={r.id} bill={r} categories={categories} />
-            ))}
-          </div>
-        )}
-
-        {/* Mini projeção dos próximos meses */}
-        {(activeRecurring.length > 0 || pending.length > 0 || activeGroups.length > 0) && (
-          <div className="bg-ink-800 rounded-xl border border-ink-700 p-4 mt-1">
-            <div className="flex items-center gap-2 mb-3">
-              <CalendarDays className="size-4 text-brand-400" />
-              <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos</h3>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {projection.map((m) => (
-                <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
-                  <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
-                    {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
-                    {m.label}
-                  </p>
-                  <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
-                  <div className="flex flex-col gap-0.5">
-                    {m.breakdown.fixed > 0 && (
-                      <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>
-                    )}
-                    {m.breakdown.avulso > 0 && (
-                      <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>
-                    )}
-                    {m.breakdown.installment > 0 && (
-                      <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>
-                    )}
-                  </div>
+          <div className="grid grid-cols-3 gap-3">
+            {projection.map((m) => (
+              <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
+                <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
+                  {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
+                  {m.label}
+                </p>
+                <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
+                <div className="flex flex-col gap-0.5">
+                  {m.breakdown.fixed > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>}
+                  {m.breakdown.avulso > 0 && <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>}
+                  {m.breakdown.installment > 0 && <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>}
                 </div>
-              ))}
-            </div>
-            <p className="text-[11px] text-slate-600 mt-2">
-              Fixas + avulsos agendados + parcelas vencendo em cada mês.
-            </p>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+          <p className="text-[11px] text-slate-600 mt-2">Fixas + avulsos agendados + parcelas vencendo em cada mês.</p>
+        </div>
+      )}
 
       {bills.length === 0 && recurringBills.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
@@ -242,6 +197,101 @@ export default async function BillsPage() {
             <p className="text-slate-300 text-sm font-medium">Nenhuma conta cadastrada</p>
             <p className="text-slate-600 text-xs max-w-xs mt-1">Adicione boletos, parcelas e contas fixas para nunca mais perder um vencimento.</p>
           </div>
+        </div>
+      )}
+
+      {/* ── Blocos horizontais: Fixas | Pendentes ───────────── */}
+      {(bills.length > 0 || recurringBills.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+
+          {/* Contas Fixas */}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+              <RefreshCw className="size-3.5" /> Contas Fixas
+              {activeRecurring.length > 0 && (
+                <span className="normal-case font-medium text-slate-600 bg-ink-700 px-1.5 py-0.5 rounded-full text-[10px]">
+                  {formatCurrency(monthlyFixed)}/mês
+                </span>
+              )}
+            </h2>
+            <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+              🔁 <strong className="text-slate-300">Fixas</strong> se repetem todo mês no dia configurado — cadastre uma vez e aparecem automaticamente.
+            </div>
+            {recurringBills.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+                <p className="text-xs text-slate-600">Nenhuma conta fixa</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {activeRecurring.map((r) => (
+                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
+                ))}
+                {pausedRecurring.map((r) => (
+                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Pendentes */}
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+              <Clock className="size-3.5" /> Pendentes
+              {pending.length > 0 && (
+                <span className="normal-case font-medium text-danger bg-danger/10 px-1.5 py-0.5 rounded-full text-[10px]">
+                  {formatCurrency(totalPending)}
+                </span>
+              )}
+            </h2>
+            <div className="bg-danger/5 border border-danger/20 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+              💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e as parcelas geradas pelas contas fixas — marque como pago quando quitar.
+            </div>
+            {pending.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+                <p className="text-xs text-success">Nenhuma conta pendente 🎉</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {pending.map((bill) => {
+                  const status = classifyBillStatus(bill.dueDate, bill.isPaid)
+                  const cfg    = statusConfig[status]
+                  const Icon   = cfg.icon
+                  return (
+                    <div key={bill.id} className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors group ${
+                      status === 'overdue' ? 'bg-danger/8 border-danger/25 hover:bg-danger/12'
+                      : status === 'urgent' ? 'bg-warning/5 border-warning/20 hover:bg-warning/8'
+                      : 'bg-ink-800 border-ink-700 hover:bg-ink-700/80'
+                    }`}>
+                      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
+                        status === 'overdue' || status === 'urgent' ? 'bg-danger/15 text-danger' : 'bg-ink-600 text-slate-500'
+                      }`}>
+                        {bill.recurringBillId ? <RefreshCw className="size-3.5" /> : <Icon className="size-3.5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-sm font-medium text-slate-200 truncate">{bill.name}</p>
+                          {bill.recurringBillId && <span className="text-[10px] text-brand-500">↻ fixa</span>}
+                          <Badge variant={cfg.variant} size="sm" dot>{cfg.label}</Badge>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
+                        <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                          <EditBillModal bill={bill} categories={categories} />
+                          <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
+                          <DeleteBillButton id={bill.id} />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
         </div>
       )}
 
@@ -310,50 +360,6 @@ export default async function BillsPage() {
         </div>
       )}
 
-      {/* ── Pendentes ───────────────────────────────────────── */}
-      {pending.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pendentes</h2>
-          <Card padding="none">
-            <CardContent>
-              <div className="divide-y divide-white/5">
-                {pending.map((bill) => {
-                  const status = classifyBillStatus(bill.dueDate, bill.isPaid)
-                  const cfg    = statusConfig[status]
-                  const Icon   = cfg.icon
-                  return (
-                    <div key={bill.id} className="flex items-center gap-4 px-5 py-4 hover:bg-ink-600/30 transition-colors group">
-                      <div className={`size-9 rounded-lg flex items-center justify-center shrink-0 ${
-                        status === 'overdue' || status === 'urgent' ? 'bg-danger/10 text-danger' : 'bg-ink-600 text-slate-500'
-                      }`}>
-                        {bill.recurringBillId ? <RefreshCw className="size-4" /> : <Icon className="size-4" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-sm font-medium text-slate-200 truncate">{bill.name}</p>
-                          {bill.recurringBillId && <span className="text-[10px] text-brand-500 shrink-0">↻ fixa</span>}
-                        </div>
-                        <p className="text-xs text-slate-500">
-                          {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex flex-col items-end">
-                          <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
-                          <Badge variant={cfg.variant} size="sm" dot>{cfg.label}</Badge>
-                        </div>
-                        <EditBillModal bill={bill} categories={categories} />
-                        <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
-                        <DeleteBillButton id={bill.id} />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
 
       {/* ── Pagas ───────────────────────────────────────────── */}
       {paid.length > 0 && (
