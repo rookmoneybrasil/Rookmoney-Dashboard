@@ -52,7 +52,7 @@ export function EntryModal({ personId, personName, categories }: Props) {
   const error   = errorEntry || errorRecurring
   const mutate  = mode === 'recorrente'
     ? (data: Parameters<typeof clientApi.createEntry>[1] & { installments?: number }) =>
-        mutateRecurring({ personId, type: data.type, description: data.description, amount: parseFloat(String(data.amount)), dayOfMonth, notes: data.notes, categoryId: data.categoryId ?? null })
+        mutateRecurring({ personId, type: data.type, description: data.description, amount: parseFloat(String(data.amount)), dayOfMonth, firstDate: data.date, notes: data.notes, categoryId: data.categoryId ?? null })
     : mutateEntry
 
   const today     = new Date().toISOString().split('T')[0]

@@ -229,7 +229,7 @@ export const clientApi = {
     clientFetch<void>(`/people/entries/${id}?applyToGroup=true`, { method: 'DELETE' }),
 
   // Person Entry Recurring
-  createPersonRecurring: (data: { personId: string; type: string; description: string; amount: number; dayOfMonth?: number; notes?: string | null; categoryId?: string | null }) =>
+  createPersonRecurring: (data: { personId: string; type: string; description: string; amount: number; dayOfMonth?: number; firstDate?: string | null; notes?: string | null; categoryId?: string | null }) =>
     clientFetch<PersonEntryRecurringItem>('/people/recurring', { method: 'POST', body: JSON.stringify(data) }),
   updatePersonRecurring: (id: string, data: { description?: string; amount?: number; dayOfMonth?: number; categoryId?: string | null; notes?: string | null; isActive?: boolean }) =>
     clientFetch<PersonEntryRecurringItem>(`/people/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
