@@ -10,12 +10,7 @@ import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, 
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
-import dynamic from 'next/dynamic'
-
-const PluggySection = dynamic(
-  () => import('@/components/pluggy/pluggy-connect-button').then(m => ({ default: m.PluggySection })),
-  { ssr: false, loading: () => null }
-)
+import { BillsTabs } from '@/components/bills/bills-tabs'
 
 const statusConfig = {
   paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
@@ -119,13 +114,9 @@ export default async function BillsPage() {
   })
 
   return (
-    <div className="flex flex-col gap-8 max-w-4xl mx-auto">
-
-      {/* Open Finance — Pluggy */}
-      <PluggySection
-        initialItems={pluggyItems}
-        initialBoletos={pluggyData.boletos}
-      />
+    <div className="flex flex-col gap-2 max-w-4xl mx-auto">
+    <BillsTabs pluggyItems={pluggyItems} pluggyBoletos={pluggyData.boletos}>
+    <div className="flex flex-col gap-8">
 
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
@@ -471,6 +462,8 @@ export default async function BillsPage() {
           </div>
         </>
       )}
+    </div>
+    </BillsTabs>
     </div>
   )
 }
