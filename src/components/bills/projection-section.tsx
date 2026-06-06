@@ -74,7 +74,7 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
               <CalendarDays className="size-4 text-brand-400" />
               {month.label}
             </h2>
-            <p className="text-sm text-danger font-semibold mt-0.5">-{formatCurrency(month.amount)}</p>
+            <p className="text-sm text-danger font-semibold mt-0.5">{`-${formatCurrency(month.amount)}`}</p>
           </div>
           <button onClick={onClose}
             className="size-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-200 hover:bg-ink-600 transition-colors">
@@ -162,7 +162,7 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
         {/* Footer */}
         <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between shrink-0 bg-ink-800">
           <span className="text-xs text-slate-500">{month.bills.length + peopleDue.length} item{month.bills.length + peopleDue.length !== 1 ? 's' : ''} no total</span>
-          <span className="text-sm font-bold text-danger">-{formatCurrency(month.amount + iOweTotal)}</span>
+          <span className="text-sm font-bold text-danger">{`-${formatCurrency(month.amount + iOweTotal)}`}</span>
         </div>
       </div>
     </div>
@@ -193,7 +193,7 @@ export function ProjectionSection({ months, peopleDue = [] }: { months: Projecti
                 {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
                 {m.label}
               </p>
-              <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
+              <p className="text-sm font-bold text-danger mb-1.5">{`-${formatCurrency(m.amount)}`}</p>
               <div className="flex flex-col gap-0.5">
                 {m.breakdown.fixed       > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>}
                 {m.breakdown.avulso      > 0 && <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>}
