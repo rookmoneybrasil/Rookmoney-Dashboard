@@ -1,5 +1,5 @@
-import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw, CalendarDays } from 'lucide-react'
-import { addMonths, format } from 'date-fns'
+import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw } from 'lucide-react'
+import { addMonths, format, startOfMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
 // import { BillsTabs } from '@/components/bills/bills-tabs' // Open Finance — reativar quando Pluggy pago
+import { ProjectionSection, type ProjectionBill, type ProjectionMonth } from '@/components/bills/projection-section'
 
 const statusConfig = {
   paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
@@ -71,8 +72,19 @@ export default async function BillsPage() {
   const overdueList = pending.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
   const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
 
-  // Projection: next 3 months — fixed + avulsos agendados + parcelas
-  const projection = Array.from({ length: 3 }, (_, i) => {
+  // Bills do mês atual (não atrasados)
+  const monthStart = startOfMonth(now)
+  const pendingThisMonth = pending.filter(b => {
+    const d = new Date(b.dueDate)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
+  const totalThisMonth = pendingThisMonth.reduce((s, b) => s + Number(b.amount), 0)
+    + activeGroups.flatMap(g => g.items)
+        .filter(inst => !inst.isPaid && (() => { const d = new Date(inst.dueDate); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() })())
+        .reduce((s, inst) => s + Number(inst.amount), 0)
+
+  // Projection: próximos 3 meses
+  const projection: ProjectionMonth[] = Array.from({ length: 3 }, (_, i) => {
     const d  = addMonths(now, i)
     const yr = d.getFullYear()
     const mo = d.getMonth()
@@ -83,12 +95,10 @@ export default async function BillsPage() {
       return dd.getFullYear() === yr && dd.getMonth() === mo
     }
 
-    // Avulsos agendados para este mês (sem recurringBillId)
     const avulsoAmount = pending
-      .filter(b => !b.recurringBillId && inMonth(b.dueDate))
+      .filter(b => !b.recurringBillId && !b.installmentGroupId && inMonth(b.dueDate))
       .reduce((s, b) => s + Number(b.amount), 0)
 
-    // Parcelas devidas neste mês (installment groups)
     const installmentAmount = activeGroups
       .flatMap(g => g.items)
       .filter(inst => !inst.isPaid && inMonth(inst.dueDate))
@@ -96,27 +106,68 @@ export default async function BillsPage() {
 
     let fixedAmount: number
     if (i === 0) {
-      // Mês atual: contas fixas JÁ aparecem em pending como bills geradas
       fixedAmount = pending
         .filter(b => !!b.recurringBillId && inMonth(b.dueDate))
         .reduce((s, b) => s + Number(b.amount), 0)
     } else {
-      // Meses futuros: usar o valor mensal das fixas ativas
       fixedAmount = monthlyFixed
     }
 
-    // Atrasados de meses anteriores entram na projeção do mês atual
-    const overdueCarryAmount = i === 0
-      ? overdueList
-          .filter(b => !inMonth(b.dueDate))
-          .reduce((s, b) => s + Number(b.amount), 0)
-      : 0
+    // Bills para o popup — avulsos + fixas geradas já em pending para este mês
+    const billsInMonth: ProjectionBill[] = [
+      // Contas já existentes no banco com vencimento neste mês
+      ...pending
+        .filter(b => inMonth(b.dueDate))
+        .map(b => ({
+          id:            b.id,
+          name:          b.name,
+          amount:        Number(b.amount),
+          dueDate:       b.dueDate,
+          isFixed:       !!b.recurringBillId,
+          isInstallment: !!b.installmentGroupId,
+          categoryIcon:  b.category?.icon ?? null,
+          categoryName:  b.category?.name ?? null,
+          categoryColor: b.category?.color ?? null,
+        })),
+      // Parcelas de installment groups vencendo neste mês
+      ...activeGroups
+        .flatMap(g => g.items.filter(inst => !inst.isPaid && inMonth(inst.dueDate))
+          .map(inst => ({
+            id:            inst.id,
+            name:          `${g.name} (${inst.installmentCurrent}/${g.total})`,
+            amount:        Number(inst.amount),
+            dueDate:       inst.dueDate,
+            isFixed:       false,
+            isInstallment: true,
+            categoryIcon:  inst.category?.icon ?? null,
+            categoryName:  inst.category?.name ?? null,
+            categoryColor: inst.category?.color ?? null,
+          }))),
+      // Meses futuros: adicionar fixas como templates se não estiverem em pending
+      ...(i > 0
+        ? activeRecurring
+            .filter(r => !pending.some(b => b.recurringBillId === r.id && inMonth(b.dueDate)))
+            .map(r => ({
+              id:            r.id,
+              name:          r.name,
+              amount:        Number(r.amount),
+              dueDate:       `${yr}-${String(mo + 1).padStart(2, '0')}-${String(r.dayOfMonth).padStart(2, '0')}`,
+              isFixed:       true,
+              isInstallment: false,
+              categoryIcon:  r.category?.icon ?? null,
+              categoryName:  r.category?.name ?? null,
+              categoryColor: r.category?.color ?? null,
+              isTemplate:    true,
+            }))
+        : []),
+    ].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
 
     return {
       label,
-      amount: fixedAmount + avulsoAmount + installmentAmount + overdueCarryAmount,
+      amount: fixedAmount + avulsoAmount + installmentAmount,
       isCurrent: i === 0,
-      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount, overdue: overdueCarryAmount },
+      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount },
+      bills: billsInMonth,
     }
   })
 
@@ -145,12 +196,19 @@ export default async function BillsPage() {
         <div className="flex flex-col gap-3">
           <div className="grid grid-cols-2 gap-4">
             <Card variant="outline" padding="sm">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-slate-500">A pagar</span>
-                <span className="text-xl font-bold text-slate-100 tabular-nums">{formatCurrency(totalPending)}</span>
-                <span className="text-xs text-slate-600">
-                  {pending.length} avulsa{pending.length !== 1 ? 's' : ''} + {activeGroups.length} parcelada{activeGroups.length !== 1 ? 's' : ''}
-                </span>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-0">
+                  <span className="text-xs text-slate-500">Este mês</span>
+                  <span className="text-xl font-bold text-slate-100 tabular-nums">{formatCurrency(totalThisMonth)}</span>
+                  <span className="text-xs text-slate-600">{pendingThisMonth.length} conta{pendingThisMonth.length !== 1 ? 's' : ''} pendente{pendingThisMonth.length !== 1 ? 's' : ''}</span>
+                </div>
+                {overdueTotal > 0 && (
+                  <div className="border-t border-white/6 pt-1.5 flex flex-col gap-0">
+                    <span className="text-[10px] text-danger/80 font-medium">⚠️ Em atraso</span>
+                    <span className="text-sm font-bold text-danger tabular-nums">{formatCurrency(overdueTotal)}</span>
+                    <span className="text-[10px] text-slate-600">{overdueList.length} conta{overdueList.length !== 1 ? 's' : ''}</span>
+                  </div>
+                )}
               </div>
             </Card>
             <Card variant="outline" padding="sm">
@@ -176,30 +234,7 @@ export default async function BillsPage() {
 
       {/* ── Projeção (topo) ─────────────────────────────────── */}
       {(activeRecurring.length > 0 || pending.length > 0 || activeGroups.length > 0) && (
-        <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <CalendarDays className="size-4 text-brand-400" />
-            <h3 className="text-sm font-semibold text-slate-300">Projeção de gastos</h3>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {projection.map((m) => (
-              <div key={m.label} className={`rounded-lg p-3 border ${m.isCurrent ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
-                <p className="text-[11px] text-slate-500 mb-2 flex items-center gap-1">
-                  {m.isCurrent && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
-                  {m.label}
-                </p>
-                <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
-                <div className="flex flex-col gap-0.5">
-                  {m.breakdown.overdue > 0 && <p className="text-[10px] text-danger/70">⚠️ {formatCurrency(m.breakdown.overdue)} em atraso</p>}
-                  {m.breakdown.fixed > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>}
-                  {m.breakdown.avulso > 0 && <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>}
-                  {m.breakdown.installment > 0 && <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-slate-600 mt-2">Fixas + avulsos agendados + parcelas vencendo em cada mês.</p>
-        </div>
+        <ProjectionSection months={projection} />
       )}
 
       {bills.length === 0 && recurringBills.length === 0 && (
