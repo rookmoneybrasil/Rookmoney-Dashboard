@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, TrendingUp, TrendingDown, ArrowDownToLine, Wallet, AlertTriangle, ArrowUpRight } from 'lucide-react'
+import { X, TrendingUp, TrendingDown, ArrowDownToLine, Wallet, AlertTriangle, ArrowUpRight, Layers, RefreshCw, Users } from 'lucide-react'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
 import { BorderGlow } from '@/components/ui/border-glow'
 import { StatCard } from '@/components/ui/card'
@@ -197,37 +197,129 @@ export function DashboardKPIs(p: Props) {
         </StatModal>
       )}
 
-      {modal === 'pagar' && (
-        <StatModal title="A Pagar" icon={<TrendingDown className="size-4 text-danger" />} onClose={() => setModal(null)}>
-          {p.upcomingBills.filter(b => !b.isPaid).length === 0 && p.upcomingPersonPayables.length === 0
-            ? <Empty text="Nenhuma conta pendente. Tudo em dia! 🎉" />
-            : <>
-                {p.upcomingBills.filter(b => !b.isPaid).map(bill => {
-                  const status = classifyBillStatus(bill.dueDate, bill.isPaid)
+      {modal === 'pagar' && (() => {
+        const unpaid      = p.upcomingBills.filter(b => !b.isPaid)
+        const overdue     = unpaid.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
+        const installment = unpaid.filter(b => !!b.installmentGroupId && classifyBillStatus(b.dueDate, false) !== 'overdue')
+        const recAvulso   = unpaid.filter(b => !b.installmentGroupId && classifyBillStatus(b.dueDate, false) !== 'overdue')
+          .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+
+        // Pessoas: aggregate by person name
+        const peopleMap = p.upcomingPersonPayables.reduce<Record<string, number>>((acc, up) => {
+          acc[up.person.name] = (acc[up.person.name] ?? 0) + Number(up.amount)
+          return acc
+        }, {})
+        const peopleEntries = Object.entries(peopleMap)
+
+        const sumOf = (arr: Bill[]) => arr.reduce((s, b) => s + Number(b.amount), 0)
+        const peopleTotal = peopleEntries.reduce((s, [, v]) => s + v, 0)
+
+        const blocks = [
+          { label: 'Em atraso',     icon: AlertTriangle, color: 'text-danger',    bg: 'bg-danger/10',    border: 'border-danger/20',    total: sumOf(overdue),     count: overdue.length     },
+          { label: 'Parceladas',    icon: Layers,        color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', total: sumOf(installment), count: installment.length },
+          { label: 'Contas',        icon: RefreshCw,     color: 'text-slate-300', bg: 'bg-ink-600',      border: 'border-white/8',      total: sumOf(recAvulso),   count: recAvulso.length   },
+          { label: 'Pessoas',       icon: Users,         color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', total: peopleTotal,      count: peopleEntries.length },
+        ].filter(b => b.count > 0)
+
+        const hasAnything = unpaid.length > 0 || peopleEntries.length > 0
+
+        return (
+          <StatModal title="A Pagar" icon={<TrendingDown className="size-4 text-danger" />} onClose={() => setModal(null)}>
+            {!hasAnything ? <Empty text="Nenhuma conta pendente. Tudo em dia! 🎉" /> : <>
+
+              {/* Summary blocks */}
+              <div className={`grid gap-2 mb-1 ${blocks.length <= 2 ? 'grid-cols-2' : blocks.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+                {blocks.map(b => (
+                  <div key={b.label} className={`rounded-xl border ${b.bg} ${b.border} p-3 flex flex-col gap-0.5`}>
+                    <div className={`flex items-center gap-1.5 ${b.color}`}>
+                      <b.icon className="size-3" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wide">{b.label}</span>
+                    </div>
+                    <p className={`text-sm font-bold tabular-nums ${b.color}`}>{formatCurrency(b.total)}</p>
+                    <p className="text-[10px] text-slate-600">{b.count} item{b.count !== 1 ? 's' : ''}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Em atraso */}
+              {overdue.length > 0 && <>
+                <p className="text-[10px] font-semibold text-danger/80 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <AlertTriangle className="size-3" /> Em atraso
+                </p>
+                {overdue.map(bill => (
+                  <div key={bill.id} className="flex items-center gap-3 p-3 rounded-xl bg-danger/8 border border-danger/20">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{bill.name}</p>
+                      <p className="text-xs text-danger">{formatDate(new Date(bill.dueDate))}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-danger shrink-0">{formatCurrency(Number(bill.amount))}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Parceladas */}
+              {installment.length > 0 && <>
+                <p className="text-[10px] font-semibold text-brand-400 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <Layers className="size-3" /> Parceladas
+                </p>
+                {installment.map(bill => (
+                  <div key={bill.id} className="flex items-center gap-3 p-3 rounded-xl bg-ink-700/60">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">
+                        {bill.name}
+                        {bill.installmentCurrent && bill.installmentTotal && (
+                          <span className="ml-1.5 text-[10px] text-slate-600">{bill.installmentCurrent}/{bill.installmentTotal}</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-slate-500">{formatDate(new Date(bill.dueDate))}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-slate-300 shrink-0">{formatCurrency(Number(bill.amount))}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Fixas + Avulsas */}
+              {recAvulso.length > 0 && <>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <RefreshCw className="size-3" /> Contas
+                </p>
+                {recAvulso.map(bill => {
+                  const status = classifyBillStatus(bill.dueDate, false)
                   return (
-                    <div key={bill.id} className={`flex items-center gap-3 p-3 rounded-xl ${status === 'overdue' ? 'bg-danger/8 border border-danger/20' : 'bg-ink-700/60'}`}>
-                      {(status === 'overdue' || status === 'urgent') && <AlertTriangle className={`size-4 shrink-0 ${status === 'overdue' ? 'text-danger' : 'text-warning'}`} />}
+                    <div key={bill.id} className="flex items-center gap-3 p-3 rounded-xl bg-ink-700/60">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-200 font-medium truncate">{bill.name}</p>
-                        <p className={`text-xs ${status === 'overdue' ? 'text-danger' : 'text-slate-500'}`}>{status === 'overdue' ? 'Em atraso · ' : ''}{formatDate(new Date(bill.dueDate))}</p>
+                        <p className={`text-xs ${status === 'urgent' ? 'text-warning' : 'text-slate-500'}`}>
+                          {bill.recurringBillId ? '🔁 fixa · ' : ''}{formatDate(new Date(bill.dueDate))}
+                        </p>
                       </div>
-                      <span className={`text-sm font-semibold shrink-0 ${status === 'overdue' ? 'text-danger' : 'text-slate-300'}`}>{formatCurrency(Number(bill.amount))}</span>
+                      <span className={`text-sm font-semibold shrink-0 ${status === 'urgent' ? 'text-warning' : 'text-slate-300'}`}>
+                        {formatCurrency(Number(bill.amount))}
+                      </span>
                     </div>
                   )
                 })}
-                {p.upcomingPersonPayables.map(up => (
-                  <div key={up.id} className="flex items-center gap-3 p-3 bg-ink-700/60 rounded-xl">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-200 font-medium truncate">{up.person.name} · {up.description}</p>
-                      <p className="text-xs text-slate-500">{formatDate(new Date(up.date))}</p>
+              </>}
+
+              {/* Pessoas */}
+              {peopleEntries.length > 0 && <>
+                <p className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <Users className="size-3" /> Pessoas
+                </p>
+                {peopleEntries.map(([name, total]) => (
+                  <div key={name} className="flex items-center gap-3 p-3 rounded-xl bg-purple-500/8 border border-purple-500/15">
+                    <div className="size-8 rounded-full bg-purple-500/20 flex items-center justify-center text-sm font-bold text-purple-300 shrink-0">
+                      {name[0].toUpperCase()}
                     </div>
-                    <span className="text-sm font-semibold text-danger shrink-0">-{formatCurrency(Number(up.amount))}</span>
+                    <p className="flex-1 text-sm text-slate-200 font-medium truncate">{name}</p>
+                    <span className="text-sm font-semibold text-purple-300 shrink-0">{formatCurrency(total)}</span>
                   </div>
                 ))}
-              </>
-          }
-        </StatModal>
-      )}
+              </>}
+            </>}
+          </StatModal>
+        )
+      })()}
 
       {modal === 'saldo' && (
         <StatModal title={`Saldo — ${p.monthLabel}`} icon={<Wallet className="size-4 text-brand-400" />} onClose={() => setModal(null)}>
