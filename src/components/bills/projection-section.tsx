@@ -157,7 +157,6 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
               </div>
             </div>
           )}
-        </div>
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between shrink-0 bg-ink-800">
