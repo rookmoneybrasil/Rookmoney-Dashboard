@@ -139,8 +139,35 @@ export async function GET(req: NextRequest) {
       ? customRedirect
       : 'rookmoney://auth/callback'
     const deepLink = `${baseUrl}?${callbackParams}`
-    const res = NextResponse.redirect(deepLink)
-    res.cookies.delete('google_oauth_state')
+
+    // Return HTML page that redirects via JS — Chrome blocks 302 → custom scheme in redirect chains
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rook Money</title>
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           min-height: 100vh; background: #0f0f13; font-family: system-ui, sans-serif; color: #fff; gap: 20px; }
+    p { color: #888; font-size: 14px; }
+    a { display: inline-block; background: #6C63FF; color: #fff; padding: 14px 28px;
+        border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <p>Redirecionando para o app...</p>
+  <a href="${deepLink}">Abrir Rook Money</a>
+  <script>window.location.href = ${JSON.stringify(deepLink)};</script>
+</body>
+</html>`
+
+    const res = new Response(html, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Set-Cookie': 'google_oauth_state=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax',
+      },
+    })
     return res
   }
 
