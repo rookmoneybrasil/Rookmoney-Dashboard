@@ -105,11 +105,18 @@ export default async function BillsPage() {
       fixedAmount = monthlyFixed
     }
 
+    // Atrasados de meses anteriores entram na projeção do mês atual
+    const overdueCarryAmount = i === 0
+      ? overdueList
+          .filter(b => !inMonth(b.dueDate))
+          .reduce((s, b) => s + Number(b.amount), 0)
+      : 0
+
     return {
       label,
-      amount: fixedAmount + avulsoAmount + installmentAmount,
+      amount: fixedAmount + avulsoAmount + installmentAmount + overdueCarryAmount,
       isCurrent: i === 0,
-      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount },
+      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount, overdue: overdueCarryAmount },
     }
   })
 
@@ -183,6 +190,7 @@ export default async function BillsPage() {
                 </p>
                 <p className="text-sm font-bold text-danger mb-1.5">-{formatCurrency(m.amount)}</p>
                 <div className="flex flex-col gap-0.5">
+                  {m.breakdown.overdue > 0 && <p className="text-[10px] text-danger/70">⚠️ {formatCurrency(m.breakdown.overdue)} em atraso</p>}
                   {m.breakdown.fixed > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>}
                   {m.breakdown.avulso > 0 && <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>}
                   {m.breakdown.installment > 0 && <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>}
