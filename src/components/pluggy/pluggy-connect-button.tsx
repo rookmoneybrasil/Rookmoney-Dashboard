@@ -104,7 +104,7 @@ export function PluggySection({ initialItems, initialBoletos }: Props) {
       {connectToken && (
         <PluggyConnect
           connectToken={connectToken}
-          includeSandbox={false}
+          includeSandbox={true}
           onSuccess={handleSuccess}
           onError={handleError}
           onClose={handleClose}
