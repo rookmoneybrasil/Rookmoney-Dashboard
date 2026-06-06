@@ -52,6 +52,7 @@ model User {
   personEntryRecurring  PersonEntryRecurring[]
   feedbacks             Feedback[]
   recurringBills        RecurringBill[]
+  pluggyItems           PluggyItem[]
 }
 
 // ─── Category ───────────────────────────────────────────────────────
@@ -366,4 +367,22 @@ model Feedback {
 model DataMigration {
   id    String   @id
   ranAt DateTime @default(now())
+}
+
+// ─── PluggyItem ───────────────────────────────────────────────────────────────
+// Open Finance bank connections via Pluggy.
+
+model PluggyItem {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId        String    @unique
+  connectorId   Int
+  connectorName String
+  status        String    @default("UPDATED")
+  lastSyncAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
 }

@@ -10,6 +10,7 @@ import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, 
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
+import { PluggySection } from '@/components/pluggy/pluggy-connect-button'
 
 const statusConfig = {
   paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
@@ -19,10 +20,12 @@ const statusConfig = {
 }
 
 export default async function BillsPage() {
-  const [bills, categories, recurringBills] = await Promise.all([
+  const [bills, categories, recurringBills, pluggyItems, pluggyData] = await Promise.all([
     serverApi.bills(),
     serverApi.categories(),
     serverApi.recurringBills(),
+    serverApi.pluggyItems(),
+    serverApi.pluggyBoletos(),
   ])
 
   const grouped = new Map<string, typeof bills>()
@@ -112,6 +115,13 @@ export default async function BillsPage() {
 
   return (
     <div className="flex flex-col gap-8 max-w-4xl mx-auto">
+
+      {/* Open Finance — Pluggy */}
+      <PluggySection
+        initialItems={pluggyItems}
+        initialBoletos={pluggyData.boletos}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>

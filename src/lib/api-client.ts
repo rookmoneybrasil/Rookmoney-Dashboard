@@ -128,6 +128,10 @@ export const serverApi = {
   // Notifications
   notifications: () => serverFetch<AppNotification[]>('/notifications'),
 
+  // Pluggy — Open Finance
+  pluggyItems: () => serverFetch<PluggyItemRecord[]>('/pluggy/items').catch(() => [] as PluggyItemRecord[]),
+  pluggyBoletos: () => serverFetch<{ boletos: PluggyBoleto[]; items: { id: string; connectorName: string; ok: boolean }[] }>('/pluggy/boletos').catch(() => ({ boletos: [], items: [] })),
+
   // Admin
   adminStats: () => serverFetch<AdminStats>('/admin/stats'),
   adminUsers: (params?: Record<string, string>) =>
@@ -279,6 +283,18 @@ export const clientApi = {
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ isAdmin }) }),
   adminDeleteUser: (id: string) =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'DELETE' }),
+
+  // Pluggy — Open Finance
+  pluggyConnectToken: () =>
+    clientFetch<{ accessToken: string }>('/pluggy/connect-token', { method: 'POST' }),
+  pluggyItems: () =>
+    clientFetch<PluggyItemRecord[]>('/pluggy/items'),
+  pluggySaveItem: (itemId: string) =>
+    clientFetch<PluggyItemRecord>('/pluggy/items', { method: 'POST', body: JSON.stringify({ itemId }) }),
+  pluggyDeleteItem: (id: string) =>
+    clientFetch<void>(`/pluggy/items/${id}`, { method: 'DELETE' }),
+  pluggyBoletos: () =>
+    clientFetch<{ boletos: PluggyBoleto[]; items: { id: string; connectorName: string; ok: boolean }[] }>('/pluggy/boletos'),
 }
 
 export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected' | 'received'; href: string; color: string }
@@ -355,3 +371,20 @@ export interface AdminStats { totalUsers: number; proUsers: number; freeUsers: n
 export interface AdminUser { id: string; name: string; email: string; plan: string; isAdmin: boolean; createdAt: string; updatedAt: string; whatsappPhone?: string | null; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; _count: { transactions: number; goals: number; bills: number; budgets: number; people: number } }
 export interface AdminUserDetail { user: AdminUser; recentTransactions: Transaction[] }
 export interface AdminUsersPage { users: AdminUser[]; total: number; page: number; totalPages: number }
+
+// ─── Pluggy — Open Finance ────────────────────────────────────────────────────
+export interface PluggyItemRecord {
+  id: string; itemId: string; connectorId: number; connectorName: string
+  status: string; lastSyncAt: string | null; createdAt: string
+}
+export interface PluggyBoleto {
+  id: string; description: string; amount: number; date: string
+  type: string; status: string
+  connectorName: string
+  paymentData?: {
+    payer?: string; payerDocument?: string
+    receiver?: string; receiverDocument?: string
+    barCode?: string; reference?: string
+    reason?: string; dueDate?: string
+  }
+}
