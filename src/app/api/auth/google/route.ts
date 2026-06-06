@@ -14,9 +14,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 })
   }
 
-  // CSRF state token — append ':mobile' so the callback knows where to redirect
+  // Optional custom redirect for Expo Go dev builds (exp://...)
+  const mobileRedirect = isMobile ? (searchParams.get('redirect') ?? '') : ''
+
+  // CSRF state token — append ':mobile:{redirect}' so the callback knows where to redirect
   const csrf  = randomBytes(16).toString('hex')
-  const state = isMobile ? `${csrf}:mobile` : csrf
+  const state = isMobile ? `${csrf}:mobile:${mobileRedirect}` : csrf
 
   const params = new URLSearchParams({
     client_id:     clientId,

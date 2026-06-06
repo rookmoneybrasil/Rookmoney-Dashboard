@@ -38,7 +38,9 @@ export async function GET(req: NextRequest) {
   }
 
   // Detect if this originated from the mobile app
-  const isMobile = state.endsWith(':mobile')
+  // State format: {csrf}:mobile:{redirectUrl} or {csrf}:mobile or {csrf}
+  const parts    = state.split(':mobile:')
+  const isMobile = state.includes(':mobile')
 
   const clientId     = process.env.GOOGLE_CLIENT_ID     ?? ''
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? ''
@@ -122,8 +124,7 @@ export async function GET(req: NextRequest) {
       .setIssuedAt()
       .sign(SECRET)
 
-    // Redirect to deep link — the mobile app handles rookmoney://auth/callback
-    const params = new URLSearchParams({
+    const callbackParams = new URLSearchParams({
       token,
       id:           user.id,
       name:         user.name,
@@ -132,7 +133,12 @@ export async function GET(req: NextRequest) {
       hasOnboarded: user.hasOnboarded ? '1' : '0',
     })
 
-    const deepLink = `rookmoney://auth/callback?${params}`
+    // Use custom redirect if provided (e.g. exp://... for Expo Go dev), else production scheme
+    const customRedirect = parts[1] ?? ''
+    const baseUrl = (customRedirect.startsWith('exp://') || customRedirect.startsWith('rookmoney://'))
+      ? customRedirect
+      : 'rookmoney://auth/callback'
+    const deepLink = `${baseUrl}?${callbackParams}`
     const res = NextResponse.redirect(deepLink)
     res.cookies.delete('google_oauth_state')
     return res
