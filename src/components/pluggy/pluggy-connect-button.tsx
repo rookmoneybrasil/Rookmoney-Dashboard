@@ -108,6 +108,11 @@ export function PluggySection({ initialItems, initialBoletos }: Props) {
           onSuccess={handleSuccess}
           onError={handleError}
           onClose={handleClose}
+          onLoadError={(err) => {
+            setError(`Falha ao carregar widget: ${err.message}`)
+            setConnectToken(null)
+            setConnecting(false)
+          }}
         />
       )}
 

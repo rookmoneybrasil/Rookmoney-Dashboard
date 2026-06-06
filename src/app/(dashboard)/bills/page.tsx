@@ -10,7 +10,12 @@ import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, 
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
-import { PluggySection } from '@/components/pluggy/pluggy-connect-button'
+import dynamic from 'next/dynamic'
+
+const PluggySection = dynamic(
+  () => import('@/components/pluggy/pluggy-connect-button').then(m => ({ default: m.PluggySection })),
+  { ssr: false, loading: () => null }
+)
 
 const statusConfig = {
   paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
