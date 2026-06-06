@@ -59,8 +59,9 @@ export default async function BillsPage() {
   const pending = regular.filter((b) => !b.isPaid)
   const paid    = regular.filter((b) =>  b.isPaid)
 
+  // Conta apenas a próxima parcela pendente de cada grupo (não o total futuro)
   const totalPending = pending.reduce((s, b) => s + Number(b.amount), 0)
-    + activeGroups.reduce((s, g) => s + (g.total - g.paidCount) * g.amount, 0)
+    + activeGroups.reduce((s, g) => s + Number(g.nextDue.amount), 0)
   const totalPaid = paid.reduce((s, b) => s + Number(b.amount), 0)
     + allGroups.reduce((s, g) => s + g.paidCount * g.amount, 0)
 
@@ -382,7 +383,7 @@ export default async function BillsPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-slate-200 truncate">{group.name}</p>
-                          <p className="text-xs text-slate-500">{formatCurrency(group.amount)}/parcela · {group.total}x</p>
+                          <p className="text-xs text-slate-500">{formatCurrency(group.amount)}/parcela · {group.total}x · <span className="text-slate-400 font-medium">{formatCurrency(group.grandTotal)} total</span></p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xs font-semibold text-slate-400 tabular-nums">{group.paidCount}/{group.total}</span>
@@ -405,6 +406,7 @@ export default async function BillsPage() {
                                 <div className="flex items-center gap-2 min-w-0">
                                   <span className="text-xs tabular-nums text-slate-600 w-7 shrink-0">{inst.installmentCurrent}ª</span>
                                   <span className="text-xs text-slate-500">{formatDate(inst.dueDate)}</span>
+                                  <span className="text-xs font-semibold text-slate-300 tabular-nums">{formatCurrency(Number(inst.amount))}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
                                   <Badge variant={inst.isPaid ? 'success' : s === 'overdue' || s === 'urgent' ? 'danger' : 'default'} size="sm">
