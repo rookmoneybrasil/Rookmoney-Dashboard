@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, CalendarDays, AlertTriangle, Layers, RefreshCw, Zap } from 'lucide-react'
+import { X, CalendarDays, AlertTriangle, Layers, RefreshCw, Users } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 export interface ProjectionBill {
@@ -25,9 +25,16 @@ export interface ProjectionMonth {
   bills: ProjectionBill[]
 }
 
+export interface PersonDue {
+  id: string
+  name: string
+  amount: number
+  color: string | null
+}
+
 // ─── Popup ────────────────────────────────────────────────────────────────────
 
-function BillsPopup({ month, onClose }: { month: ProjectionMonth; onClose: () => void }) {
+function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peopleDue: PersonDue[]; onClose: () => void }) {
   const now  = new Date()
   const msod = new Date(now.getFullYear(), now.getMonth(), 1) // start of current month
 
@@ -36,19 +43,21 @@ function BillsPopup({ month, onClose }: { month: ProjectionMonth; onClose: () =>
   const fixed       = month.bills.filter(b => b.isFixed && !b.isInstallment && new Date(b.dueDate) >= msod)
   const avulso      = month.bills.filter(b => !b.isFixed && !b.isInstallment && new Date(b.dueDate) >= msod)
   const recAvulso   = [...fixed, ...avulso].sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+  const iOweTotal   = peopleDue.reduce((s, p) => s + p.amount, 0)
 
   const sumOf = (arr: ProjectionBill[]) => arr.reduce((s, b) => s + Math.abs(b.amount), 0)
 
   const blocks = [
-    { label: 'Em atraso',         icon: AlertTriangle, color: 'text-danger',   bg: 'bg-danger/10',   border: 'border-danger/20',   total: sumOf(overdue),     count: overdue.length     },
-    { label: 'Parceladas',        icon: Layers,        color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', total: sumOf(installment), count: installment.length },
-    { label: 'Fixas + Avulsas',   icon: RefreshCw,     color: 'text-slate-300', bg: 'bg-ink-600',     border: 'border-white/8',      total: sumOf(recAvulso),   count: recAvulso.length   },
+    { label: 'Em atraso',       icon: AlertTriangle, color: 'text-danger',    bg: 'bg-danger/10',    border: 'border-danger/20',    total: sumOf(overdue),     count: overdue.length     },
+    { label: 'Parceladas',      icon: Layers,        color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', total: sumOf(installment), count: installment.length },
+    { label: 'Fixas + Avulsas', icon: RefreshCw,     color: 'text-slate-300', bg: 'bg-ink-600',      border: 'border-white/8',      total: sumOf(recAvulso),   count: recAvulso.length   },
+    { label: 'Pessoas',         icon: Users,         color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', total: iOweTotal,        count: peopleDue.length   },
   ].filter(b => b.count > 0)
 
   const sections: { label: string; icon: React.ElementType; bills: ProjectionBill[]; color: string }[] = [
-    ...(overdue.length > 0     ? [{ label: 'Em atraso',      icon: AlertTriangle, bills: overdue,     color: 'text-danger'    }] : []),
-    ...(installment.length > 0 ? [{ label: 'Parceladas',     icon: Layers,        bills: installment, color: 'text-brand-400' }] : []),
-    ...(recAvulso.length > 0   ? [{ label: 'Fixas + Avulsas', icon: RefreshCw,    bills: recAvulso,   color: 'text-slate-400' }] : []),
+    ...(overdue.length > 0     ? [{ label: 'Em atraso',       icon: AlertTriangle, bills: overdue,     color: 'text-danger'    }] : []),
+    ...(installment.length > 0 ? [{ label: 'Parceladas',      icon: Layers,        bills: installment, color: 'text-brand-400' }] : []),
+    ...(recAvulso.length > 0   ? [{ label: 'Fixas + Avulsas', icon: RefreshCw,     bills: recAvulso,   color: 'text-slate-400' }] : []),
   ]
 
   return (
@@ -91,7 +100,7 @@ function BillsPopup({ month, onClose }: { month: ProjectionMonth; onClose: () =>
 
         {/* Bills list */}
         <div className="overflow-y-auto flex-1 mt-3">
-          {month.bills.length === 0 ? (
+          {month.bills.length === 0 && peopleDue.length === 0 ? (
             <p className="text-center text-sm text-slate-600 py-10">Nenhuma conta prevista para este mês</p>
           ) : sections.map(sec => (
             <div key={sec.label}>
@@ -125,10 +134,35 @@ function BillsPopup({ month, onClose }: { month: ProjectionMonth; onClose: () =>
           ))}
         </div>
 
+          {/* Pessoas section */}
+          {peopleDue.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 px-5 py-2 sticky top-0 bg-ink-800/95 backdrop-blur-sm border-y border-white/5">
+                <Users className="size-3 text-purple-400" />
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-purple-400">Pessoas</span>
+              </div>
+              <div className="divide-y divide-white/5">
+                {peopleDue.map(p => (
+                  <div key={p.id} className="flex items-center gap-3 px-5 py-3">
+                    <div className="size-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 text-white"
+                      style={{ backgroundColor: p.color ?? '#8B5CF6' }}>
+                      {p.name[0].toUpperCase()}
+                    </div>
+                    <p className="flex-1 text-sm font-medium text-slate-200 truncate">{p.name}</p>
+                    <span className="text-sm font-semibold text-purple-300 tabular-nums shrink-0">
+                      {formatCurrency(p.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Footer */}
         <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between shrink-0 bg-ink-800">
-          <span className="text-xs text-slate-500">{month.bills.length} conta{month.bills.length !== 1 ? 's' : ''} no total</span>
-          <span className="text-sm font-bold text-danger">-{formatCurrency(month.amount)}</span>
+          <span className="text-xs text-slate-500">{month.bills.length + peopleDue.length} item{month.bills.length + peopleDue.length !== 1 ? 's' : ''} no total</span>
+          <span className="text-sm font-bold text-danger">-{formatCurrency(month.amount + iOweTotal)}</span>
         </div>
       </div>
     </div>
@@ -137,7 +171,7 @@ function BillsPopup({ month, onClose }: { month: ProjectionMonth; onClose: () =>
 
 // ─── Projection cards ─────────────────────────────────────────────────────────
 
-export function ProjectionSection({ months }: { months: ProjectionMonth[] }) {
+export function ProjectionSection({ months, peopleDue = [] }: { months: ProjectionMonth[]; peopleDue?: PersonDue[] }) {
   const [selected, setSelected] = useState<ProjectionMonth | null>(null)
 
   return (
@@ -172,7 +206,7 @@ export function ProjectionSection({ months }: { months: ProjectionMonth[] }) {
         <p className="text-[11px] text-slate-600 mt-2">Fixas + avulsos agendados + parcelas vencendo em cada mês.</p>
       </div>
 
-      {selected && <BillsPopup month={selected} onClose={() => setSelected(null)} />}
+      {selected && <BillsPopup month={selected} peopleDue={peopleDue} onClose={() => setSelected(null)} />}
     </>
   )
 }

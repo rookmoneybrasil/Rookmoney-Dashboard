@@ -21,13 +21,17 @@ const statusConfig = {
 }
 
 export default async function BillsPage() {
-  const [bills, categories, recurringBills] = await Promise.all([
+  const [bills, categories, recurringBills, people] = await Promise.all([
     serverApi.bills(),
     serverApi.categories(),
     serverApi.recurringBills(),
+    serverApi.people(),
     // serverApi.pluggyItems(),   // Open Finance — reativar quando Pluggy pago
     // serverApi.pluggyBoletos(), // Open Finance — reativar quando Pluggy pago
   ])
+
+  const iOwePeople = people.filter(p => (p.iOweThem ?? 0) > 0)
+  const iOweTotal  = iOwePeople.reduce((s, p) => s + (p.iOweThem ?? 0), 0)
 
   const grouped = new Map<string, typeof bills>()
   const regular: typeof bills = []
@@ -210,6 +214,13 @@ export default async function BillsPage() {
                     <span className="text-[10px] text-slate-600">{overdueList.length} conta{overdueList.length !== 1 ? 's' : ''}</span>
                   </div>
                 )}
+                {iOweTotal > 0 && (
+                  <div className="border-t border-white/6 pt-1.5 flex flex-col gap-0">
+                    <span className="text-[10px] text-slate-400 font-medium">👥 Pessoas</span>
+                    <span className="text-sm font-bold text-slate-200 tabular-nums">{formatCurrency(iOweTotal)}</span>
+                    <span className="text-[10px] text-slate-600">{iOwePeople.length} pessoa{iOwePeople.length !== 1 ? 's' : ''}</span>
+                  </div>
+                )}
               </div>
             </Card>
             <Card variant="outline" padding="sm">
@@ -235,7 +246,10 @@ export default async function BillsPage() {
 
       {/* ── Projeção (topo) ─────────────────────────────────── */}
       {(activeRecurring.length > 0 || pending.length > 0 || activeGroups.length > 0) && (
-        <ProjectionSection months={projection} />
+        <ProjectionSection
+          months={projection}
+          peopleDue={iOwePeople.map(p => ({ id: p.id, name: p.name, amount: p.iOweThem ?? 0, color: p.color }))}
+        />
       )}
 
       {bills.length === 0 && recurringBills.length === 0 && (
