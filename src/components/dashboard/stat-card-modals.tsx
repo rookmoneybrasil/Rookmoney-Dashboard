@@ -135,48 +135,93 @@ export function DashboardKPIs(p: Props) {
       </div>
 
       {/* ── Modals ── */}
-      {modal === 'receber' && (
-        <StatModal title="A Receber" icon={<ArrowDownToLine className="size-4 text-cyan-400" />} onClose={() => setModal(null)}>
-          {p.upcomingPeopleReceivable.length > 0 && (() => {
-            // Group by person name and sum amounts
-            const byPerson = p.upcomingPeopleReceivable.reduce<Record<string, number>>((acc, up) => {
-              acc[up.person.name] = (acc[up.person.name] ?? 0) + Number(up.amount)
-              return acc
-            }, {})
-            return <>
-              <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1">Pessoas que te devem</p>
-              {Object.entries(byPerson).map(([name, total]) => (
-                <div key={name} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
-                  <p className="text-sm text-slate-200 font-medium truncate">{name}</p>
-                  <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(total)}</span>
-                </div>
-              ))}
-            </>
-          })()}
-          {p.pendingIncomeSources.length > 0 && <>
-            <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-1 mt-2">Fontes de renda pendentes</p>
-            {p.pendingIncomeSources.map(src => (
-              <div key={src.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-200 font-medium truncate">{src.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {src.isRecurring ? `Recorrente · dia ${src.dayOfMonth ?? 1}` : 'Eventual · pendente'}
-                  </p>
-                </div>
-                <span className="text-sm font-semibold text-cyan-400 shrink-0">+{formatCurrency(src.amount)}</span>
+      {modal === 'receber' && (() => {
+        const fixedSrc  = p.pendingIncomeSources.filter(s => s.isRecurring)
+        const oneOffSrc = p.pendingIncomeSources.filter(s => !s.isRecurring)
+
+        // Pessoas: aggregate by person name
+        const peopleMap = p.upcomingPeopleReceivable.reduce<Record<string, number>>((acc, up) => {
+          acc[up.person.name] = (acc[up.person.name] ?? 0) + Number(up.amount)
+          return acc
+        }, {})
+        const peopleEntries = Object.entries(peopleMap)
+
+        const sumOf = (arr: { amount: number }[]) => arr.reduce((s, src) => s + Number(src.amount), 0)
+
+        const blocks = [
+          { label: 'Fixo · Recorrente', icon: RefreshCw,    color: 'text-cyan-400',   bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20',    total: sumOf(fixedSrc),  count: fixedSrc.length  },
+          { label: 'Avulso',            icon: ArrowUpRight, color: 'text-slate-300',  bg: 'bg-ink-600',        border: 'border-white/8',        total: sumOf(oneOffSrc), count: oneOffSrc.length },
+          { label: 'Pessoas',           icon: Users,        color: 'text-purple-400', bg: 'bg-purple-500/10',  border: 'border-purple-500/20',  total: peopleEntries.reduce((s, [, v]) => s + v, 0), count: peopleEntries.length },
+        ].filter(b => b.count > 0)
+
+        const hasAnything = p.pendingIncomeSources.length > 0 || peopleEntries.length > 0
+
+        return (
+          <StatModal title="A Receber" icon={<ArrowDownToLine className="size-4 text-cyan-400" />} onClose={() => setModal(null)}>
+            {!hasAnything ? <Empty text="Nada a receber no momento." /> : <>
+
+              {/* Summary blocks */}
+              <div className={`grid gap-2 mb-1 ${blocks.length <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                {blocks.map(b => (
+                  <div key={b.label} className={`rounded-xl border ${b.bg} ${b.border} p-3 flex flex-col gap-0.5`}>
+                    <div className={`flex items-center gap-1.5 ${b.color}`}>
+                      <b.icon className="size-3" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wide">{b.label}</span>
+                    </div>
+                    <p className={`text-sm font-bold tabular-nums ${b.color}`}>{formatCurrency(b.total)}</p>
+                    <p className="text-[10px] text-slate-600">{b.count} item{b.count !== 1 ? 's' : ''}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </>}
-          {/* Fallback: API ainda sem pendingIncomeSources mas há valor a receber */}
-          {p.pendingIncomeSources.length === 0 && p.totalIncomeReceivable > 0 && (
-            <div className="p-3 bg-ink-700/60 rounded-xl flex items-center justify-between">
-              <p className="text-sm text-slate-300">Fontes de renda pendentes este mês</p>
-              <span className="text-sm font-semibold text-cyan-400">+{formatCurrency(p.totalIncomeReceivable)}</span>
-            </div>
-          )}
-          {p.totalReceivable === 0 && <Empty text="Nada a receber no momento." />}
-        </StatModal>
-      )}
+
+              {/* Fixo · Recorrente */}
+              {fixedSrc.length > 0 && <>
+                <p className="text-[10px] font-semibold text-cyan-400 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <RefreshCw className="size-3" /> Fixo · Recorrente
+                </p>
+                {fixedSrc.map(src => (
+                  <div key={src.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
+                    <div className="min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{src.name}</p>
+                      <p className="text-xs text-slate-500">dia {src.dayOfMonth ?? 1}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-cyan-400 shrink-0">+{formatCurrency(src.amount)}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Avulso */}
+              {oneOffSrc.length > 0 && <>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <ArrowUpRight className="size-3" /> Avulso
+                </p>
+                {oneOffSrc.map(src => (
+                  <div key={src.id} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
+                    <div className="min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{src.name}</p>
+                      <p className="text-xs text-slate-500">Eventual · pendente</p>
+                    </div>
+                    <span className="text-sm font-semibold text-cyan-400 shrink-0">+{formatCurrency(src.amount)}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Pessoas */}
+              {peopleEntries.length > 0 && <>
+                <p className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <Users className="size-3" /> Pessoas que te devem
+                </p>
+                {peopleEntries.map(([name, total]) => (
+                  <div key={name} className="flex items-center justify-between gap-3 p-3 bg-ink-700/60 rounded-xl">
+                    <p className="text-sm text-slate-200 font-medium truncate">{name}</p>
+                    <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(total)}</span>
+                  </div>
+                ))}
+              </>}
+            </>}
+          </StatModal>
+        )
+      })()}
 
       {modal === 'receitas' && (() => {
         const txs       = p.monthIncomeTransactions ?? []
