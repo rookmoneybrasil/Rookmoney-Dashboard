@@ -4,9 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronRight, History, RotateCcw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/utils'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -136,7 +134,7 @@ function SourceHistory({ sourceId, name, entries, canRevert, hasVariation }: {
                 {/* Date */}
                 <div className="min-w-[120px] shrink-0">
                   <p className="text-xs font-medium text-slate-300">
-                    {format(new Date(entry.date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                    {formatDate(entry.date, "dd 'de' MMM yyyy")}
                   </p>
                 </div>
 
