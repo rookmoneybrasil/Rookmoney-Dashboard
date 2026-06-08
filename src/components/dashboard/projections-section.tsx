@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TrendingUp, TrendingDown, Sparkles, X, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { MonthProjection, ProjectionItem } from '@/lib/api-client'
@@ -228,6 +228,11 @@ interface Props {
 export function ProjectionsSection({ projections }: Props) {
   const [selected, setSelected] = useState<string | null>(null)
   const selectedProj = projections.find(p => p.month === selected) ?? null
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (selectedProj) panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [selectedProj])
 
   const hasAny     = projections.some(p => p.income > 0 || p.expense > 0)
   const cumulatives = projections.map(p => p.cumulativeBalance)
@@ -274,7 +279,9 @@ export function ProjectionsSection({ projections }: Props) {
           </div>
 
           {selectedProj && (
-            <DetailPanel proj={selectedProj} onClose={() => setSelected(null)} />
+            <div ref={panelRef}>
+              <DetailPanel proj={selectedProj} onClose={() => setSelected(null)} />
+            </div>
           )}
         </>
       )}
