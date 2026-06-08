@@ -7,7 +7,7 @@ import { BorderGlow } from '@/components/ui/border-glow'
 import { StatCard } from '@/components/ui/card'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { Sparkline } from './sparkline'
-import type { Bill, Transaction, UpcomingPersonPayable } from '@/lib/api-client'
+import type { Bill, Transaction, MonthIncomeTransaction, UpcomingPersonPayable } from '@/lib/api-client'
 
 // ─── Modal shell ──────────────────────────────────────────────────────────────
 
@@ -57,7 +57,8 @@ interface Props {
   upcomingPeopleReceivable: UpcomingPersonPayable[]
   pendingIncomeSources:     { id: string; name: string; amount: number; isRecurring: boolean; dayOfMonth: number | null }[]
   recentTransactions:       Transaction[]
-  monthIncomeTransactions:  Transaction[]
+  monthIncomeTransactions:  MonthIncomeTransaction[]
+  monthPeopleReceived:      UpcomingPersonPayable[]
   monthLabel:            string
   monthlyHistory:        { month: string; income: number; expense: number }[]
 }
@@ -177,26 +178,99 @@ export function DashboardKPIs(p: Props) {
         </StatModal>
       )}
 
-      {modal === 'receitas' && (
-        <StatModal title="Receitas do mês" icon={<TrendingUp className="size-4 text-success" />} onClose={() => setModal(null)}>
-          {(p.monthIncomeTransactions ?? []).length === 0
-            ? <Empty text="Nenhuma receita registrada este mês." />
-            : (p.monthIncomeTransactions ?? []).map(tx => (
-              <div key={tx.id} className="flex items-center gap-3 p-3 bg-ink-700/60 rounded-xl">
-                <div className="size-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                  style={{ backgroundColor: tx.category.color + '22', color: tx.category.color }}>
-                  {tx.category.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-200 font-medium truncate">{tx.description ?? tx.category.name}</p>
-                  <p className="text-xs text-slate-500">{tx.category.name} · {formatDate(new Date(tx.date))}</p>
-                </div>
-                <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(Number(tx.amount))}</span>
+      {modal === 'receitas' && (() => {
+        const txs       = p.monthIncomeTransactions ?? []
+        const fixed     = txs.filter(t => t.isRecurringIncome)
+        const oneOff    = txs.filter(t => !t.isRecurringIncome)
+        const people    = p.monthPeopleReceived ?? []
+
+        const sumOf = (arr: { amount: number }[]) => arr.reduce((s, t) => s + Number(t.amount), 0)
+
+        const blocks = [
+          { label: 'Fixo · Recorrente', icon: RefreshCw,    color: 'text-success',    bg: 'bg-success/10',     border: 'border-success/20',     total: sumOf(fixed),  count: fixed.length  },
+          { label: 'Avulso',            icon: ArrowUpRight, color: 'text-slate-300',  bg: 'bg-ink-600',        border: 'border-white/8',        total: sumOf(oneOff), count: oneOff.length },
+          { label: 'Pessoas',           icon: Users,        color: 'text-purple-400', bg: 'bg-purple-500/10',  border: 'border-purple-500/20',  total: sumOf(people), count: people.length  },
+        ].filter(b => b.count > 0)
+
+        const hasAnything = txs.length > 0 || people.length > 0
+
+        return (
+          <StatModal title="Receitas do mês" icon={<TrendingUp className="size-4 text-success" />} onClose={() => setModal(null)}>
+            {!hasAnything ? <Empty text="Nenhuma receita registrada este mês." /> : <>
+
+              {/* Summary blocks */}
+              <div className={`grid gap-2 mb-1 ${blocks.length <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                {blocks.map(b => (
+                  <div key={b.label} className={`rounded-xl border ${b.bg} ${b.border} p-3 flex flex-col gap-0.5`}>
+                    <div className={`flex items-center gap-1.5 ${b.color}`}>
+                      <b.icon className="size-3" />
+                      <span className="text-[10px] font-semibold uppercase tracking-wide">{b.label}</span>
+                    </div>
+                    <p className={`text-sm font-bold tabular-nums ${b.color}`}>{formatCurrency(b.total)}</p>
+                    <p className="text-[10px] text-slate-600">{b.count} item{b.count !== 1 ? 's' : ''}</p>
+                  </div>
+                ))}
               </div>
-            ))
-          }
-        </StatModal>
-      )}
+
+              {/* Fixo · Recorrente */}
+              {fixed.length > 0 && <>
+                <p className="text-[10px] font-semibold text-success/80 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <RefreshCw className="size-3" /> Fixo · Recorrente
+                </p>
+                {fixed.map(tx => (
+                  <div key={tx.id} className="flex items-center gap-3 p-3 bg-ink-700/60 rounded-xl">
+                    <div className="size-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+                      style={{ backgroundColor: tx.category.color + '22', color: tx.category.color }}>
+                      {tx.category.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{tx.description ?? tx.category.name}</p>
+                      <p className="text-xs text-slate-500">{tx.category.name} · {formatDate(new Date(tx.date))}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(Number(tx.amount))}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Avulso */}
+              {oneOff.length > 0 && <>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <ArrowUpRight className="size-3" /> Avulso
+                </p>
+                {oneOff.map(tx => (
+                  <div key={tx.id} className="flex items-center gap-3 p-3 bg-ink-700/60 rounded-xl">
+                    <div className="size-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+                      style={{ backgroundColor: tx.category.color + '22', color: tx.category.color }}>
+                      {tx.category.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{tx.description ?? tx.category.name}</p>
+                      <p className="text-xs text-slate-500">{tx.category.name} · {formatDate(new Date(tx.date))}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(Number(tx.amount))}</span>
+                  </div>
+                ))}
+              </>}
+
+              {/* Pessoas */}
+              {people.length > 0 && <>
+                <p className="text-[10px] font-semibold text-purple-400 uppercase tracking-wider px-1 pt-2 flex items-center gap-1.5">
+                  <Users className="size-3" /> Recebido de pessoas
+                </p>
+                {people.map(entry => (
+                  <div key={entry.id} className="flex items-center gap-3 p-3 rounded-xl bg-ink-700/60">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 font-medium truncate">{entry.person.name}</p>
+                      <p className="text-xs text-slate-500">{entry.description} · {formatDate(new Date(entry.date))}</p>
+                    </div>
+                    <span className="text-sm font-semibold text-success shrink-0">+{formatCurrency(Number(entry.amount))}</span>
+                  </div>
+                ))}
+              </>}
+            </>}
+          </StatModal>
+        )
+      })()}
 
       {modal === 'pagar' && (() => {
         const unpaid      = p.upcomingBills.filter(b => !b.isPaid)
