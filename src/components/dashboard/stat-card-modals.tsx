@@ -179,9 +179,9 @@ export function DashboardKPIs(p: Props) {
 
       {modal === 'receitas' && (
         <StatModal title="Receitas do mês" icon={<TrendingUp className="size-4 text-success" />} onClose={() => setModal(null)}>
-          {p.monthIncomeTransactions.length === 0
+          {(p.monthIncomeTransactions ?? []).length === 0
             ? <Empty text="Nenhuma receita registrada este mês." />
-            : p.monthIncomeTransactions.map(tx => (
+            : (p.monthIncomeTransactions ?? []).map(tx => (
               <div key={tx.id} className="flex items-center gap-3 p-3 bg-ink-700/60 rounded-xl">
                 <div className="size-8 rounded-lg flex items-center justify-center text-sm shrink-0"
                   style={{ backgroundColor: tx.category.color + '22', color: tx.category.color }}>
