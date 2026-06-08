@@ -109,7 +109,7 @@ export function BillModal({ categories }: Props) {
   const amountLabel = mode === 'parcelado' ? t('perInstallmentLabel') : t('amountLabel')
 
   return (
-    <Modal open={open} onOpenChange={setOpen}>
+    <Modal open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
       <button
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"

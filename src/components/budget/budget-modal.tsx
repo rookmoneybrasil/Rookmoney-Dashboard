@@ -62,7 +62,7 @@ export function BudgetModal({ categories, month, budget }: Props) {
   }
 
   return (
-    <Modal open={open} onOpenChange={setOpen}>
+    <Modal open={open} onOpenChange={(v) => { setOpen(v); if (!v && !isEdit) setCat('') }}>
       {isEdit ? (
         <button onClick={() => setOpen(true)}
           className="size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10 transition-colors"

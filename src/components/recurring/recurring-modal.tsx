@@ -72,7 +72,7 @@ export function RecurringModal({ categories, item }: Props) {
   }, [item])
 
   return (
-    <Modal open={open} onOpenChange={setOpen}>
+    <Modal open={open} onOpenChange={(v) => { setOpen(v); if (!v && !isEdit) { setType('EXPENSE'); setCatId(''); setFrequency('MONTHLY') } }}>
       {isEdit ? (
         <button
           onClick={() => setOpen(true)}
