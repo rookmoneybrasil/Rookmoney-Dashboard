@@ -28,21 +28,26 @@ export function MonthPace({ income, expense, dayOfMonth, daysInMonth }: Props) {
   const c = colors[status]
   const Icon = c.icon
 
+  const projectedPct = timePct > 0 ? Math.round((spendPct / timePct) * 100) : 0
+
   return (
     <div className="bg-ink-800 border border-white/6 rounded-2xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Icon className={`size-4 shrink-0 ${c.text}`} />
-          <p className="text-sm font-medium text-slate-200">Ritmo do mês</p>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <Icon className={`size-4 shrink-0 ${c.text}`} />
+            <p className="text-sm font-medium text-slate-200">Ritmo de gastos</p>
+          </div>
+          <p className="text-[10px] text-slate-600 pl-6">Seus gastos vs. o tempo do mês</p>
         </div>
-        <span className="text-xs text-slate-500">dia {dayOfMonth}/{daysInMonth}</span>
+        <span className="text-xs text-slate-500 shrink-0">dia {dayOfMonth}/{daysInMonth}</span>
       </div>
 
       {/* Dual progress bars */}
       <div className="flex flex-col gap-1.5">
         {/* Time progress */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-600 w-12 shrink-0 text-right">Tempo</span>
+          <span className="text-[10px] text-slate-500 w-16 shrink-0 text-right leading-tight">do mês<br/>passou</span>
           <div className="flex-1 h-1.5 bg-ink-600 rounded-full overflow-hidden">
             <div className="h-full bg-slate-500 rounded-full" style={{ width: `${timePct}%` }} />
           </div>
@@ -50,7 +55,7 @@ export function MonthPace({ income, expense, dayOfMonth, daysInMonth }: Props) {
         </div>
         {/* Spending progress */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-600 w-12 shrink-0 text-right">Gastos</span>
+          <span className="text-[10px] text-slate-500 w-16 shrink-0 text-right leading-tight">da renda<br/>já gasta</span>
           <div className="flex-1 h-1.5 bg-ink-600 rounded-full overflow-hidden">
             <div className={`h-full rounded-full ${c.bar}`} style={{ width: `${Math.min(spendPct, 100)}%` }} />
           </div>
@@ -60,10 +65,10 @@ export function MonthPace({ income, expense, dayOfMonth, daysInMonth }: Props) {
 
       <p className="text-xs text-slate-500 leading-snug">
         {status === 'over'
-          ? `Você já gastou ${formatCurrency(expense - income)} a mais do que recebeu.`
+          ? `Você já gastou ${formatCurrency(expense - income)} além da sua renda este mês.`
           : status === 'warn'
-          ? `Ritmo ${delta}% acima do esperado. Faltam ${daysLeft} dias.`
-          : `No ritmo certo. ${formatCurrency(income - expense)} disponíveis.`}
+          ? `Gastou ${spendPct}% da renda com só ${timePct}% do mês passado — nesse ritmo vai usar ${projectedPct}% da renda total.`
+          : `Tudo certo. Ainda tem ${formatCurrency(income - expense)} disponíveis para os próximos ${daysLeft} dias.`}
       </p>
     </div>
   )
