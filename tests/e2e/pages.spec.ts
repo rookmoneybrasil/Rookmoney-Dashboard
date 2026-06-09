@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { STORAGE_STATE } from './auth.setup'
+import { STORAGE_STATE } from './constants'
 
 test.use({ storageState: STORAGE_STATE })
 
@@ -23,11 +23,12 @@ for (const { name, path } of pages) {
     page.on('pageerror', (err) => errors.push(err.message))
 
     const response = await page.goto(path)
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
-    // Não pode ser 500 nem redirecionar para login (sessão válida)
+    // Não pode ser 500, login ou onboarding (sessão válida com hasOnboarded=true)
     expect(response?.status()).not.toBe(500)
     await expect(page).not.toHaveURL(/login/)
+    await expect(page).not.toHaveURL(/onboarding/)
 
     // Sem erros de JS não tratados
     expect(errors).toHaveLength(0)

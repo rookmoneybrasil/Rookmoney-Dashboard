@@ -1,17 +1,39 @@
 import { defineConfig, devices } from '@playwright/test'
+import { config } from 'dotenv'
+import path from 'path'
+
+// Carrega .env.test explicitamente antes de tudo
+config({ path: path.resolve(__dirname, '.env.test') })
 
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
+  workers: 2,           // limita workers para evitar ENOBUFS no dev server
   retries: 1,
-  timeout: 30_000,
+  timeout: 120_000,
   reporter: [['list'], ['html', { open: 'never' }]],
 
   use: {
-    baseURL: process.env.TEST_BASE_URL ?? 'https://rookmoney-dashboard-git-staging-rook-money-s-projects.vercel.app',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     locale: 'pt-BR',
+  },
+
+  // Passa env vars explicitamente — garante que Next.js não sobrescreve com .env local
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: false,
+    timeout: 120_000,
+    env: {
+      DATABASE_URL:  process.env.DATABASE_URL  ?? '',
+      API_URL:       process.env.API_URL       ?? '',
+      JWT_SECRET:    process.env.JWT_SECRET    ?? 'rook-dev-secret-replace-in-production',
+      TEST_EMAIL:    process.env.TEST_EMAIL    ?? '',
+      TEST_PASSWORD: process.env.TEST_PASSWORD ?? '',
+      NODE_ENV:      'development',
+    },
   },
 
   projects: [

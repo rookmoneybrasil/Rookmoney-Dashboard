@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
-import { STORAGE_STATE } from './auth.setup'
+import { STORAGE_STATE } from './constants'
 
 test.use({ storageState: STORAGE_STATE })
 
 test.describe('Contas a Pagar', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/pt/bills')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('página carrega', async ({ page }) => {
@@ -39,8 +39,9 @@ test.describe('Contas a Pagar', () => {
 
     await page.fill('input[name="name"]', '[E2E] Conta Teste')
 
-    // CurrencyInput — digita via teclado no campo visível
-    const amountInput = dialog.locator('input[type="text"]').first()
+    // CurrencyInput — o campo visível (type="text") não tem atributo name;
+    // o name="amount" fica no hidden input. Por isso o 2º text input é o display do CurrencyInput.
+    const amountInput = dialog.locator('input[type="text"]').nth(1)
     await amountInput.click()
     await page.keyboard.type('15000') // R$ 150,00
 
@@ -52,6 +53,6 @@ test.describe('Contas a Pagar', () => {
 
     // Após salvar, modal fecha e conta aparece na lista
     await expect(dialog).not.toBeVisible()
-    await expect(page.locator('text=[E2E] Conta Teste')).toBeVisible({ timeout: 10_000 })
+    await expect(page.locator('text=[E2E] Conta Teste').first()).toBeVisible({ timeout: 10_000 })
   })
 })

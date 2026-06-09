@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
-import { STORAGE_STATE } from './auth.setup'
+import { STORAGE_STATE } from './constants'
 
 test.use({ storageState: STORAGE_STATE })
 
 test.describe('Metas', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/pt/goals')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
   })
 
   test('página carrega', async ({ page }) => {
