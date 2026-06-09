@@ -8,7 +8,7 @@ config({ path: path.resolve(__dirname, '.env.test') })
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: false,
-  workers: 2,           // limita workers para evitar ENOBUFS no dev server
+  workers: 1,           // 1 worker evita race condition entre specs que compartilham o banco
   retries: 1,
   timeout: 120_000,
   reporter: [['list'], ['html', { open: 'never' }]],

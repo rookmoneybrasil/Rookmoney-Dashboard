@@ -23,7 +23,7 @@ const EMOJI_GROUPS = [
   { label: 'Lazer',        emojis: ['🎮','🎬','🎵','🏖️','🎯','🎲','🎭','📷','🏋️','⚽','🎸','🎨'] },
   { label: 'Compras',      emojis: ['🛍️','👗','👟','💄','⌚','📱','💻','🖨️','📺','🎁','🧴','🪒'] },
   { label: 'Trabalho',     emojis: ['💼','🏢','📊','📋','🖊️','📌','📎','🗃️','📤','📥','🤝','👔'] },
-  { label: 'Pets',         emojis: ['🐶','🐱','🐟','🐰','🐦','🐹','🐢','🦮','🐾','🦴','🐾','🏡'] },
+  { label: 'Pets',         emojis: ['🐶','🐱','🐟','🐰','🐦','🐹','🐢','🦮','🐾','🦴','🐕','🏡'] },
 ]
 
 interface Category { id: string; name: string; icon: string; color: string }
