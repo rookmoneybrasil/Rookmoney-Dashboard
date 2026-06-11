@@ -12,7 +12,11 @@ type ProjectionMonth = {
   month: string; label: string
   incomeItems: ProjectionItem[]; expenseItems: ProjectionItem[]
   totalIncome: number; totalExpense: number
-  balance: number; cumulativeBalance: number; isActual: boolean
+  actualIncome: number; actualExpense: number
+  pendingIncome: number; pendingExpense: number
+  balance: number; actualBalance: number
+  cumulativeBalance: number; actualCumulativeBalance: number
+  isActual: boolean
 }
 
 function fmt(n: number)        { return formatCurrency(n) }
@@ -65,17 +69,19 @@ function DetailPanel({ data, onClose }: { data: ProjectionMonth; onClose: () => 
   const incPct = Math.round((data.totalIncome  / maxBar) * 100)
   const expPct = Math.round((data.totalExpense / maxBar) * 100)
 
+  const hasPending = data.isActual && (data.pendingIncome > 0 || data.pendingExpense > 0)
+
   return (
     <div className="rounded-xl border border-ink-600 bg-ink-800 overflow-hidden animate-in slide-in-from-top-2 duration-200">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-ink-700 flex-wrap gap-3">
         <div className="flex items-center gap-6 flex-wrap">
           <div>
-            <p className="text-xs text-slate-500 capitalize">{data.label} · Saldo acumulado</p>
+            <p className="text-xs text-slate-500 capitalize">{data.label} · {hasPending ? 'Estimativa do mês' : 'Saldo acumulado'}</p>
             <p className={`text-2xl font-bold tabular-nums ${data.cumulativeBalance >= 0 ? 'text-success' : 'text-danger'}`}>
               {fmt(data.cumulativeBalance)}
             </p>
-            {data.isActual && <span className="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded-full">dados reais</span>}
+            {data.isActual && !hasPending && <span className="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded-full">dados reais</span>}
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-1.5 text-xs">
@@ -95,6 +101,33 @@ function DetailPanel({ data, onClose }: { data: ProjectionMonth; onClose: () => 
               </span>
             </div>
           </div>
+          {hasPending && (
+            <div>
+              <p className="text-xs text-slate-500">Saldo real até agora</p>
+              <p className={`text-2xl font-bold tabular-nums ${data.actualCumulativeBalance >= 0 ? 'text-success' : 'text-danger'}`}>
+                {fmt(data.actualCumulativeBalance)}
+              </p>
+              <span className="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded-full">dados reais</span>
+            </div>
+          )}
+          {hasPending && (
+            <div className="flex flex-col gap-1">
+              {data.pendingIncome > 0 && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <ArrowUpRight className="size-3.5 text-success/60" />
+                  <span className="text-slate-500">A receber:</span>
+                  <span className="text-success/70 font-semibold tabular-nums">+{fmt(data.pendingIncome)}</span>
+                </div>
+              )}
+              {data.pendingExpense > 0 && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <ArrowDownRight className="size-3.5 text-danger/60" />
+                  <span className="text-slate-500">A pagar:</span>
+                  <span className="text-danger/70 font-semibold tabular-nums">-{fmt(data.pendingExpense)}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <button onClick={onClose}
           className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-ink-700 transition-colors">
