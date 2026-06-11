@@ -39,7 +39,7 @@ export default async function IncomePage() {
 
   const recurring    = sources.filter((s) =>  s.isRecurring)
   const nonRecurring = sources.filter((s) => !s.isRecurring)
-  const eventualPending = nonRecurring.filter((s) => s.lastAutoPayMonth !== currentMonth)
+  const eventualPending = nonRecurring.filter((s) => s.lastAutoPayMonth === null)
 
   const totalRecorrente = recurring.reduce((s, r) => s + Number(r.amount), 0)
   const totalEventual   = nonRecurring.reduce((s, r) => s + Number(r.amount), 0)
@@ -62,9 +62,9 @@ export default async function IncomePage() {
       })
       .reduce((s, r) => s + Number(r.amount), 0)
 
-    // Eventuais que ainda precisam ser recebidos (não recebidos neste mês)
+    // Eventuais que ainda nunca foram recebidos
     const evAmount = i === 0
-      ? nonRecurring.filter(s => s.lastAutoPayMonth !== currentMonth).reduce((s, r) => s + Number(r.amount), 0)
+      ? nonRecurring.filter(s => s.lastAutoPayMonth === null).reduce((s, r) => s + Number(r.amount), 0)
       : 0
 
     return { label, recAmount, evAmount, total: recAmount + evAmount, isCurrent: i === 0 }
