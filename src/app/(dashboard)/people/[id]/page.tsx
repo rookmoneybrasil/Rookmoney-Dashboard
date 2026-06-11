@@ -255,6 +255,10 @@ export default async function PersonPage({ params }: Props) {
     return { label, theyOwe: projTheyOwe, iOwe: projIOwe, balance: projTheyOwe - projIOwe }
   })
 
+  // Show the projection card whenever there's something projected (recurring
+  // entries OR open installments due in the next 3 months) — not just recurring.
+  const hasProjectionData = projection.some(m => m.theyOwe > 0 || m.iOwe > 0)
+
   // Detect old-style recurring groups (installmentTotal >= 24, all unsettled)
   const hasOldRecurring = openEntries.some(e => (e.installmentTotal ?? 0) >= 24)
 
@@ -375,7 +379,7 @@ export default async function PersonPage({ params }: Props) {
       </div>
 
       {/* ── Mini projeção ────────────────────────────────── */}
-      {recurring.length > 0 && (
+      {hasProjectionData && (
         <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
           <div className="flex items-center gap-2 mb-3">
             <CalendarDays className="size-4 text-brand-400" />
