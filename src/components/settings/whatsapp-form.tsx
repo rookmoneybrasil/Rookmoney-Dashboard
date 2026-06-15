@@ -12,7 +12,7 @@ interface Props { currentPhone: string | null }
 const SANDBOX_NUMBER = process.env.NEXT_PUBLIC_TWILIO_SANDBOX_NUMBER ?? '+1 415 523 8886'
 
 export function WhatsAppForm({ currentPhone }: Props) {
-  const [phone, setPhone] = useState(currentPhone)
+  const [phone] = useState(currentPhone)
 
   const { mutate: save, pending: saving, error } = useMutation(
     (p: string) => clientApi.updateProfile({ whatsappPhone: p || '' }),

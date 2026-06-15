@@ -174,7 +174,7 @@ export function OFXImporter({ categories }: { categories: Category[] }) {
             ))}
           </div>
           <p className="text-xs text-slate-600 mt-4">
-            Não encontrou seu banco? Procure por "exportar extrato" ou "salvar extrato" no internet banking e selecione o formato OFX, QFX ou OFC.
+            Não encontrou seu banco? Procure por &ldquo;exportar extrato&rdquo; ou &ldquo;salvar extrato&rdquo; no internet banking e selecione o formato OFX, QFX ou OFC.
           </p>
         </div>
       )}

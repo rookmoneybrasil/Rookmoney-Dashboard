@@ -132,7 +132,7 @@ interface SidebarProps {
   plan?:      string
 }
 
-export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: SidebarProps) {
   const pathname = usePathname()
   const isPro    = plan === 'PRO'
   const t        = useTranslations('nav')
@@ -201,7 +201,7 @@ export function Sidebar({ user, collapsed = false, onToggle, badges = {}, plan }
         ) : (
           // Expanded: grupos com labels
           <div className="flex flex-col gap-4 py-1">
-            {navGroups.map((group, gi) => (
+            {navGroups.map(group => (
               <div key={group.label}>
                 <p className="text-[10px] font-semibold text-slate-700 uppercase tracking-wider px-2 mb-1">{group.label}</p>
                 <div className="flex flex-col gap-0.5">

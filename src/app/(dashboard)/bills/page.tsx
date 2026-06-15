@@ -1,5 +1,5 @@
 import { Check, Clock, AlertCircle, Layers, ChevronDown, Archive, FileText, RefreshCw } from 'lucide-react'
-import { addMonths, format, startOfMonth } from 'date-fns'
+import { addMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -78,7 +78,6 @@ export default async function BillsPage() {
   const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
 
   // Bills do mês atual (não atrasados)
-  const monthStart = startOfMonth(now)
   const pendingThisMonth = pending.filter(b => {
     const d = new Date(b.dueDate)
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()

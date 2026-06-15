@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { X, MessageCircle } from 'lucide-react'
 import { MASCOT_SRCS, type MascotMood, type MascotEvent } from '@/lib/mascot'
 import { MascotChat } from './mascot-chat'
@@ -73,6 +74,7 @@ export function Mascot({ baseMood = 'idle' }: Props) {
   }, [showPopup])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs mascot mood with baseMood prop changes while no popup is active
     if (!popup) setMood(baseMood)
   }, [baseMood, popup])
 
@@ -109,7 +111,7 @@ export function Mascot({ baseMood = 'idle' }: Props) {
               else setChatOpen(v => !v)
             }}
           >
-            <img
+            <Image
               src={MASCOT_SRCS[mood]}
               alt="Rook — clique para abrir o assistente"
               width={100}
@@ -160,7 +162,7 @@ export function Mascot({ baseMood = 'idle' }: Props) {
 
             <div className="flex justify-center pt-8 pb-2">
               <div className="mascot-bounce">
-                <img src={MASCOT_SRCS[popup.mood]} alt="" width={200} height={200} className="object-contain"
+                <Image src={MASCOT_SRCS[popup.mood]} alt="" width={200} height={200} className="object-contain"
                   style={{ filter: 'drop-shadow(0 16px 40px rgba(0,0,0,0.5))' }} />
               </div>
             </div>

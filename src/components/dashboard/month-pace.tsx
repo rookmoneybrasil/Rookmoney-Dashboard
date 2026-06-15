@@ -11,7 +11,6 @@ interface Props {
 export function MonthPace({ income, expense, dayOfMonth, daysInMonth }: Props) {
   const timePct    = Math.round((dayOfMonth / daysInMonth) * 100)
   const spendPct   = income > 0 ? Math.round((expense / income) * 100) : 0
-  const delta      = spendPct - timePct  // positive = spending faster than time passes
   const daysLeft   = daysInMonth - dayOfMonth
 
   const status = spendPct > 100

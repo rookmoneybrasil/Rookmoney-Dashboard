@@ -1,5 +1,5 @@
 import { Plus, Calendar, TrendingUp } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress, CircularProgress } from '@/components/ui/progress'
 import { format } from 'date-fns'

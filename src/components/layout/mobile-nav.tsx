@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, FileText, Banknote,
   Target, PiggyBank, BarChart3, Tag, Settings, LogOut,
-  X, Menu, RefreshCw, Upload, Users, CalendarDays,
+  X, Menu, Upload, Users, CalendarDays,
 } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { useTranslations } from 'next-intl'

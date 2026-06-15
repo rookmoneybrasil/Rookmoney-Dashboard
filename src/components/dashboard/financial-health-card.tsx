@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl'
 
 // ─── Arc SVG ──────────────────────────────────────────────────────────────────
 
-function ScoreArc({ score, color }: { score: number; color: string }) {
+function ScoreArc({ score }: { score: number }) {
   // Arc from -210° to 30° (240° sweep) centered at bottom
   const R = 52
   const cx = 64
@@ -111,7 +111,7 @@ export function FinancialHealthCard({ health }: { health: FinancialHealth }) {
       {/* Main row */}
       <div className="flex items-center gap-4 px-5 py-4">
         {/* Arc */}
-        <ScoreArc score={health.score} color={health.color} />
+        <ScoreArc score={health.score} />
 
         {/* Info */}
         <div className="flex-1 min-w-0">

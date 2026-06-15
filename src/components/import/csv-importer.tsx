@@ -279,8 +279,6 @@ export function CSVImporter({ categories }: CSVImporterProps) {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  const defaultCategoryId = categories[0]?.id ?? ''
-
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">
       {/* Status banner */}

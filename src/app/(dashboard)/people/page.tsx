@@ -5,7 +5,6 @@ import { serverApi } from '@/lib/api-client'
 import { PersonModal } from '@/components/people/person-modal'
 import { PeopleFilters } from '@/components/people/people-filters'
 import { formatCurrency } from '@/lib/utils'
-import type { Person as PersonWithBalance } from '@/lib/api-client'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 

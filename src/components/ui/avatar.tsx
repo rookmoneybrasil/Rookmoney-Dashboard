@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Image from 'next/image'
 import { cn, getInitials } from '@/lib/utils'
 
 export interface AvatarProps {
@@ -29,7 +30,7 @@ export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
       )}
     >
       {src ? (
-        <img src={src} alt={name ?? 'Avatar'} className="size-full object-cover" />
+        <Image src={src} alt={name ?? 'Avatar'} fill className="object-cover" />
       ) : (
         <span>{initials}</span>
       )}

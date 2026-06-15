@@ -267,7 +267,7 @@ export default async function LandingPage() {
             {(t.raw('testimonials') as { name: string; role: string; text: string; initials: string; color: string }[]).map(({ name, role, text, initials, color }, i) => (
               <FadeIn key={name} delay={i * 100} from="bottom">
                 <div className="bg-ink-800 border border-white/6 rounded-2xl p-5 flex flex-col gap-4">
-                  <p className="text-sm text-slate-300 leading-relaxed flex-1">"{text}"</p>
+                  <p className="text-sm text-slate-300 leading-relaxed flex-1">&ldquo;{text}&rdquo;</p>
                   <div className="flex items-center gap-3 pt-2 border-t border-white/5">
                     <div
                       className="size-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"

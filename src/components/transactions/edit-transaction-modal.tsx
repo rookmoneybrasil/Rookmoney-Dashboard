@@ -9,9 +9,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/ui/select'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'

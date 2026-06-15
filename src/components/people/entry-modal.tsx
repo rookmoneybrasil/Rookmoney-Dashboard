@@ -9,9 +9,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/ui/select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { formatCurrency } from '@/lib/utils'
@@ -56,12 +53,6 @@ export function EntryModal({ personId, personName, categories }: Props) {
     : mutateEntry
 
   const today     = new Date().toISOString().split('T')[0]
-
-  const effectiveInstallments = mode === 'parcelado' ? installments : 1
-
-  const perMonth = mode === 'parcelado' && effectiveInstallments > 1
-    ? Math.round((amountNum / effectiveInstallments) * 100) / 100
-    : amountNum
 
   const remaining   = mode === 'parcelado' ? installments - alreadyPaid : installments
   const submitLabel = mode === 'parcelado' ? `Criar ${remaining} parcela${remaining !== 1 ? 's' : ''}`

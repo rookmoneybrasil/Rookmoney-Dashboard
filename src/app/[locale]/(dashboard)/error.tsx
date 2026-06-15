@@ -5,7 +5,6 @@ import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 export default function DashboardError({
   error,
-  reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void

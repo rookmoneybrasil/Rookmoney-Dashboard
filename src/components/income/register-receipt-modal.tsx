@@ -52,6 +52,7 @@ export function RegisterReceiptModal({ source, categories, label = 'Recebi' }: P
 
   useEffect(() => {
     if (state && !state.error) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- useActionState has no completion callback; close modal and reset form after successful submission
       setOpen(false)
       setCat('')
       setDateOpt('today')

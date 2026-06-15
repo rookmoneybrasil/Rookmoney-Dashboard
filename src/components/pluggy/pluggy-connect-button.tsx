@@ -33,29 +33,6 @@ export function PluggySection({ initialItems, initialBoletos }: Props) {
     }
   }, [])
 
-  const handleSuccess = useCallback(async (data: { item: { id: string } }) => {
-    setConnectToken(null)
-    setConnecting(false)
-    try {
-      const saved = await clientApi.pluggySaveItem(data.item.id)
-      setItems(prev => [saved, ...prev.filter(i => i.itemId !== data.item.id)])
-      await refreshBoletos()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao salvar conexão')
-    }
-  }, [])
-
-  const handleError = useCallback((err: { message: string }) => {
-    setConnectToken(null)
-    setConnecting(false)
-    setError(err.message ?? 'Erro ao conectar banco')
-  }, [])
-
-  const handleClose = useCallback(() => {
-    setConnectToken(null)
-    setConnecting(false)
-  }, [])
-
   const refreshBoletos = useCallback(async () => {
     setSyncing(true)
     try {
@@ -66,6 +43,29 @@ export function PluggySection({ initialItems, initialBoletos }: Props) {
     } finally {
       setSyncing(false)
     }
+  }, [])
+
+  const handleSuccess = useCallback(async (data: { item: { id: string } }) => {
+    setConnectToken(null)
+    setConnecting(false)
+    try {
+      const saved = await clientApi.pluggySaveItem(data.item.id)
+      setItems(prev => [saved, ...prev.filter(i => i.itemId !== data.item.id)])
+      await refreshBoletos()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erro ao salvar conexão')
+    }
+  }, [refreshBoletos])
+
+  const handleError = useCallback((err: { message: string }) => {
+    setConnectToken(null)
+    setConnecting(false)
+    setError(err.message ?? 'Erro ao conectar banco')
+  }, [])
+
+  const handleClose = useCallback(() => {
+    setConnectToken(null)
+    setConnecting(false)
   }, [])
 
   const disconnect = useCallback(async (id: string, connectorName: string) => {

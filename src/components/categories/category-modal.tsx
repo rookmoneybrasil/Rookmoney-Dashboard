@@ -69,7 +69,6 @@ export function CategoryModal({ category }: Props) {
     mutate({ name: fd.get('name') as string })
   }
 
-  const searchLower = search.toLowerCase()
   const filteredGroups = search
     ? [{ label: 'Resultados', emojis: EMOJI_GROUPS.flatMap((g) => g.emojis).filter((_, i, arr) => arr.indexOf(_) === i) }]
     : EMOJI_GROUPS

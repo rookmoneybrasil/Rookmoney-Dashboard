@@ -45,7 +45,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Quote */}
           <div>
             <blockquote className="text-2xl font-bold text-white leading-snug">
-              "Seu dinheiro no movimento certo."
+              &ldquo;Seu dinheiro no movimento certo.&rdquo;
             </blockquote>
             <p className="text-slate-400 text-sm leading-relaxed mt-2 max-w-sm">
               Visualize entradas, saídas e metas em um só lugar — sem complicação.

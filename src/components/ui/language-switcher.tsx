@@ -14,6 +14,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   function switchLocale(next: string) {
     if (next === locale) return
     // Set NEXT_LOCALE cookie — middleware picks it up on next request
+    // eslint-disable-next-line react-hooks/immutability -- browser cookie write in click handler, not component state
     document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; SameSite=Lax`
     window.location.reload()
   }

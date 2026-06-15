@@ -25,7 +25,6 @@ export function NextBillHighlight({ bills }: Props) {
   const days = differenceInDays(parseISO(next.dueDate.split('T')[0]), new Date())
   const isOverdue  = days < 0
   const isUrgent   = days <= 2 && days >= 0
-  const isUpcoming = days <= 7
 
   const bg    = isOverdue ? 'bg-danger/8 border-danger/25' : isUrgent ? 'bg-amber-400/8 border-amber-400/25' : 'bg-ink-800 border-white/6'
   const color = isOverdue ? 'text-danger' : isUrgent ? 'text-amber-400' : 'text-slate-300'

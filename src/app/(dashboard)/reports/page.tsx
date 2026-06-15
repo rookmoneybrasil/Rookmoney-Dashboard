@@ -12,7 +12,6 @@ import { TopExpenses } from '@/components/reports/top-expenses'
 import { SpendingPattern } from '@/components/reports/spending-pattern'
 import { IncomeSourcesChart } from '@/components/reports/income-sources-chart'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { ProGate } from '@/components/ui/pro-gate'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
@@ -83,7 +82,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
       {/* ── KPI cards + rest of report (only when has data) ────────── */}
       {hasData && (<>
       <div className="print:block print:[&>*]:mb-3">
-        <PeriodKPIs period={period} nMonths={months} />
+        <PeriodKPIs period={period} />
       </div>
 
       {/* ── Evolução mensal (full width) ──────────────────────────── */}

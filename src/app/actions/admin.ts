@@ -23,7 +23,6 @@ export async function getAdminStats() {
   const now      = new Date()
   const today    = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const weekAgo  = new Date(today.getTime() - 7  * 24 * 60 * 60 * 1000)
-  const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
   const [

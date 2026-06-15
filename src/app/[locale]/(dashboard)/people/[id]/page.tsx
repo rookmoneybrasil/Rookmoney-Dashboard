@@ -140,7 +140,6 @@ export default async function PersonPage({ params }: Props) {
 
   // For each recurring template, find if there's an entry this month (settled or pending)
   const now          = new Date()
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd     = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
@@ -248,9 +247,9 @@ export default async function PersonPage({ params }: Props) {
 
   // For display: group ALL entries (open + settled) by installmentGroupId so we render each
   // group once. A group is "pending" if any entry is unsettled; "settled" if all settled.
-  const { singles: singleOpen,   groupList: groupOpen }    = groupEntries(openEntries)
+  const { singles: singleOpen }    = groupEntries(openEntries)
   // Settled singles only (groups with all settled appear in their own grouped section)
-  const { singles: singleSettled, groupList: groupSettled } = groupEntries(settledEntries)
+  const { singles: singleSettled } = groupEntries(settledEntries)
 
   // Groups that have at least one open entry — pull them from the full entries
   const openGroupIds = new Set(openEntries.filter((e) => e.installmentGroupId).map((e) => e.installmentGroupId as string))

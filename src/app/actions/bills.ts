@@ -117,7 +117,9 @@ export async function updateBill(
     return { error: validated.error.flatten().formErrors[0] ?? 'Dados inválidos.' }
   }
 
-  const { installments: _inst, dueDate: dueDateStr, ...fields } = validated.data
+  // installments is not a Bill column — drop it before building the update payload
+  const { installments, dueDate: dueDateStr, ...fields } = validated.data
+  void installments
 
   await db.bill.updateMany({
     where: { id, userId: session.userId },

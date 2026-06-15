@@ -26,9 +26,10 @@ export function DashboardGreeting({ firstName, mood, moodLabel }: Props) {
 
   useEffect(() => {
     const h = new Date().getHours()
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- time-of-day greeting computed client-side to avoid SSR/client hydration mismatch
     setGreeting(h < 12 ? t('morning') : h < 18 ? t('afternoon') : t('evening'))
     setMonthLabel(format(new Date(), 'MMMM yyyy', { locale: dateLocale }))
-  }, [locale])
+  }, [locale, dateLocale, t])
 
   return (
     <div className="flex items-center gap-3">

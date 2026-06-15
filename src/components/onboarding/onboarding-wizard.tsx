@@ -25,8 +25,11 @@ export function OnboardingWizard({ firstName }: Props) {
   const [billState,   billAction,   billPending]   = useActionState(createOnboardingBill,   undefined)
   const [goalState,   goalAction,   goalPending]   = useActionState(createOnboardingGoal,   undefined)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- useActionState has no completion callback; advance wizard step on successful submission
   useEffect(() => { if (incomeState && !incomeState.error) setStep(2) }, [incomeState])
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- useActionState has no completion callback; advance wizard step on successful submission
   useEffect(() => { if (billState   && !billState.error)   setStep(3) }, [billState])
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- useActionState has no completion callback; advance wizard step on successful submission
   useEffect(() => { if (goalState   && !goalState.error)   setStep(4) }, [goalState])
 
   const STEPS = [

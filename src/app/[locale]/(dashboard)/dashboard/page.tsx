@@ -1,11 +1,10 @@
 import { Suspense } from 'react'
-import { TrendingUp, TrendingDown, Wallet, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react'
+import Link from 'next/link'
 import { WelcomeProModal } from '@/components/ui/welcome-pro-modal'
 import { UpsellModal } from '@/components/ui/upsell-modal'
 import { ProjectionsSection } from '@/components/dashboard/projections-section'
 import { FinancialHealthCard } from '@/components/dashboard/financial-health-card'
 import { DashboardGreeting } from '@/components/dashboard/greeting'
-import { Sparkline } from '@/components/dashboard/sparkline'
 import { MonthPace } from '@/components/dashboard/month-pace'
 import { NextBillHighlight } from '@/components/dashboard/next-bill-highlight'
 import { CategoryDonut } from '@/components/dashboard/category-donut'
@@ -15,14 +14,12 @@ import { ThemedBillCard } from '@/components/dashboard/themed-bill-card'
 import { format } from 'date-fns'
 import { ptBR, enUS, es as esLocale } from 'date-fns/locale'
 import { getTranslations, getLocale } from 'next-intl/server'
-import { Card, CardHeader, CardTitle, CardContent, StatCard } from '@/components/ui/card'
-import { BorderGlow } from '@/components/ui/border-glow'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
 import { getServiceBrand } from '@/lib/service-brands'
 import type { MascotMood } from '@/lib/mascot'
-import { MASCOT_SRCS } from '@/lib/mascot'
 import { serverApi } from '@/lib/api-client'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -46,7 +43,6 @@ export default async function DashboardPage() {
     serverApi.me().catch(() => null),
   ])
   const isPro = me?.plan === 'PRO'
-  const hour      = now.getHours()
   const monthLabel = format(now, 'MMMM yyyy', { locale: dateLocale })
   const firstName  = data.userName.split(' ')[0]
   const mood       = data.mood as MascotMood
@@ -159,7 +155,7 @@ export default async function DashboardPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('sections.recentTransactions')}</CardTitle>
-                  <a href="/transactions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.recentActivity')} →</a>
+                  <Link href="/transactions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.recentActivity')} →</Link>
                 </div>
               </CardHeader>
               <CardContent>
@@ -198,7 +194,7 @@ export default async function DashboardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{t('sections.activeGoals')}</CardTitle>
-                <a href="/goals" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.activeGoals')} →</a>
+                <Link href="/goals" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.activeGoals')} →</Link>
               </div>
             </CardHeader>
             <CardContent>
@@ -246,7 +242,7 @@ export default async function DashboardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{t('sections.upcomingBills')}</CardTitle>
-                <a href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.upcomingBills')} →</a>
+                <Link href="/bills" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.upcomingBills')} →</Link>
               </div>
             </CardHeader>
             <CardContent>
@@ -278,7 +274,7 @@ export default async function DashboardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>{t('sections.withPeople')}</CardTitle>
-                <a href="/people" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.withPeople')} →</a>
+                <Link href="/people" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.withPeople')} →</Link>
               </div>
             </CardHeader>
             <CardContent>
@@ -314,7 +310,7 @@ export default async function DashboardPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('sections.monthBudget')}</CardTitle>
-                  <a href="/budget" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.monthBudget')} →</a>
+                  <Link href="/budget" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">{t('sections.monthBudget')} →</Link>
                 </div>
               </CardHeader>
               <CardContent>
@@ -343,7 +339,7 @@ export default async function DashboardPage() {
               <CardHeader><CardTitle>Orçamento do mês</CardTitle></CardHeader>
               <CardContent>
                 <p className="text-sm text-slate-600 py-2 text-center">{t('empty.noBudget')}</p>
-                <a href="/budget" className="block text-center text-xs text-brand-400 hover:text-brand-300 mt-2">{t('empty.setupBudget')}</a>
+                <Link href="/budget" className="block text-center text-xs text-brand-400 hover:text-brand-300 mt-2">{t('empty.setupBudget')}</Link>
               </CardContent>
             </Card>
           )}

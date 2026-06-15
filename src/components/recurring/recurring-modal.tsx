@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { CategorySelect } from '@/components/ui/category-select'
 import { Plus, Pencil } from 'lucide-react'
 import {
@@ -61,15 +61,6 @@ export function RecurringModal({ categories, item }: Props) {
         : clientApi.createRecurring(data),
     { onSuccess: () => setOpen(false) },
   )
-
-  // Re-init state when item changes
-  useEffect(() => {
-    if (item) {
-      setType(item.type)
-      setCatId(item.categoryId)
-      setFrequency(item.frequency)
-    }
-  }, [item])
 
   return (
     <Modal open={open} onOpenChange={(v) => { setOpen(v); if (!v && !isEdit) { setType('EXPENSE'); setCatId(''); setFrequency('MONTHLY') } }}>

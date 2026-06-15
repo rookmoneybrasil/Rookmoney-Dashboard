@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { playBillPaid, playClick } from '@/lib/sounds'
+import { playBillPaid } from '@/lib/sounds'
 
 /**
  * Client-side delete buttons for each resource type.

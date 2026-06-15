@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Receipt, TrendingUp, RefreshCw } from 'lucide-react'
 import { format, addMonths, subMonths } from 'date-fns'
@@ -34,21 +33,18 @@ export default function CalendarPage() {
   const [data, setData]               = useState<CalendarData | null>(null)
   const [loading, setLoading]         = useState(true)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
-  const router = useRouter()
 
   const monthStr = format(currentDate, 'yyyy-MM')
 
   useEffect(() => {
-    setLoading(true)
-    setSelectedDay(null)
     fetch(`${API}/api/calendar?month=${monthStr}`)
       .then(r => r.json())
       .then(json => { setData(json.data); setLoading(false) })
       .catch(() => setLoading(false))
   }, [monthStr])
 
-  const prevMonth = () => setCurrentDate(d => subMonths(d, 1))
-  const nextMonth = () => setCurrentDate(d => addMonths(d, 1))
+  const prevMonth = () => { setCurrentDate(d => subMonths(d, 1)); setLoading(true); setSelectedDay(null) }
+  const nextMonth = () => { setCurrentDate(d => addMonths(d, 1)); setLoading(true); setSelectedDay(null) }
 
   const today   = new Date()
   const isToday = (day: number) =>

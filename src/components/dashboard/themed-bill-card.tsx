@@ -2,8 +2,8 @@
 
 import { BorderGlow } from '@/components/ui/border-glow'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { ArrowUpFromLine, AlertTriangle } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { ArrowUpFromLine } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
 interface Props {

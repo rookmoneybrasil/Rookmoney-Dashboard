@@ -337,7 +337,7 @@ export interface BillInput { name: string; amount: number; dueDate: string; isRe
 export interface RecurringBill { id: string; name: string; amount: number; dayOfMonth: number; isActive: boolean; lastAutoMonth: string | null; notes: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
 export interface RecurringBillInput { name: string; amount: number; dayOfMonth: number; categoryId?: string | null; notes?: string | null; generateNow?: boolean }
 export interface Budget { id: string; categoryId: string; month: string; amount: number; category: Category }
-export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; notes?: string | null; categoryId?: string | null }
+export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; startDate?: string | null; notes?: string | null; categoryId?: string | null }
 export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
 export interface PersonInput { name: string; color?: string | null; notes?: string | null }
 export interface EntryInput { type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; notes?: string | null; categoryId?: string | null }

@@ -205,7 +205,6 @@ export default function ProjectionPage() {
 
   useEffect(() => {
     if (isPro === null || !isPro) return
-    setLoading(true)
     fetch(`${API}/api/projection?months=${months}`)
       .then(r => r.json())
       .then(j => {
@@ -268,7 +267,7 @@ export default function ProjectionPage() {
         </div>
         <div className="flex items-center gap-1 bg-ink-800 border border-ink-600 rounded-lg p-1 shrink-0">
           {[3, 6, 12].map((n) => (
-            <button key={n} onClick={() => setMonths(n)}
+            <button key={n} onClick={() => { setMonths(n); setLoading(true) }}
               className={`h-6 px-2.5 rounded-md text-xs font-medium transition-colors ${
                 months === n ? 'bg-brand-600 text-white' : 'text-slate-500 hover:text-slate-300'
               }`}>

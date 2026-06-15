@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, Pencil, Trash2, X, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react'
+import { RefreshCw, X, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react'
 import { clientApi, type RecurringBill, type Category } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { formatCurrency } from '@/lib/utils'

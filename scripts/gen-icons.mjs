@@ -3,7 +3,6 @@
  * Run: node scripts/gen-icons.mjs
  */
 import sharp from 'sharp'
-import { readFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 

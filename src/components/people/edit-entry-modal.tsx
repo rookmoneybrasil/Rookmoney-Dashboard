@@ -53,8 +53,6 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
     })
   }
 
-  const personName = entry.description // fallback — idealmente viria do parent
-
   return (
     <Modal open={open} onOpenChange={setOpen}>
       <button onClick={() => setOpen(true)} title="Editar"

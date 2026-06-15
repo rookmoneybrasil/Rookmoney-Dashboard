@@ -16,13 +16,6 @@ import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { useTranslations } from 'next-intl'

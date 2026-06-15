@@ -6,7 +6,7 @@ import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
 } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
-import { Input, FormField } from '@/components/ui/input'
+import { FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
 import { triggerMascot } from '@/lib/mascot'

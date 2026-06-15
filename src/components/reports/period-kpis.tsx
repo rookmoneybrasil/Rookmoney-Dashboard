@@ -34,7 +34,7 @@ function KpiCard({
   )
 }
 
-export function PeriodKPIs({ period, nMonths }: { period: PeriodStats; nMonths: number }) {
+export function PeriodKPIs({ period }: { period: PeriodStats }) {
   const savingsColor = period.savingsRate >= 20 ? 'text-success'
                      : period.savingsRate >= 0  ? 'text-amber-400'
                      : 'text-danger'

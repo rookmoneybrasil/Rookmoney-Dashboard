@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Crown, Check, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight } from 'lucide-react'
+import { Crown, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight } from 'lucide-react'
 import { clientApi, type User } from '@/lib/api-client'
 import { UsageBar } from '@/components/ui/limit-banner'
 

@@ -52,7 +52,7 @@ const LOCALES = ['pt', 'en', 'es'] as const
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies()
   const raw    = cookieStore.get('NEXT_LOCALE')?.value ?? 'pt'
-  const locale = LOCALES.includes(raw as any) ? raw : 'pt'
+  const locale = (LOCALES as readonly string[]).includes(raw) ? raw : 'pt'
 
   let messages: Record<string, unknown> = {}
   try {

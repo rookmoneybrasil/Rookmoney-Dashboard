@@ -44,7 +44,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
         <div className="relative z-10 px-8 pb-10 flex flex-col gap-5">
           <div>
             <blockquote className="text-2xl font-bold text-white leading-snug">
-              "{t('hero.badge')}"
+              &ldquo;{t('hero.badge')}&rdquo;
             </blockquote>
             <p className="text-slate-400 text-sm leading-relaxed mt-2 max-w-sm">
               {t('hero.description')}

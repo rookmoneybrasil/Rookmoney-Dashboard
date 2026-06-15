@@ -23,6 +23,7 @@ export function WelcomeProModal() {
 
   useEffect(() => {
     if (params.get('upgraded') === '1') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- opens welcome modal in response to ?upgraded=1 URL param on mount
       setOpen(true)
       playProUpgrade()
       router.replace('/dashboard', { scroll: false })

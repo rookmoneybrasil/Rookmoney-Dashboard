@@ -1,5 +1,5 @@
 import { Banknote, RefreshCw, Zap, CalendarDays } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 import { serverApi } from '@/lib/api-client'
@@ -51,7 +51,6 @@ export default async function IncomePage() {
     const yr = d.getFullYear()
     const mo = d.getMonth()
     const label = format(d, "MMM/yy", { locale: ptBR })
-    const monthStr = `${yr}-${String(mo + 1).padStart(2, '0')}`
 
     // Recorrentes ativos nesse mês (respeitando startDate)
     const recAmount = recurring

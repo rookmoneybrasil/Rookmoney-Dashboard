@@ -37,7 +37,6 @@ export function InstallmentGroup({ personId, entries, categories }: Props) {
   const remaining    = entries.filter((e) => !e.isSettled).length
   const name         = baseDescription(first.description)
   const perInst      = Number(first.amount)
-  const totalAmount  = perInst * total
   const leftAmount   = perInst * remaining
   const nextDue      = entries.find((e) => !e.isSettled)
   const allSettled   = remaining === 0

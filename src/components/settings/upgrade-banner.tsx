@@ -12,6 +12,7 @@ export function UpgradeBanner() {
 
   useEffect(() => {
     if (searchParams.get('upgraded') === '1') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- shows upgrade banner in response to ?upgraded=1 URL param on mount
       setVisible(true)
 
       const timer = setTimeout(() => {

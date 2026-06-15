@@ -81,7 +81,7 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
               startDate:   startDateRaw || null,
               notes:       (fd.get('notes') as string) || null,
               categoryId:  categoryId || null,
-            } as any)
+            })
           }}
           className="flex flex-col gap-4"
         >

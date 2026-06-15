@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Upload, ScanLine, CheckCircle2, AlertCircle, X, ImageIcon, Loader2 } from 'lucide-react'
+import { ScanLine, CheckCircle2, AlertCircle, X, ImageIcon, Loader2 } from 'lucide-react'
 import { clientApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 
@@ -157,6 +157,7 @@ export function ReceiptScanner({ categories }: Props) {
         <div className="flex flex-col sm:flex-row gap-5">
           {/* Image preview */}
           <div className="relative shrink-0 w-full sm:w-48">
+            {/* eslint-disable-next-line @next/next/no-img-element -- data: URL preview from FileReader, no fixed dimensions for next/image */}
             <img src={preview} alt="Comprovante" className="w-full rounded-xl border border-white/8 object-cover max-h-60 sm:max-h-none" />
             {!saved && (
               <button

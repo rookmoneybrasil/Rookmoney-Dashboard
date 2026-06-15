@@ -107,7 +107,7 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         {!confirming && (
           <button
             onClick={handleTogglePaid}
-            disabled={marking || processing.current}
+            disabled={marking}
             className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               paid
                 ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700'

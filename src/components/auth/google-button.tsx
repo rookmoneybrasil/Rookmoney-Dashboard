@@ -22,6 +22,7 @@ export function GoogleButton({ label = 'Continuar com Google' }: { label?: strin
           {errorMsg}
         </div>
       )}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- full page navigation required for OAuth redirect */}
       <a
         href="/api/auth/google"
         className="flex items-center justify-center gap-3 h-11 px-4 rounded-xl border border-white/10 bg-ink-800 hover:bg-ink-700 text-slate-200 text-sm font-medium transition-colors"

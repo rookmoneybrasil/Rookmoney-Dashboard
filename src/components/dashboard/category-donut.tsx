@@ -1,5 +1,3 @@
-import { formatCurrency } from '@/lib/utils'
-
 interface Category { name: string; icon: string; color: string; amount: number; pct: number }
 
 interface Props { categories: Category[]; total: number }
@@ -21,11 +19,11 @@ export function CategoryDonut({ categories, total }: Props) {
   const cy = 44
   const circumference = 2 * Math.PI * R
 
-  let cumulative = 0
-  const slices = categories.slice(0, 5).map(cat => {
+  const top5 = categories.slice(0, 5)
+  const slices = top5.map((cat, i) => {
+    const cumulative = top5.slice(0, i).reduce((sum, c) => sum + c.pct, 0)
     const dashArray  = (cat.pct / 100) * circumference
     const dashOffset = circumference * (1 - cumulative / 100)
-    cumulative += cat.pct
     return { ...cat, dashArray, dashOffset }
   })
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -40,17 +40,13 @@ export function PersonModal({ person, trigger }: Props) {
     { onSuccess: () => setOpen(false) },
   )
 
-  useEffect(() => {
-    if (open) setColor(person?.color ?? AVATAR_COLORS[0])
-  }, [open, person?.color])
-
   return (
     <Modal open={open} onOpenChange={setOpen}>
       {trigger ? (
-        <span onClick={() => setOpen(true)}>{trigger}</span>
+        <span onClick={() => { setColor(person?.color ?? AVATAR_COLORS[0]); setOpen(true) }}>{trigger}</span>
       ) : (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => { setColor(person?.color ?? AVATAR_COLORS[0]); setOpen(true) }}
           className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"
         >
           <Plus className="size-3.5" />

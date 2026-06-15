@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             <p>
               Usamos um cookie de sessão (<code className="text-xs bg-ink-700 px-1 py-0.5 rounded">rook_session</code>) para manter você
               autenticado. Não utilizamos cookies de rastreamento ou publicidade. Se você desmarcar
-              "Lembrar de mim" no login, o cookie expira ao fechar o navegador.
+              &ldquo;Lembrar de mim&rdquo; no login, o cookie expira ao fechar o navegador.
             </p>
           </section>
 

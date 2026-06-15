@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Lock, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react'
+import { Lock, Eye, EyeOff, XCircle } from 'lucide-react'
 import { useState, useActionState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
