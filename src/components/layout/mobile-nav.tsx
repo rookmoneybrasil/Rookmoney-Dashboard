@@ -32,15 +32,15 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
   const tAuth = useTranslations('auth.login')
 
   const PRIMARY_NAV = [
-    { href: '/dashboard',    icon: LayoutDashboard, label: t('dashboard')    },
-    { href: '/transactions', icon: ArrowLeftRight,  label: t('transactions') },
-    { href: '/bills',        icon: FileText,        label: t('bills')        },
-    { href: '/people',       icon: Users,           label: t('people')       },
+    { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard') },
+    { href: '/income',    icon: Banknote,        label: t('income')    },
+    { href: '/bills',     icon: FileText,        label: t('bills')     },
+    { href: '/people',    icon: Users,           label: t('people')    },
   ]
 
   const MORE_NAV = [
-    { href: '/income',     icon: Banknote,    label: t('income')      },
-    { href: '/goals',      icon: Target,      label: t('goals')       },
+    { href: '/transactions', icon: ArrowLeftRight, label: t('transactions') },
+    { href: '/goals',        icon: Target,         label: t('goals')        },
     { href: '/budget',     icon: PiggyBank,   label: t('budget')      },
     { href: '/calendar',   icon: CalendarDays,label: t('calendar')    },
     { href: '/reports',    icon: BarChart3,   label: t('reports')     },

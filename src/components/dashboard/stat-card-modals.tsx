@@ -91,7 +91,7 @@ export function DashboardKPIs(p: Props) {
                 <StatCard label="Receitas" value={formatCurrency(p.monthIncome)} variant="income" icon={<TrendingUp className="size-4" />}
                   trend={p.incomeChange !== 0 ? { value: p.incomeChange, label: 'vs mês ant.' } : undefined}
                   sub="Total recebido" className="bg-transparent border-transparent" />
-                <div className="absolute bottom-3 right-3 opacity-50">
+                <div className="absolute bottom-3 right-3 opacity-50 hidden sm:block">
                   <Sparkline data={p.monthlyHistory.map(h => h.income)} color="#22c55e" />
                 </div>
               </div>
@@ -108,7 +108,7 @@ export function DashboardKPIs(p: Props) {
                 <StatCard label="A Pagar" value={formatCurrency(p.pendingBillsAmount + p.personPayablesAmount)} variant="expense" icon={<TrendingDown className="size-4" />}
                   sub={p.overdueCount > 0 ? `${p.overdueCount} em atraso · ${p.pendingBillsCount} conta${p.pendingBillsCount !== 1 ? 's' : ''}` : `${p.pendingBillsCount} conta${p.pendingBillsCount !== 1 ? 's' : ''} pendente${p.pendingBillsCount !== 1 ? 's' : ''}`}
                   className="bg-transparent border-transparent" />
-                <div className="absolute bottom-3 right-3 opacity-50">
+                <div className="absolute bottom-3 right-3 opacity-50 hidden sm:block">
                   <Sparkline data={p.monthlyHistory.map(h => h.expense)} color="#ef4444" />
                 </div>
               </div>
@@ -124,7 +124,7 @@ export function DashboardKPIs(p: Props) {
               <div className="relative">
                 <StatCard label="Saldo do mês" value={formatCurrency(p.monthBalance)} variant="default" icon={<Wallet className="size-4" />}
                   sub={`Já pago: ${formatCurrency(p.monthExpense)}`} className="bg-transparent border-transparent" />
-                <div className="absolute bottom-3 right-3 opacity-50">
+                <div className="absolute bottom-3 right-3 opacity-50 hidden sm:block">
                   <Sparkline data={p.monthlyHistory.map(h => h.income - h.expense)} color="#6366f1" />
                 </div>
               </div>
