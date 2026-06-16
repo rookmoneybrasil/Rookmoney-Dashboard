@@ -114,13 +114,13 @@ export function StatCard({ label, value, sub, icon, trend, variant = 'default', 
         )}
       </div>
       <div className="flex items-end justify-between gap-2">
-        <span className={cn('text-2xl font-bold leading-none tracking-tight', valueStyles[variant])}>
+        <span className={cn('text-xl sm:text-2xl font-bold leading-none tracking-tight min-w-0', valueStyles[variant])}>
           {value}
         </span>
         {trend && (
-          <span className={cn('text-xs font-medium', isPositive ? 'text-success' : 'text-danger')}>
+          <span className={cn('text-xs font-medium shrink-0', isPositive ? 'text-success' : 'text-danger')}>
             {isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-            {trend.label && <span className="text-slate-500 ml-1">{trend.label}</span>}
+            {trend.label && <span className="text-slate-500 ml-1 hidden sm:inline">{trend.label}</span>}
           </span>
         )}
       </div>
