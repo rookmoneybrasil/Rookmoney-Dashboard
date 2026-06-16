@@ -17,9 +17,32 @@ import { useTranslations } from 'next-intl'
 
 interface Props { firstName: string }
 
+const INCOME_TYPES = [
+  { value: 'EMPLOYMENT', label: 'CLT / Emprego', emoji: '💼' },
+  { value: 'FREELANCE',  label: 'Freelance',     emoji: '🧑‍💻' },
+  { value: 'RENTAL',     label: 'Aluguel',        emoji: '🏠' },
+  { value: 'OTHER',      label: 'Outro',          emoji: '💡' },
+]
+
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export function OnboardingWizard({ firstName }: Props) {
   const t = useTranslations('onboarding')
   const [step, setStep] = useState(0)
+
+  // Income state
+  const [incomeIsRecurring, setIncomeRecurring] = useState(true)
+  const [incomeType,        setIncomeType]      = useState('EMPLOYMENT')
+
+  // Bill state
+  const [showInstallments, setShowInstallments] = useState(false)
+  const [billIsRecurring,  setBillRecurring]    = useState(false)
+  const [billAmount,       setBillAmount]       = useState('')
+  const [billInstallments, setBillInstallments] = useState('')
+  const [billAlreadyPaid,  setBillAlreadyPaid]  = useState('0')
 
   const [incomeState, incomeAction, incomePending] = useActionState(createOnboardingIncome, undefined)
   const [billState,   billAction,   billPending]   = useActionState(createOnboardingBill,   undefined)
@@ -118,22 +141,64 @@ export function OnboardingWizard({ firstName }: Props) {
                 )}
 
                 <form action={incomeAction} className="flex flex-col gap-4">
-                  <FormField label={t('step1.sourceLabel')} htmlFor="name" required>
-                    <Input id="name" name="name" placeholder={t('step1.sourcePlaceholder')} autoFocus required />
-                  </FormField>
-                  <div className="grid grid-cols-2 gap-3">
-                    <FormField label={t('step1.amountLabel')} htmlFor="amount" required>
-                      <Input id="amount" name="amount" type="number" step="0.01" min="1" placeholder="3.000,00" required />
-                    </FormField>
-                    <FormField label={t('step1.dayLabel')} htmlFor="dayOfMonth">
-                      <Input id="dayOfMonth" name="dayOfMonth" type="number" min="1" max="31" placeholder="1" />
-                    </FormField>
+                  <input type="hidden" name="type" value={incomeType} />
+                  <input type="hidden" name="isRecurring" value={String(incomeIsRecurring)} />
+
+                  {/* Recorrente / Eventual */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: true,  label: 'Recorrente', desc: 'Entra todo mês', emoji: '🔁' },
+                      { value: false, label: 'Eventual',   desc: 'Renda pontual',  emoji: '💡' },
+                    ].map((opt) => (
+                      <button key={opt.label} type="button"
+                        onClick={() => setIncomeRecurring(opt.value)}
+                        className={`flex flex-col items-center gap-1 py-3 rounded-xl border transition-colors text-sm font-medium
+                          ${incomeIsRecurring === opt.value
+                            ? 'border-brand-500 bg-brand-900/30 text-brand-400'
+                            : 'border-white/8 bg-ink-800 text-slate-400 hover:border-white/20'}`}>
+                        <span className="text-lg">{opt.emoji}</span>
+                        {opt.label}
+                        <span className="text-xs font-normal text-slate-500">{opt.desc}</span>
+                      </button>
+                    ))}
                   </div>
 
-                  <div className="bg-success/5 border border-success/10 rounded-xl px-4 py-3 flex items-start gap-2">
-                    <span className="text-success text-sm mt-0.5">💡</span>
-                    <p className="text-xs text-slate-400 leading-relaxed">{t('step1.tip')}</p>
+                  <FormField label="Nome *" htmlFor="name" required>
+                    <Input id="name" name="name" placeholder="Ex: Salário, Freela Design..." autoFocus required />
+                  </FormField>
+
+                  {/* Tipo */}
+                  <div>
+                    <p className="text-xs text-slate-500 mb-2">Tipo de renda</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {INCOME_TYPES.map((it) => (
+                        <button key={it.value} type="button"
+                          onClick={() => setIncomeType(it.value)}
+                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors
+                            ${incomeType === it.value
+                              ? 'border-brand-500 bg-brand-900/30 text-brand-400'
+                              : 'border-white/8 bg-ink-800 text-slate-400 hover:border-white/20'}`}>
+                          <span>{it.emoji}</span>
+                          <span className="font-medium">{it.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  <FormField label="Valor (R$) *" htmlFor="amount" required>
+                    <Input id="amount" name="amount" type="number" step="0.01" min="1" placeholder="0,00" required />
+                  </FormField>
+
+                  {incomeIsRecurring && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
+                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min="1" max="31" placeholder="Ex: 5" />
+                      </FormField>
+                      <FormField label="Primeiro pagamento" htmlFor="startDate">
+                        <Input id="startDate" name="startDate" placeholder="AAAA-MM-DD" maxLength={10} />
+                      </FormField>
+                    </div>
+                  )}
 
                   <div className="flex gap-3 pt-2">
                     <Button type="button" variant="secondary" onClick={() => setStep(2)} className="flex-1">{t('skip2')}</Button>
@@ -164,22 +229,76 @@ export function OnboardingWizard({ firstName }: Props) {
                 )}
 
                 <form action={billAction} className="flex flex-col gap-4">
+                  <input type="hidden" name="isRecurring" value={String(!showInstallments && billIsRecurring)} />
+
                   <FormField label={t('step2.nameLabel')} htmlFor="billName" required>
                     <Input id="billName" name="name" placeholder={t('step2.namePlaceholder')} autoFocus required />
                   </FormField>
+
                   <div className="grid grid-cols-2 gap-3">
                     <FormField label={t('step2.amountLabel')} htmlFor="billAmount" required>
-                      <Input id="billAmount" name="amount" type="number" step="0.01" min="1" placeholder="1.200,00" required />
+                      <Input
+                        id="billAmount" name="amount" type="number" step="0.01" min="1"
+                        placeholder="0,00" required
+                        onChange={(e) => setBillAmount(e.target.value)}
+                      />
                     </FormField>
-                    <FormField label={t('step2.dayLabel')} htmlFor="day">
-                      <Input id="day" name="day" type="number" min="1" max="28" placeholder="10" />
+                    <FormField label="Vencimento" htmlFor="dueDate" required>
+                      <Input id="dueDate" name="dueDate" placeholder="AAAA-MM-DD" maxLength={10} required />
                     </FormField>
                   </div>
 
-                  <div className="bg-warning/5 border border-warning/10 rounded-xl px-4 py-3 flex items-start gap-2">
-                    <span className="text-warning text-sm mt-0.5">💡</span>
-                    <p className="text-xs text-slate-400 leading-relaxed">{t('step2.tip')}</p>
-                  </div>
+                  {/* Parcelado */}
+                  <label className="flex items-center justify-between px-3 py-3 rounded-xl bg-ink-800 border border-white/8 cursor-pointer">
+                    <div>
+                      <p className="text-sm font-medium text-slate-200">Parcelado</p>
+                      <p className="text-xs text-slate-500">Dividido em várias parcelas</p>
+                    </div>
+                    <input type="checkbox" className="sr-only" checked={showInstallments} onChange={e => {
+                      setShowInstallments(e.target.checked)
+                      if (e.target.checked) setBillRecurring(false)
+                    }} />
+                    <div className={`w-11 h-6 rounded-full transition-colors relative ${showInstallments ? 'bg-brand-500' : 'bg-ink-600'}`}>
+                      <div className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform ${showInstallments ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                  </label>
+
+                  {showInstallments && (
+                    <div className="flex flex-col gap-3 pl-1">
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField label="Total de parcelas" htmlFor="installments">
+                          <Input id="installments" name="installments" type="number" min="2" max="96" placeholder="12"
+                            onChange={e => setBillInstallments(e.target.value)} />
+                        </FormField>
+                        <FormField label="Já pagas" htmlFor="alreadyPaid">
+                          <Input id="alreadyPaid" name="alreadyPaid" type="number" min="0" placeholder="0"
+                            value={billAlreadyPaid} onChange={e => setBillAlreadyPaid(e.target.value)} />
+                        </FormField>
+                      </div>
+                      {billAmount && billInstallments && Number(billInstallments) > 0 && (
+                        <p className="text-xs text-slate-500 bg-ink-800 border border-white/6 rounded-lg px-3 py-2">
+                          {Number(billInstallments) - Number(billAlreadyPaid)} parcelas restantes de{' '}
+                          <span className="text-slate-300 font-medium">
+                            R$ {(Number(billAmount) / Number(billInstallments)).toFixed(2)}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Recorrente (só se não for parcelado) */}
+                  {!showInstallments && (
+                    <label className="flex items-center justify-between px-3 py-3 rounded-xl bg-ink-800 border border-white/8 cursor-pointer">
+                      <div>
+                        <p className="text-sm font-medium text-slate-200">Recorrente</p>
+                        <p className="text-xs text-slate-500">Repete todo mês automaticamente</p>
+                      </div>
+                      <input type="checkbox" className="sr-only" checked={billIsRecurring} onChange={e => setBillRecurring(e.target.checked)} />
+                      <div className={`w-11 h-6 rounded-full transition-colors relative ${billIsRecurring ? 'bg-brand-500' : 'bg-ink-600'}`}>
+                        <div className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform ${billIsRecurring ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                      </div>
+                    </label>
+                  )}
 
                   <div className="flex gap-3 pt-2">
                     <Button type="button" variant="secondary" onClick={() => setStep(3)} className="flex-1">{t('skip2')}</Button>

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
+import { parseISO, addMonths } from 'date-fns'
+import { randomUUID } from 'crypto'
 
 export async function createOnboardingIncome(
   _state: { error?: string } | undefined,
@@ -12,18 +14,27 @@ export async function createOnboardingIncome(
   const session = await getSession()
   if (!session) redirect('/login')
 
-  const name   = (formData.get('name') as string)?.trim()
-  const amount = Number(formData.get('amount'))
+  const name        = (formData.get('name') as string)?.trim()
+  const amount      = Number(formData.get('amount'))
+  const type        = (formData.get('type') as string) || 'EMPLOYMENT'
+  const isRecurring = formData.get('isRecurring') !== 'false'
+  const dayOfMonth  = parseInt(formData.get('dayOfMonth') as string) || null
+  const startDate   = (formData.get('startDate') as string)?.trim() || null
 
   if (!name || name.length < 2) return { error: 'Nome muito curto.' }
   if (!amount || amount <= 0)   return { error: 'Valor inválido.' }
+
+  const validTypes = ['EMPLOYMENT', 'FREELANCE', 'RENTAL', 'OTHER']
+  const safeType   = validTypes.includes(type) ? type : 'EMPLOYMENT'
 
   await db.incomeSource.create({
     data: {
       name,
       amount,
-      type:        'EMPLOYMENT',
-      isRecurring: true,
+      type:        safeType,
+      isRecurring,
+      dayOfMonth:  dayOfMonth && dayOfMonth >= 1 && dayOfMonth <= 31 ? dayOfMonth : null,
+      startDate:   startDate ? new Date(startDate) : null,
       userId:      session.userId,
     },
   })
@@ -60,35 +71,49 @@ export async function createOnboardingBill(
   const session = await getSession()
   if (!session) redirect('/login')
 
-  const name    = (formData.get('name') as string)?.trim()
-  const amount  = Number(formData.get('amount'))
-  const dayStr  = formData.get('day') as string
-  const day     = parseInt(dayStr) || 1
+  const name         = (formData.get('name') as string)?.trim()
+  const amount       = Number(formData.get('amount'))
+  const dueDateStr   = (formData.get('dueDate') as string)?.trim()
+  const isRecurring  = formData.get('isRecurring') === 'true'
+  const installments = parseInt(formData.get('installments') as string) || 1
+  const alreadyPaid  = parseInt(formData.get('alreadyPaid') as string)  || 0
 
   if (!name || name.length < 2) return { error: 'Nome muito curto.' }
   if (!amount || amount <= 0)   return { error: 'Valor inválido.' }
+  if (!dueDateStr?.match(/^\d{4}-\d{2}-\d{2}$/)) return { error: 'Data inválida (AAAA-MM-DD).' }
 
-  const now     = new Date()
-  const dueDate = new Date(now.getFullYear(), now.getMonth(), Math.min(day, 28))
-  if (dueDate < now) dueDate.setMonth(dueDate.getMonth() + 1)
+  const baseDate = parseISO(dueDateStr)
 
-  const salary  = await db.category.findFirst({
-    where: { OR: [{ isDefault: true }, { userId: session.userId }] },
-    orderBy: { isDefault: 'desc' },
-  })
-
-  await db.bill.create({
-    data: {
-      name,
-      amount,
-      dueDate,
-      isRecurring: true,
-      userId:      session.userId,
-      categoryId:  salary?.id ?? null,
-    },
-  })
+  if (installments > 1) {
+    const remaining   = installments - alreadyPaid
+    const groupId     = randomUUID()
+    const perInstallment = Math.round((amount / installments) * 100) / 100
+    await db.bill.createMany({
+      data: Array.from({ length: remaining }, (_, i) => ({
+        name,
+        amount:             perInstallment,
+        dueDate:            addMonths(baseDate, i),
+        isRecurring:        false,
+        userId:             session.userId,
+        installmentTotal:   installments,
+        installmentCurrent: alreadyPaid + i + 1,
+        installmentGroupId: groupId,
+      })),
+    })
+  } else {
+    await db.bill.create({
+      data: {
+        name,
+        amount,
+        dueDate:     baseDate,
+        isRecurring,
+        userId:      session.userId,
+      },
+    })
+  }
 
   revalidatePath('/bills')
+  revalidatePath('/dashboard')
   return {}
 }
 
