@@ -118,7 +118,7 @@ export function StatCard({ label, value, sub, icon, trend, variant = 'default', 
           {value}
         </span>
         {trend && (
-          <span className={cn('hidden sm:inline text-xs font-medium shrink-0', isPositive ? 'text-success' : 'text-danger')}>
+          <span className={cn('max-sm:hidden text-xs font-medium shrink-0', isPositive ? 'text-success' : 'text-danger')}>
             {isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
             {trend.label && <span className="text-slate-500 ml-1">{trend.label}</span>}
           </span>
