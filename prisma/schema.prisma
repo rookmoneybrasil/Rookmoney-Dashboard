@@ -31,6 +31,7 @@ model User {
   notifBillReminder   Boolean   @default(true)
   notifCategoryLimit  Boolean   @default(true)
   notifMonthlyEmail   Boolean   @default(false)
+  pushToken           String?
   currency            String    @default("BRL")
   dateFormat          String    @default("dd/MM/yyyy")
   chatUsageMonth      String?
