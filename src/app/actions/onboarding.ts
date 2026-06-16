@@ -6,6 +6,7 @@ import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { parseISO, addMonths } from 'date-fns'
 import { randomUUID } from 'crypto'
+import { IncomeSourceType } from '@/generated/prisma/client'
 
 export async function createOnboardingIncome(
   _state: { error?: string } | undefined,
@@ -24,8 +25,8 @@ export async function createOnboardingIncome(
   if (!name || name.length < 2) return { error: 'Nome muito curto.' }
   if (!amount || amount <= 0)   return { error: 'Valor inválido.' }
 
-  const validTypes = ['EMPLOYMENT', 'FREELANCE', 'RENTAL', 'OTHER']
-  const safeType   = validTypes.includes(type) ? type : 'EMPLOYMENT'
+  const validTypes = Object.values(IncomeSourceType)
+  const safeType   = validTypes.includes(type as IncomeSourceType) ? (type as IncomeSourceType) : IncomeSourceType.EMPLOYMENT
 
   await db.incomeSource.create({
     data: {
