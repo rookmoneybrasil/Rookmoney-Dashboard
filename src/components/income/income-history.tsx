@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronRight, History, RotateCcw } from 'lucide-react'
+import { ChevronDown, ChevronRight, History, RotateCcw, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { clientApi } from '@/lib/api-client'
@@ -73,6 +73,10 @@ function SourceHistory({ sourceId, name, entries, canRevert, hasVariation }: {
   const router = useRouter()
   const { mutate: revert, pending } = useMutation(
     () => clientApi.revertIncomeReceipt(sourceId),
+    { onSuccess: () => router.refresh() },
+  )
+  const { mutate: deleteEntry, pending: deleting } = useMutation(
+    (id: string) => clientApi.deleteTransaction(id),
     { onSuccess: () => router.refresh() },
   )
 
@@ -156,7 +160,7 @@ function SourceHistory({ sourceId, name, entries, canRevert, hasVariation }: {
                   )}
                 </div>
 
-                {/* Amount + variation badge */}
+                {/* Amount + variation badge + delete */}
                 <div className="flex items-center gap-2 shrink-0">
                   {changed && (
                     <span className="text-[10px] text-warning bg-warning/10 px-1.5 py-0.5 rounded">
@@ -166,6 +170,15 @@ function SourceHistory({ sourceId, name, entries, canRevert, hasVariation }: {
                   <span className="text-sm font-semibold text-success tabular-nums">
                     {formatCurrency(entry.amount)}
                   </span>
+                  <button
+                    type="button"
+                    onClick={() => deleteEntry(entry.id)}
+                    disabled={deleting}
+                    title="Excluir este recebimento"
+                    className="p-1 rounded text-slate-600 hover:text-danger hover:bg-danger/10 transition-colors"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
                 </div>
               </div>
             )

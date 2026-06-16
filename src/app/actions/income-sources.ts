@@ -99,8 +99,17 @@ export async function deleteIncomeSource(id: string) {
   const session = await getSession()
   if (!session) redirect('/login')
 
+  const src = await db.incomeSource.findFirst({ where: { id, userId: session.userId }, select: { name: true } })
+  if (!src) return
+
+  // Delete all income transactions that came from this source (matched by description)
+  await db.transaction.deleteMany({
+    where: { userId: session.userId, type: 'INCOME', description: src.name },
+  })
   await db.incomeSource.deleteMany({ where: { id, userId: session.userId } })
   revalidatePath('/income')
+  revalidatePath('/dashboard')
+  revalidatePath('/transactions')
 }
 
 export async function registerReceipt(
