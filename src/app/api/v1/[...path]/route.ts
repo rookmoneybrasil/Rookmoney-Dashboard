@@ -3,9 +3,28 @@ import { cookies } from 'next/headers'
 
 const API = process.env.API_URL ?? 'http://localhost:3000'
 
+function jwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+  } catch {
+    return null
+  }
+}
+
 async function proxy(req: NextRequest, params: { path: string[] }) {
   const store  = await cookies()
   const cookie = store.get('rook_session')
+
+  // Block mutations from impersonation sessions at the proxy level
+  if (!['GET', 'HEAD'].includes(req.method) && cookie) {
+    const payload = jwtPayload(cookie.value)
+    if (payload?.impersonating === true) {
+      return NextResponse.json(
+        { ok: false, error: 'Ação bloqueada no modo visualização.', code: 'IMPERSONATING' },
+        { status: 403 }
+      )
+    }
+  }
 
   const path = params.path.join('/')
   const qs   = req.nextUrl.search ?? ''

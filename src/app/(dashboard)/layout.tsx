@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation'
 import { serverApi } from '@/lib/api-client'
+import { getSession } from '@/lib/auth'
 import { DashboardShell } from '@/components/layout/dashboard-shell'
 import { Header } from '@/components/layout/header'
 import { LimitBanner } from '@/components/ui/limit-banner'
+import { ImpersonationBanner } from '@/components/ui/impersonation-banner'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let user
@@ -14,6 +16,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user.hasOnboarded) redirect('/onboarding')
 
+  const session = await getSession()
+  const isImpersonating = session?.impersonating === true
+
   const badges: Record<string, number> = {}
   if (user.badges) {
     Object.entries(user.badges).forEach(([path, count]) => {
@@ -21,7 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     })
   }
 
-  const showLimitBanner = user.plan !== 'PRO' && user.usage && user.limits
+  const showLimitBanner = !isImpersonating && user.plan !== 'PRO' && user.usage && user.limits
 
   return (
     <DashboardShell
@@ -29,9 +34,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
       badges={badges}
       plan={user.plan}
       header={<Header />}
-      banner={showLimitBanner && user.usage && user.limits
-        ? <LimitBanner usage={user.usage} limits={user.limits} />
-        : undefined
+      banner={isImpersonating
+        ? <ImpersonationBanner name={user.name} />
+        : (showLimitBanner && user.usage && user.limits
+          ? <LimitBanner usage={user.usage} limits={user.limits} />
+          : undefined)
       }
     >
       {children}

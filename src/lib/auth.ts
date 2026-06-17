@@ -6,9 +6,10 @@ const SECRET      = new TextEncoder().encode(process.env.JWT_SECRET ?? 'rook-dev
 const COOKIE_NAME = 'rook_session'
 
 export interface Session {
-  userId: string
-  name:   string
-  email:  string
+  userId:        string
+  name:          string
+  email:         string
+  impersonating?: boolean
 }
 
 export async function createSession(userId: string, name: string, email: string, rememberMe = true) {
