@@ -121,7 +121,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Atenção ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-4 lg:order-3">
         <SectionLabel>Atenção</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <RookinhoInsight insight={data.insight ?? ''} mood={mood} />
@@ -130,7 +130,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Este mês ─────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-5 lg:order-4">
         <SectionLabel>Este mês</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <MonthPace income={data.monthIncome} expense={data.monthExpense} dayOfMonth={now.getDate()} daysInMonth={daysInMonth} />
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Atividade ────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-6 lg:order-5">
         <SectionLabel>Atividade recente</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           {/* Transações — 2/3 */}
@@ -219,7 +219,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Compromissos ─────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-7 lg:order-6">
         <SectionLabel>Compromissos</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* A Pagar — theme-aware */}
@@ -294,7 +294,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Planejamento ─────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-8 lg:order-7">
         <SectionLabel>Planejamento</SectionLabel>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {/* Orçamento */}
@@ -343,7 +343,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Futuro ───────────────────────────────────────────────────── */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 order-3 lg:order-8">
         <SectionLabel>Futuro</SectionLabel>
         <ProjectionsSection projections={projData.projections as never} />
       </div>
