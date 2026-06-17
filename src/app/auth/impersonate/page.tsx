@@ -12,14 +12,19 @@ function ImpersonateInner() {
     if (!token) { router.replace('/'); return }
 
     fetch('/api/v1/auth/impersonate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ token }),
+      method:      'POST',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
+      body:        JSON.stringify({ token }),
     })
       .then(r => r.json())
       .then(data => {
-        if (data.ok) router.replace('/dashboard')
-        else setError(data.error ?? 'Token inválido.')
+        if (data.ok) {
+          // Full page navigation so the server layout reads the new cookie correctly
+          window.location.href = '/dashboard'
+        } else {
+          setError(data.error ?? 'Token inválido.')
+        }
       })
       .catch(() => setError('Erro ao validar token.'))
   }, [params, router])
