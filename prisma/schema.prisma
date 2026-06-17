@@ -374,6 +374,14 @@ model DataMigration {
   ranAt DateTime @default(now())
 }
 
+// ─── AppSetting ───────────────────────────────────────────────────────────────
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 // ─── PluggyItem ───────────────────────────────────────────────────────────────
 // Open Finance bank connections via Pluggy.
 
