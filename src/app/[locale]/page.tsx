@@ -69,7 +69,7 @@ const features = [
 export default async function LandingPage() {
   const t = await getTranslations('landing')
   return (
-    <div className="min-h-screen bg-ink-900 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-900 text-slate-100 flex flex-col overflow-x-hidden">
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-white/6 bg-ink-900/80 backdrop-blur-md">
@@ -313,12 +313,12 @@ export default async function LandingPage() {
             </div>
 
             {/* CardSwap */}
-            <div className="relative flex-1" style={{ height: 480 }}>
+            <div className="relative flex-1 w-full max-w-full" style={{ height: 420 }}>
               <CardSwap
-                width={420}
-                height={300}
-                cardDistance={50}
-                verticalDistance={55}
+                width={320}
+                height={260}
+                cardDistance={40}
+                verticalDistance={45}
                 delay={4000}
                 pauseOnHover
                 skewAmount={4}
@@ -585,7 +585,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ minHeight: 560 }}>
+      <section className="relative overflow-hidden" style={{ minHeight: 480 }}>
         {/* LaserFlow background */}
         <div aria-hidden className="absolute inset-0">
           <LaserFlow
@@ -640,40 +640,38 @@ export default async function LandingPage() {
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
       <footer className="border-t border-white/6 py-10 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col items-center gap-6">
           <Link href="/" className="relative h-7 w-28 shrink-0">
-            <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain object-left opacity-60" />
+            <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain opacity-60" />
           </Link>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-            <nav className="flex items-center gap-5">
-              <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                {t('footer.privacy')}
-              </Link>
-              <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                {t('footer.terms')}
-              </Link>
-              <a href="mailto:contato@rookmoney.com" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
-                {t('footer.contact')}
-              </a>
-              <a
-                href="https://www.instagram.com/rookmoneybr/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-slate-500 hover:text-pink-400 transition-colors"
-                aria-label="Instagram"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="size-5">
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-                </svg>
-              </a>
-              <LanguageSwitcher />
-            </nav>
-            <p className="text-sm text-slate-600 text-center sm:text-right">
-              &copy; {new Date().getFullYear()} Rook Money · {t('footer.rights')}
-            </p>
-          </div>
+          <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+            <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              {t('footer.privacy')}
+            </Link>
+            <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              {t('footer.terms')}
+            </Link>
+            <a href="mailto:contato@rookmoney.com" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              {t('footer.contact')}
+            </a>
+            <a
+              href="https://www.instagram.com/rookmoneybr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-pink-400 transition-colors"
+              aria-label="Instagram"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="size-5">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+              </svg>
+            </a>
+            <LanguageSwitcher />
+          </nav>
+          <p className="text-xs text-slate-600 text-center">
+            &copy; {new Date().getFullYear()} Rook Money · {t('footer.rights')}
+          </p>
         </div>
       </footer>
 
