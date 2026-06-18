@@ -5,6 +5,7 @@ import { Lock } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { clientApi, type AchievementItem, type AchievementCategory } from '@/lib/api-client'
 import { cn } from '@/lib/utils'
+import { WithTooltip } from '@/components/ui/tooltip'
 
 const CATEGORY_LABELS: Record<AchievementCategory, string> = {
   onboarding:    'categoryOnboarding',
@@ -56,55 +57,78 @@ export function AchievementsGrid({ grouped }: { grouped: GroupedAchievements[] }
               {items.map(a => {
                 let name: string
                 let desc: string
+                let tip: string
                 try { name = ti(`${a.slug}.name`) } catch { name = a.slug }
                 try { desc = ti(`${a.slug}.desc`) } catch { desc = '' }
+                try { tip  = ti(`${a.slug}.tip`)  } catch { tip  = desc }
 
                 return (
-                  <div
+                  <WithTooltip
                     key={a.slug}
-                    className={cn(
-                      'relative rounded-xl border p-4 transition-all duration-200',
-                      a.unlocked
-                        ? `bg-ink-800/80 ${CATEGORY_COLORS[a.category]} shadow-sm`
-                        : 'bg-ink-900/60 border-white/4 opacity-50',
-                      a.unlocked && !a.seen && 'ring-1 ring-amber-400/40 animate-pulse',
-                    )}
-                  >
-                    <img
-                      src={`/achievements/${a.slug}.png`}
-                      alt=""
-                      className={cn(
-                        'size-12 mb-2 rounded-lg object-contain',
-                        !a.unlocked && 'grayscale opacity-40',
-                      )}
-                    />
-
-                    <p className={cn(
-                      'text-sm font-medium truncate',
-                      a.unlocked ? 'text-slate-200' : 'text-slate-600',
-                    )}>
-                      {name}
-                    </p>
-
-                    <p className={cn(
-                      'text-[11px] leading-snug mt-0.5 line-clamp-2',
-                      a.unlocked ? 'text-slate-500' : 'text-slate-700',
-                    )}>
-                      {desc}
-                    </p>
-
-                    {a.unlocked && a.unlockedAt && (
-                      <p className="text-[10px] text-slate-600 mt-2">
-                        {new Date(a.unlockedAt).toLocaleDateString('pt-BR')}
-                      </p>
-                    )}
-
-                    {!a.unlocked && (
-                      <div className="absolute top-3 right-3">
-                        <Lock className="size-3.5 text-slate-700" />
+                    delayDuration={300}
+                    content={
+                      <div className="flex flex-col gap-1 max-w-[220px] py-0.5">
+                        <div className="flex items-center gap-2">
+                          <img src={`/achievements/${a.slug}.png`} alt="" className="size-6 rounded object-contain" />
+                          <span className="font-semibold text-slate-100">{name}</span>
+                        </div>
+                        <p className="text-slate-400 leading-snug">{tip}</p>
+                        {a.unlocked && a.unlockedAt && (
+                          <p className="text-[10px] text-emerald-400 mt-0.5">
+                            Desbloqueada em {new Date(a.unlockedAt).toLocaleDateString('pt-BR')}
+                          </p>
+                        )}
+                        {!a.unlocked && (
+                          <p className="text-[10px] text-slate-600 mt-0.5">Ainda não desbloqueada</p>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    }
+                  >
+                    <div
+                      className={cn(
+                        'relative rounded-xl border p-4 transition-all duration-200 cursor-default',
+                        a.unlocked
+                          ? `bg-ink-800/80 ${CATEGORY_COLORS[a.category]} shadow-sm`
+                          : 'bg-ink-900/60 border-white/4 opacity-50',
+                        a.unlocked && !a.seen && 'ring-1 ring-amber-400/40 animate-pulse',
+                      )}
+                    >
+                      <img
+                        src={`/achievements/${a.slug}.png`}
+                        alt=""
+                        className={cn(
+                          'size-12 mb-2 rounded-lg object-contain',
+                          !a.unlocked && 'grayscale opacity-40',
+                        )}
+                      />
+
+                      <p className={cn(
+                        'text-sm font-medium truncate',
+                        a.unlocked ? 'text-slate-200' : 'text-slate-600',
+                      )}>
+                        {name}
+                      </p>
+
+                      <p className={cn(
+                        'text-[11px] leading-snug mt-0.5 line-clamp-2',
+                        a.unlocked ? 'text-slate-500' : 'text-slate-700',
+                      )}>
+                        {desc}
+                      </p>
+
+                      {a.unlocked && a.unlockedAt && (
+                        <p className="text-[10px] text-slate-600 mt-2">
+                          {new Date(a.unlockedAt).toLocaleDateString('pt-BR')}
+                        </p>
+                      )}
+
+                      {!a.unlocked && (
+                        <div className="absolute top-3 right-3">
+                          <Lock className="size-3.5 text-slate-700" />
+                        </div>
+                      )}
+                    </div>
+                  </WithTooltip>
                 )
               })}
             </div>
