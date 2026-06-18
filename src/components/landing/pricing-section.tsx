@@ -39,9 +39,18 @@ export function PricingSection() {
   return (
     <section id="pricing" className="py-24 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <FadeIn className="text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-100">Planos simples e transparentes</h2>
-          <p className="mt-3 text-slate-400">Comece grátis. Faça upgrade quando precisar.</p>
+        <FadeIn className="flex flex-col items-center mb-10">
+          <div className="relative w-24 sm:w-28 mb-4">
+            <img
+              src="/rookinho/rookinho-coin.png"
+              alt="Rookinho com moeda"
+              width={120}
+              height={140}
+              className="object-contain w-full h-auto drop-shadow-lg"
+            />
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-100 text-center">Planos simples e transparentes</h2>
+          <p className="mt-3 text-slate-400 text-center">Comece grátis. Faça upgrade quando precisar.</p>
         </FadeIn>
 
         {/* Toggle mensal/anual */}

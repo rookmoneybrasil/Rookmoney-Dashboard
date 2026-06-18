@@ -251,6 +251,17 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink
 .bubble-in     { animation: bubble-in     0.3s ease-out forwards; }
 .bubble-out    { animation: bubble-out    0.25s ease-in  forwards; }
 
+@keyframes scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scroll-right {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.animate-scroll-left  { animation: scroll-left  30s linear infinite; width: max-content; }
+.animate-scroll-right { animation: scroll-right 30s linear infinite; width: max-content; }
+
 /* ─── Border Glow (React Bits — exact source port) ────────────────── */
 
 .border-glow-card {

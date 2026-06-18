@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   FileText,
   Target,
-  Banknote,
   PiggyBank,
   BarChart3,
   ArrowRight,
@@ -13,12 +12,17 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
+  Trophy,
+  Users,
+  Repeat,
+  Smartphone,
+  Calendar,
+  Bell,
 } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { BorderGlow } from '@/components/ui/border-glow'
 import { GlassIcon } from '@/components/ui/glass-icons'
 import DarkVeil from '@/components/ui/dark-veil'
-import CardSwap, { Card } from '@/components/ui/card-swap'
 import LaserFlow from '@/components/ui/laser-flow'
 import { FadeIn } from '@/components/ui/fade-in'
 import { PricingSection } from '@/components/landing/pricing-section'
@@ -38,7 +42,7 @@ const features = [
   {
     icon:  FileText,
     title: 'Contas a pagar',
-    description: 'Nunca mais esqueça uma conta. Cadastre vencimentos e receba alertas automáticos.',
+    description: 'Nunca mais esqueça uma conta. Cadastre vencimentos, parcele e receba alertas automáticos.',
   },
   {
     icon:  Target,
@@ -46,9 +50,19 @@ const features = [
     description: 'Defina objetivos, acompanhe o progresso e comemore cada conquista no seu caminho à independência financeira.',
   },
   {
-    icon:  Banknote,
-    title: 'Rendas automáticas',
-    description: 'Registre fontes de renda recorrentes e deixe o Rook calcular automaticamente suas entradas mensais.',
+    icon:  Repeat,
+    title: 'Rendas e contas recorrentes',
+    description: 'Cadastre uma vez e o Rook gera automaticamente suas contas e rendas todo mês, sem esquecer nenhuma.',
+  },
+  {
+    icon:  Users,
+    title: 'Controle de pessoas',
+    description: 'Quem te deve? Quanto você deve? Registre empréstimos, dívidas compartilhadas e acompanhe tudo com clareza.',
+  },
+  {
+    icon:  Trophy,
+    title: 'Conquistas e gamificação',
+    description: 'Ganhe badges ao atingir marcos financeiros. 61 conquistas para manter a motivação em alta.',
   },
   {
     icon:  PiggyBank,
@@ -59,6 +73,11 @@ const features = [
     icon:  BarChart3,
     title: 'Relatórios detalhados',
     description: 'Gráficos e tabelas que revelam padrões de consumo. Exporte em CSV e tome decisões embasadas.',
+  },
+  {
+    icon:  Calendar,
+    title: 'Calendário financeiro',
+    description: 'Visualize todas as suas contas e rendas num calendário. Saiba exatamente o que entra e sai em cada dia.',
   },
 ]
 
@@ -98,19 +117,16 @@ export default async function LandingPage() {
         <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ opacity: 0.45 }}>
           <DarkVeil speed={0.4} hueShift={30} warpAmount={0.2} />
         </div>
-        {/* Dark overlay — garante legibilidade do texto */}
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
           style={{ background: 'rgba(8,14,29,0.55)' }}
         />
-        {/* Fade to page bg at bottom */}
         <div
           aria-hidden
           className="absolute bottom-0 inset-x-0 h-32 pointer-events-none"
           style={{ background: 'linear-gradient(to bottom, transparent, var(--color-ink-900))' }}
         />
-        {/* Fade to page bg at top (blend with header) */}
         <div
           aria-hidden
           className="absolute top-0 inset-x-0 h-16 pointer-events-none"
@@ -118,33 +134,14 @@ export default async function LandingPage() {
         />
 
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-6">
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-6">
 
-            {/* ── Left: mascot ── */}
-            <div className="relative shrink-0 w-64 sm:w-80 lg:w-[420px]">
-              {/* Glow under mascot */}
-              <div
-                aria-hidden
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-16 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.35) 0%, transparent 70%)', filter: 'blur(16px)' }}
-              />
-              <Image
-                src="/ROOKINHO FLUTUANDO.png"
-                alt="Rookinho"
-                width={420}
-                height={420}
-                className="object-contain w-full h-auto mascot-float"
-                priority
-              />
-            </div>
-
-            {/* ── Right: copy ── */}
+            {/* ── Left: copy ── */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left flex-1 min-w-0 pt-4 lg:pt-0">
-              {/* Badge */}
               <FadeIn delay={100}>
                 <div className="inline-flex items-center gap-2 bg-brand-800/60 border border-brand-700/40 text-brand-400 text-xs font-medium px-3 py-1 rounded-full mb-6">
                   <Zap className="size-3" />
-                  Controle financeiro simplificado
+                  {t('hero.badge')}
                 </div>
               </FadeIn>
 
@@ -168,21 +165,21 @@ export default async function LandingPage() {
               </FadeIn>
 
               <FadeIn delay={440}>
-              <div className="mt-8 flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                <Link
-                  href="/register"
-                  className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-500/30"
-                >
-                  {t('hero.cta')}
-                  <ArrowRight className="size-4" />
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center gap-2 border border-white/10 text-slate-300 hover:text-slate-100 hover:border-white/20 font-medium px-6 py-3 rounded-xl transition-colors"
-                >
-                  {t('hero.login')}
-                </Link>
-              </div>
+                <div className="mt-8 flex flex-col sm:flex-row items-center lg:items-start gap-4">
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-500/30"
+                  >
+                    {t('hero.cta')}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-2 border border-white/10 text-slate-300 hover:text-slate-100 hover:border-white/20 font-medium px-6 py-3 rounded-xl transition-colors"
+                  >
+                    {t('hero.login')}
+                  </Link>
+                </div>
               </FadeIn>
 
               <FadeIn delay={540}>
@@ -191,63 +188,117 @@ export default async function LandingPage() {
 
               {/* Mini stat cards */}
               <FadeIn delay={660} className="w-full">
-              <div className="mt-8 grid grid-cols-3 gap-3 w-full max-w-sm lg:max-w-none">
-                <BorderGlow
-                  glowColor="123 80 45"
-                  colors={['#22c55e', '#4ade80', '#16a34a']}
-                  borderRadius={12}
-                  glowIntensity={0.9}
-                  fillOpacity={0.18}
-                  animated
-                >
-                  <div className="p-3 flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <TrendingUp className="size-3 text-success shrink-0" />
-                      <span className="hidden sm:inline">{t('hero.income')}</span>
+                <div className="mt-8 grid grid-cols-3 gap-3 w-full max-w-sm lg:max-w-none">
+                  <BorderGlow
+                    glowColor="123 80 45"
+                    colors={['#22c55e', '#4ade80', '#16a34a']}
+                    borderRadius={12}
+                    glowIntensity={0.9}
+                    fillOpacity={0.18}
+                    animated
+                  >
+                    <div className="p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                        <TrendingUp className="size-3 text-success shrink-0" />
+                        <span className="hidden sm:inline">{t('hero.income')}</span>
+                      </div>
+                      <p className="text-sm sm:text-base font-bold text-success leading-none">+R$&nbsp;6.200</p>
                     </div>
-                    <p className="text-sm sm:text-base font-bold text-success leading-none">+R$&nbsp;6.200</p>
-                  </div>
-                </BorderGlow>
+                  </BorderGlow>
 
-                <BorderGlow
-                  glowColor="3 90 65"
-                  colors={['#f43f5e', '#fb7185', '#e11d48']}
-                  borderRadius={12}
-                  glowIntensity={0.9}
-                  fillOpacity={0.18}
-                  animated
-                >
-                  <div className="p-3 flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <TrendingDown className="size-3 text-danger shrink-0" />
-                      <span className="hidden sm:inline">{t('hero.expenses')}</span>
+                  <BorderGlow
+                    glowColor="3 90 65"
+                    colors={['#f43f5e', '#fb7185', '#e11d48']}
+                    borderRadius={12}
+                    glowIntensity={0.9}
+                    fillOpacity={0.18}
+                    animated
+                  >
+                    <div className="p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                        <TrendingDown className="size-3 text-danger shrink-0" />
+                        <span className="hidden sm:inline">{t('hero.expenses')}</span>
+                      </div>
+                      <p className="text-sm sm:text-base font-bold text-danger leading-none">-R$&nbsp;3.840</p>
                     </div>
-                    <p className="text-sm sm:text-base font-bold text-danger leading-none">-R$&nbsp;3.840</p>
-                  </div>
-                </BorderGlow>
+                  </BorderGlow>
 
-                <BorderGlow
-                  glowColor="213 90 65"
-                  colors={['#3b82f6', '#60a5fa', '#2563eb']}
-                  borderRadius={12}
-                  glowIntensity={0.9}
-                  fillOpacity={0.18}
-                  animated
-                >
-                  <div className="p-3 flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <Wallet className="size-3 text-brand-400 shrink-0" />
-                      <span className="hidden sm:inline">{t('hero.balance')}</span>
+                  <BorderGlow
+                    glowColor="213 90 65"
+                    colors={['#3b82f6', '#60a5fa', '#2563eb']}
+                    borderRadius={12}
+                    glowIntensity={0.9}
+                    fillOpacity={0.18}
+                    animated
+                  >
+                    <div className="p-3 flex flex-col gap-1">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                        <Wallet className="size-3 text-brand-400 shrink-0" />
+                        <span className="hidden sm:inline">{t('hero.balance')}</span>
+                      </div>
+                      <p className="text-sm sm:text-base font-bold text-brand-300 leading-none">+R$&nbsp;2.360</p>
                     </div>
-                    <p className="text-sm sm:text-base font-bold text-brand-300 leading-none">+R$&nbsp;2.360</p>
-                  </div>
-                </BorderGlow>
-              </div>
+                  </BorderGlow>
+                </div>
               </FadeIn>
             </div>
 
+            {/* ── Right: mascot floating with coins ── */}
+            <FadeIn delay={400} from="right" className="relative shrink-0 hidden lg:block">
+              <div className="relative w-[420px]">
+                <div
+                  aria-hidden
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-20 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.4) 0%, transparent 70%)', filter: 'blur(20px)' }}
+                />
+                <Image
+                  src="/ROOKINHO FLUTUANDO.png"
+                  alt="Rookinho flutuando com moedas"
+                  width={420}
+                  height={420}
+                  className="object-contain w-full h-auto drop-shadow-2xl mascot-float"
+                  priority
+                />
+              </div>
+            </FadeIn>
+
+            {/* Mobile mascot */}
+            <FadeIn delay={300} className="lg:hidden">
+              <div className="relative w-56 sm:w-72 mx-auto">
+                <Image
+                  src="/ROOKINHO FLUTUANDO.png"
+                  alt="Rookinho flutuando com moedas"
+                  width={300}
+                  height={300}
+                  className="object-contain w-full h-auto drop-shadow-2xl"
+                  priority
+                />
+              </div>
+            </FadeIn>
+
           </div>
         </div>
+      </section>
+
+      {/* ── App stores ────────────────────────────────────────────── */}
+      <section className="py-10 px-4 sm:px-6 border-b border-white/5">
+        <FadeIn className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
+          <div className="flex items-center gap-3">
+            <Smartphone className="size-5 text-brand-400" />
+            <div>
+              <p className="text-sm font-semibold text-slate-100">Disponível em breve nos apps</p>
+              <p className="text-xs text-slate-500">Web, Android e iOS — suas finanças em qualquer lugar.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <a href="#" className="opacity-90 hover:opacity-100 transition-opacity">
+              <Image src="/rookinho/badge-appstore.png" alt="App Store" width={130} height={40} className="h-10 w-auto" />
+            </a>
+            <a href="#" className="opacity-90 hover:opacity-100 transition-opacity">
+              <Image src="/rookinho/badge-googleplay.png" alt="Google Play" width={130} height={40} className="h-10 w-auto" />
+            </a>
+          </div>
+        </FadeIn>
       </section>
 
       {/* ── Social proof ────────────────────────────────────────────── */}
@@ -287,190 +338,154 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ── App Preview (CardSwap) ──────────────────────────────────── */}
-      <section className="py-16 px-4 sm:px-6">
+      {/* ── Banner Showcase ──────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        {/* Desktop: banner background — full width, image already has dark left side */}
+        <div aria-hidden className="absolute inset-0 hidden sm:block">
+          <Image
+            src="/rookinho/hero-banner-desktop.webp"
+            alt=""
+            fill
+            className="object-cover object-center"
+            unoptimized
+          />
+        </div>
+        {/* Mobile: banner background positioned at bottom */}
+        <div aria-hidden className="absolute inset-0 sm:hidden">
+          <Image
+            src="/rookinho/hero-banner-mobile.webp"
+            alt=""
+            fill
+            className="object-cover object-bottom"
+            unoptimized
+          />
+        </div>
+        {/* Mobile: solid top covering text area, fades only at the very bottom to reveal banner */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none sm:hidden"
+          style={{ background: 'linear-gradient(to bottom, var(--color-ink-900) 0%, var(--color-ink-900) 58%, rgba(8,14,29,0.5) 75%, transparent 90%)' }}
+        />
+        {/* Fade edges into page bg */}
+        <div aria-hidden className="absolute top-0 inset-x-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-ink-900), transparent)' }} />
+        <div aria-hidden className="absolute bottom-0 inset-x-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--color-ink-900), transparent)' }} />
+
+        {/* Mobile: extra bottom padding so the Rookinho illustration shows below text */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-6 py-16 sm:py-24 pb-[480px] sm:pb-24">
+          <div className="sm:max-w-none lg:max-w-[42%] text-center sm:text-left flex flex-col items-center sm:items-start">
+            <FadeIn>
+              <div className="inline-flex items-center gap-2 bg-brand-800/60 border border-brand-700/40 text-brand-400 text-xs font-medium px-3 py-1 rounded-full mb-5 backdrop-blur-sm">
+                <LayoutDashboard className="size-3" />
+                Painel completo
+              </div>
+            </FadeIn>
+            <FadeIn delay={100}>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+                Tudo num só lugar.
+                <br />
+                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg,#818cf8,#6366f1)' }}>
+                  Sem complicação.
+                </span>
+              </h2>
+            </FadeIn>
+            <FadeIn delay={200}>
+              <p className="mt-5 text-slate-300 leading-relaxed max-w-md">
+                Receitas, gastos, saldo do mês, contas em atraso e categorias de despesas — tudo visível de relance. O Rookinho cuida dos números pra você focar no que importa.
+              </p>
+            </FadeIn>
+            <FadeIn delay={300}>
+              <div className="mt-8 grid grid-cols-2 gap-3 max-w-xs">
+                {[
+                  { icon: TrendingUp, label: 'Receitas vs gastos', color: 'text-success' },
+                  { icon: PiggyBank, label: 'Gastos por categoria', color: 'text-brand-400' },
+                  { icon: Bell, label: 'Alertas de atraso', color: 'text-danger' },
+                  { icon: BarChart3, label: 'Evolução mensal', color: 'text-indigo-400' },
+                ].map(({ icon: Icon, label, color }) => (
+                  <div key={label} className="flex items-center gap-2.5 bg-ink-900/60 backdrop-blur-sm border border-white/6 rounded-xl px-3 py-2.5">
+                    <Icon className={`size-4 ${color} shrink-0`} />
+                    <span className="text-xs text-slate-300 font-medium">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+            <FadeIn delay={400}>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-500/30 mt-8"
+              >
+                Experimentar grátis
+                <ArrowRight className="size-4" />
+              </Link>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ── App Preview ──────────────────────────────────────────────── */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
 
             {/* Copy */}
-            <div className="flex flex-col gap-5 lg:w-96 shrink-0 text-center lg:text-left">
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-100 leading-tight">
-                Veja seu dinheiro<br />
-                <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg,#818cf8,#6366f1)' }}>
-                  em tempo real
-                </span>
-              </h2>
-              <p className="text-slate-400 leading-relaxed">
-                Dashboard, relatórios, metas e transações num app só — bonito e rápido no desktop ou celular.
-              </p>
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center lg:justify-start gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-5 py-3 rounded-xl transition-all w-fit mx-auto lg:mx-0 shadow-lg shadow-brand-600/20"
-              >
-                Começar agora
-                <ArrowRight className="size-4" />
-              </Link>
+            <div className="flex flex-col gap-5 lg:w-[420px] shrink-0 text-center lg:text-left">
+              <FadeIn>
+                <h2 className="text-3xl sm:text-4xl font-bold text-slate-100 leading-tight">
+                  Veja seu dinheiro<br />
+                  <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg,#818cf8,#6366f1)' }}>
+                    em tempo real
+                  </span>
+                </h2>
+              </FadeIn>
+              <FadeIn delay={100}>
+                <p className="text-slate-400 leading-relaxed">
+                  Dashboard, relatórios, metas e transações num app só — bonito e rápido no desktop ou celular.
+                </p>
+              </FadeIn>
+              <FadeIn delay={200}>
+                <div className="flex flex-col gap-3 mt-2">
+                  {[
+                    { icon: LayoutDashboard, text: 'Dashboard completo com visão do mês' },
+                    { icon: Smartphone, text: 'Funciona no celular e no computador' },
+                    { icon: Bell, text: 'Alertas de contas e metas' },
+                    { icon: Trophy, text: '61 conquistas para desbloquear' },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="flex items-center gap-3">
+                      <div className="size-8 rounded-lg bg-brand-600/15 border border-brand-600/20 flex items-center justify-center shrink-0">
+                        <Icon className="size-4 text-brand-400" />
+                      </div>
+                      <span className="text-sm text-slate-300">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </FadeIn>
+              <FadeIn delay={300}>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center lg:justify-start gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold px-5 py-3 rounded-xl transition-all w-fit mx-auto lg:mx-0 shadow-lg shadow-brand-600/20 mt-2"
+                >
+                  Começar agora
+                  <ArrowRight className="size-4" />
+                </Link>
+              </FadeIn>
             </div>
 
-            {/* CardSwap — hidden on mobile (overflow: visible causes overlap) */}
-            <div className="relative flex-1 w-full max-w-full h-[420px] hidden md:block">
-              <CardSwap
-                width={320}
-                height={260}
-                cardDistance={40}
-                verticalDistance={45}
-                delay={4000}
-                pauseOnHover
-                skewAmount={4}
-                easing="elastic"
-              >
-                {/* Card 1 — Dashboard */}
-                <Card>
-                  <div className="p-5 flex flex-col gap-4 h-full">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dashboard</span>
-                      <span className="text-xs text-brand-400 bg-brand-900/60 border border-brand-800/60 px-2 py-0.5 rounded-full">Maio 2025</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { label: t('hero.income'),   value: '+R$ 6.200', color: '#22c55e' },
-                        { label: t('hero.expenses'), value: '-R$ 3.840', color: '#f43f5e' },
-                        { label: t('hero.balance'),  value: '+R$ 2.360', color: '#60a5fa' },
-                      ].map(s => (
-                        <div key={s.label} className="bg-ink-700/80 rounded-xl p-3 flex flex-col gap-1">
-                          <span className="text-[10px] text-slate-500">{s.label}</span>
-                          <span className="text-sm font-bold" style={{ color: s.color }}>{s.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex-1 bg-ink-700/50 rounded-xl p-3 flex flex-col gap-2">
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wide">{t('spendingByCategory')}</span>
-                      <div className="flex flex-col gap-1.5 mt-1">
-                        {[
-                          { label: 'Alimentação', pct: 72, color: '#f97316' },
-                          { label: 'Transporte',  pct: 45, color: '#3b82f6' },
-                          { label: 'Lazer',        pct: 30, color: '#a855f7' },
-                        ].map(b => (
-                          <div key={b.label} className="flex items-center gap-2">
-                            <span className="text-[10px] text-slate-500 w-20 shrink-0">{b.label}</span>
-                            <div className="flex-1 h-1.5 bg-ink-600 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full" style={{ width: `${b.pct}%`, backgroundColor: b.color }} />
-                            </div>
-                            <span className="text-[10px] text-slate-600 w-6 text-right">{b.pct}%</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Card 2 — Transações */}
-                <Card>
-                  <div className="p-5 flex flex-col gap-4 h-full">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Transações</span>
-                      <span className="text-xs text-slate-600">20 registros</span>
-                    </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      {[
-                        { label: 'Supermercado Extra',    val: '-R$ 284,50', color: '#f43f5e', date: '28 mai' },
-                        { label: 'Salário — Empresa X',   val: '+R$ 4.200',  color: '#22c55e', date: '25 mai' },
-                        { label: 'Netflix',               val: '-R$ 55,90',  color: '#f43f5e', date: '24 mai' },
-                        { label: 'Freela — Cliente Y',    val: '+R$ 2.000',  color: '#22c55e', date: '22 mai' },
-                        { label: 'Posto de gasolina',     val: '-R$ 180,00', color: '#f43f5e', date: '20 mai' },
-                      ].map(t => (
-                        <div key={t.label} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
-                          <div className="size-7 rounded-lg bg-ink-700 flex items-center justify-center shrink-0">
-                            <div className="size-2 rounded-full" style={{ backgroundColor: t.color }} />
-                          </div>
-                          <span className="flex-1 text-xs text-slate-300 truncate">{t.label}</span>
-                          <span className="text-xs font-semibold shrink-0" style={{ color: t.color }}>{t.val}</span>
-                          <span className="text-[10px] text-slate-600 shrink-0 w-10 text-right">{t.date}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Card 3 — Relatórios */}
-                <Card>
-                  <div className="p-5 flex flex-col gap-4 h-full">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Relatórios</span>
-                      <span className="text-xs text-brand-400 bg-brand-900/60 border border-brand-800/60 px-2 py-0.5 rounded-full">6 meses</span>
-                    </div>
-                    <div className="flex-1 flex flex-col gap-3">
-                      <div className="flex items-end gap-1.5 h-28 px-1">
-                        {[
-                          { month: 'Dez', income: 60, expense: 40 },
-                          { month: 'Jan', income: 75, expense: 55 },
-                          { month: 'Fev', income: 65, expense: 48 },
-                          { month: 'Mar', income: 80, expense: 60 },
-                          { month: 'Abr', income: 70, expense: 50 },
-                          { month: 'Mai', income: 90, expense: 62 },
-                        ].map(m => (
-                          <div key={m.month} className="flex-1 flex flex-col items-center gap-0.5">
-                            <div className="w-full flex flex-col-reverse gap-0.5">
-                              <div className="w-full rounded-sm" style={{ height: `${m.expense * 0.85}px`, backgroundColor: '#f43f5e66' }} />
-                              <div className="w-full rounded-sm" style={{ height: `${m.income * 0.85}px`, backgroundColor: '#3b82f666' }} />
-                            </div>
-                            <span className="text-[9px] text-slate-600 mt-1">{m.month}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-4 justify-center">
-                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-brand-500"/><span className="text-[10px] text-slate-500">{t('chartIncome')}</span></div>
-                        <div className="flex items-center gap-1.5"><div className="size-2 rounded-full bg-danger"/><span className="text-[10px] text-slate-500">{t('chartExpenses')}</span></div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-ink-700/60 rounded-xl p-2.5">
-                          <p className="text-[10px] text-slate-500">Taxa de economia</p>
-                          <p className="text-base font-bold text-success">38%</p>
-                        </div>
-                        <div className="bg-ink-700/60 rounded-xl p-2.5">
-                          <p className="text-[10px] text-slate-500">Melhor mês</p>
-                          <p className="text-base font-bold text-brand-300">Maio</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Card 4 — Metas */}
-                <Card>
-                  <div className="p-5 flex flex-col gap-4 h-full">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Metas</span>
-                      <span className="text-xs text-slate-600">3 ativas</span>
-                    </div>
-                    <div className="flex flex-col gap-3 flex-1">
-                      {[
-                        { name: 'Reserva de emergência', current: 6800,  target: 10000, color: '#3b82f6' },
-                        { name: 'Viagem para Europa',    current: 3200,  target: 8000,  color: '#a855f7' },
-                        { name: 'Notebook novo',         current: 2100,  target: 2500,  color: '#22c55e' },
-                      ].map(g => {
-                        const pct = Math.round((g.current / g.target) * 100)
-                        return (
-                          <div key={g.name} className="bg-ink-700/60 rounded-xl p-3 flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-medium text-slate-200 truncate">{g.name}</span>
-                              <span className="text-xs font-bold shrink-0 ml-2" style={{ color: g.color }}>{pct}%</span>
-                            </div>
-                            <div className="h-1.5 bg-ink-600 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: g.color }} />
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-slate-500">R$ {g.current.toLocaleString('pt-BR')}</span>
-                              <span className="text-[10px] text-slate-600">de R$ {g.target.toLocaleString('pt-BR')}</span>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </Card>
-              </CardSwap>
-            </div>
+            {/* Rookinho with dashboard */}
+            <FadeIn delay={200} from="right" className="flex-1 flex justify-center">
+              <div className="relative w-full max-w-[560px]">
+                <div
+                  aria-hidden
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 w-4/5 h-24 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.3) 0%, transparent 70%)', filter: 'blur(24px)' }}
+                />
+                <Image
+                  src="/rookinho/rookinho-dashboard.png"
+                  alt="Rookinho apresentando o dashboard"
+                  width={960}
+                  height={620}
+                  className="object-contain w-full h-auto drop-shadow-2xl"
+                />
+              </div>
+            </FadeIn>
 
           </div>
         </div>
@@ -515,37 +530,126 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── Achievements ──────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden" style={{ minHeight: 420 }}>
+        {/* Background: 3 rows of achievement icons scrolling */}
+        <div aria-hidden className="absolute inset-0 pointer-events-none flex flex-col justify-center gap-4">
+          {/* Row 1 — left */}
+          <div className="flex gap-4 animate-scroll-left">
+            {['welcome','first-transaction','first-goal','positive-balance','clean-month','debt-free','autopilot','investor','golden-semester','legendary','achiever','dedicated','dream-collector','economist','first-account','first-bill','first-income','goal-reached','dream-machine','punctual','welcome','first-transaction','first-goal','positive-balance','clean-month','debt-free','autopilot','investor','golden-semester','legendary','achiever','dedicated','dream-collector','economist','first-account','first-bill','first-income','goal-reached','dream-machine','punctual'].map((s, i) => (
+              <div key={`a1-${i}`} className="shrink-0 size-32 sm:size-36 rounded-2xl overflow-hidden">
+                <Image src={`/achievements/${s}.png`} alt="" width={144} height={144} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+          {/* Row 2 — right */}
+          <div className="flex gap-4 animate-scroll-right" style={{ animationDuration: '35s' }}>
+            {['organized','flawless-year','big-payment','surplus-3','fortune-teller','lightning-payer','veteran','relentless','frugal','halfway','epic-payment','eternal','financial-network','full-autopilot','full-panorama','goal-millionaire','heavy-deposit','monster-deposit','multi-income','obsessive','organized','flawless-year','big-payment','surplus-3','fortune-teller','lightning-payer','veteran','relentless','frugal','halfway','epic-payment','eternal','financial-network','full-autopilot','full-panorama','goal-millionaire','heavy-deposit','monster-deposit','multi-income','obsessive'].map((s, i) => (
+              <div key={`a2-${i}`} className="shrink-0 size-32 sm:size-36 rounded-2xl overflow-hidden">
+                <Image src={`/achievements/${s}.png`} alt="" width={144} height={144} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+          {/* Row 3 — left */}
+          <div className="flex gap-4 animate-scroll-left" style={{ animationDuration: '40s' }}>
+            {['perfect-quarter','punctuality-legend','rooted','split-right','steady','super-punctual','surplus-6','10-bills','50-bills','100-bills','500-bills','50-transactions','200-transactions','500-transactions','archivist','balance-guardian','complete-profile','diversified','ahead-of-time','cleared-month','perfect-quarter','punctuality-legend','rooted','split-right','steady','super-punctual','surplus-6','10-bills','50-bills','100-bills','500-bills','50-transactions','200-transactions','500-transactions','archivist','balance-guardian','complete-profile','diversified','ahead-of-time','cleared-month'].map((s, i) => (
+              <div key={`a3-${i}`} className="shrink-0 size-32 sm:size-36 rounded-2xl overflow-hidden">
+                <Image src={`/achievements/${s}.png`} alt="" width={144} height={144} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dark overlay */}
+        <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(8,14,29,0.5)' }} />
+        {/* Center spotlight for text readability */}
+        <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 50% 60% at center, rgba(8,14,29,0.85) 0%, rgba(8,14,29,0.3) 60%, transparent 100%)' }} />
+        {/* Side fades */}
+        <div aria-hidden className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--color-ink-900), transparent)' }} />
+        <div aria-hidden className="absolute right-0 top-0 bottom-0 w-24 sm:w-40 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--color-ink-900), transparent)' }} />
+
+        {/* Text content centered */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-24 sm:py-28">
+          <FadeIn>
+            <div className="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-400/25 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full mb-5 uppercase tracking-wider backdrop-blur-sm">
+              <Trophy className="size-3" />
+              Gamificação
+            </div>
+          </FadeIn>
+          <FadeIn delay={100}>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white max-w-lg leading-tight">
+              61 conquistas para desbloquear
+            </h2>
+          </FadeIn>
+          <FadeIn delay={200}>
+            <p className="mt-4 text-slate-300 text-lg max-w-md leading-relaxed">
+              Organize suas finanças e ganhe badges exclusivos. Cada marco financeiro te dá uma conquista com o Rookinho.
+            </p>
+          </FadeIn>
+          <FadeIn delay={300}>
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-ink-900 font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-amber-500/20 mt-8"
+            >
+              Começar a colecionar
+              <Trophy className="size-4" />
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ── Why Rook ────────────────────────────────────────────────── */}
       <section className="py-20 px-4 sm:px-6 bg-ink-800/30">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-            {[
-              {
-                icon: Shield,
-                title: 'Seus dados são seus',
-                desc:  'Dados armazenados com segurança. Nunca compartilhamos suas informações financeiras.',
-              },
-              {
-                icon: Zap,
-                title: 'Rápido e intuitivo',
-                desc:  'Interface limpa e responsiva. Registre transações em segundos, de qualquer dispositivo.',
-              },
-              {
-                icon: TrendingUp,
-                title: 'Insights reais',
-                desc:  'Relatórios que revelam onde seu dinheiro vai e como melhorar seus hábitos financeiros.',
-              },
-            ].map(({ icon: Icon, title, desc }, idx) => (
-              <FadeIn key={title} delay={idx * 120} from="bottom">
-                <div className="flex flex-col items-center gap-4">
-                  <div style={{ fontSize: 18 }}>
-                    <GlassIcon icon={<Icon size={24} />} color="blue" as="div" />
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+            {/* Rookinho thumbs up */}
+            <FadeIn from="left" className="shrink-0">
+              <div className="relative w-48 sm:w-56 lg:w-64">
+                <div
+                  aria-hidden
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-12 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.3) 0%, transparent 70%)', filter: 'blur(14px)' }}
+                />
+                <Image
+                  src="/rookinho/rookinho-thumbsup.png"
+                  alt="Rookinho aprovando"
+                  width={280}
+                  height={340}
+                  className="object-contain w-full h-auto drop-shadow-xl"
+                />
+              </div>
+            </FadeIn>
+
+            {/* Cards */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+              {[
+                {
+                  icon: Shield,
+                  title: 'Seus dados são seus',
+                  desc:  'Protegidos com criptografia TLS 256. Conformidade LGPD. Nunca compartilhamos suas informações.',
+                },
+                {
+                  icon: Zap,
+                  title: 'Rápido e intuitivo',
+                  desc:  'Interface limpa e responsiva. Registre transações em segundos, de qualquer dispositivo.',
+                },
+                {
+                  icon: TrendingUp,
+                  title: 'Insights reais',
+                  desc:  'Relatórios que revelam onde seu dinheiro vai e como melhorar seus hábitos financeiros.',
+                },
+              ].map(({ icon: Icon, title, desc }, idx) => (
+                <FadeIn key={title} delay={idx * 120} from="bottom">
+                  <div className="flex flex-col items-center md:items-start gap-4">
+                    <div style={{ fontSize: 18 }}>
+                      <GlassIcon icon={<Icon size={24} />} color="blue" as="div" />
+                    </div>
+                    <h3 className="font-semibold text-slate-100">{title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
                   </div>
-                  <h3 className="font-semibold text-slate-100">{title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed max-w-xs">{desc}</p>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -610,18 +714,29 @@ export default async function LandingPage() {
         <div aria-hidden className="absolute bottom-0 inset-x-0 h-16 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--color-ink-900), transparent)' }} />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-28 gap-7">
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 py-24 gap-7">
           <FadeIn>
+            <div className="relative w-32 sm:w-40 mb-2">
+              <Image
+                src="/rookinho/rookinho-phone.png"
+                alt="Rookinho com o app"
+                width={180}
+                height={200}
+                className="object-contain w-full h-auto drop-shadow-2xl"
+              />
+            </div>
+          </FadeIn>
+          <FadeIn delay={100}>
             <h2 className="text-3xl sm:text-5xl font-bold text-slate-100 max-w-xl leading-tight">
               {t('cta.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 ? <br /> : ''}</span>)}
             </h2>
           </FadeIn>
-          <FadeIn delay={150}>
+          <FadeIn delay={200}>
             <p className="text-slate-400 text-lg max-w-md leading-relaxed">
               {t('cta.description')}
             </p>
           </FadeIn>
-          <FadeIn delay={280}>
+          <FadeIn delay={300}>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Link
               href="/register"
