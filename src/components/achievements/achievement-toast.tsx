@@ -72,9 +72,11 @@ export function AchievementToastProvider() {
             }}
             className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-ink-800 border border-amber-400/30 shadow-[0_8px_32px_rgba(251,191,36,0.15)] animate-in slide-in-from-right-5 duration-300 cursor-pointer hover:border-amber-400/50 transition-colors group max-w-sm"
           >
-            <div className="size-10 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-lg shrink-0">
-              {toast.icon}
-            </div>
+            <img
+              src={`/achievements/${toast.slug}.png`}
+              alt=""
+              className="size-10 rounded-lg shrink-0 object-contain"
+            />
             <div className="flex-1 min-w-0 text-left">
               <p className="text-[10px] font-semibold text-amber-400 uppercase tracking-wider">
                 Conquista desbloqueada!

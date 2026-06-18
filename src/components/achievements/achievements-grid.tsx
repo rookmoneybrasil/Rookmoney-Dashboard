@@ -70,12 +70,14 @@ export function AchievementsGrid({ grouped }: { grouped: GroupedAchievements[] }
                       a.unlocked && !a.seen && 'ring-1 ring-amber-400/40 animate-pulse',
                     )}
                   >
-                    <div className={cn(
-                      'text-2xl mb-2',
-                      !a.unlocked && 'grayscale blur-[1px]',
-                    )}>
-                      {a.icon}
-                    </div>
+                    <img
+                      src={`/achievements/${a.slug}.png`}
+                      alt=""
+                      className={cn(
+                        'size-12 mb-2 rounded-lg object-contain',
+                        !a.unlocked && 'grayscale opacity-40',
+                      )}
+                    />
 
                     <p className={cn(
                       'text-sm font-medium truncate',
