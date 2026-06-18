@@ -541,10 +541,10 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink
 }
 
 @media (max-width: 768px) {
-  .card-swap-container { transform: scale(0.75) translate(25%, 25%); }
+  .card-swap-container { transform: translate(-50%, -50%) scale(0.8); }
 }
 @media (max-width: 480px) {
-  .card-swap-container { transform: scale(0.55) translate(25%, 25%); }
+  .card-swap-container { transform: translate(-50%, -50%) scale(0.65); }
 }
 
 /* ─── Print / PDF ─────────────────────────────────────────────────── */

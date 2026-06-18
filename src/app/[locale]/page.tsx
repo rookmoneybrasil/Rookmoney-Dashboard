@@ -313,7 +313,7 @@ export default async function LandingPage() {
             </div>
 
             {/* CardSwap */}
-            <div className="relative flex-1 w-full max-w-full" style={{ height: 420 }}>
+            <div className="relative flex-1 w-full max-w-full h-[320px] sm:h-[380px] lg:h-[420px]">
               <CardSwap
                 width={320}
                 height={260}
