@@ -312,8 +312,8 @@ export default async function LandingPage() {
               </Link>
             </div>
 
-            {/* CardSwap */}
-            <div className="relative flex-1 w-full max-w-full h-[320px] sm:h-[380px] lg:h-[420px]">
+            {/* CardSwap — hidden on mobile (overflow: visible causes overlap) */}
+            <div className="relative flex-1 w-full max-w-full h-[420px] hidden md:block">
               <CardSwap
                 width={320}
                 height={260}
