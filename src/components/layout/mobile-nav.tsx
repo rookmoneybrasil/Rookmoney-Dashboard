@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, ArrowLeftRight, FileText, Banknote,
   Target, PiggyBank, BarChart3, Tag, Settings, LogOut,
-  X, Menu, Upload, Users, CalendarDays,
+  X, Menu, Upload, Users, CalendarDays, TrendingUp, Trophy,
 } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { useTranslations } from 'next-intl'
@@ -39,14 +39,16 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
   ]
 
   const MORE_NAV = [
-    { href: '/transactions', icon: ArrowLeftRight, label: t('transactions') },
-    { href: '/goals',        icon: Target,         label: t('goals')        },
-    { href: '/budget',     icon: PiggyBank,   label: t('budget')      },
-    { href: '/calendar',   icon: CalendarDays,label: t('calendar')    },
-    { href: '/reports',    icon: BarChart3,   label: t('reports')     },
-    { href: '/import',     icon: Upload,      label: t('import')      },
-    { href: '/categories', icon: Tag,         label: t('categories')  },
-    { href: '/settings',   icon: Settings,    label: t('settings')    },
+    { href: '/transactions',  icon: ArrowLeftRight, label: t('transactions')  },
+    { href: '/goals',         icon: Target,         label: t('goals')         },
+    { href: '/budget',        icon: PiggyBank,      label: t('budget')        },
+    { href: '/calendar',      icon: CalendarDays,   label: t('calendar')      },
+    { href: '/projection',    icon: TrendingUp,     label: t('projection')    },
+    { href: '/reports',       icon: BarChart3,      label: t('reports')       },
+    { href: '/achievements',  icon: Trophy,         label: t('achievements')  },
+    { href: '/import',        icon: Upload,         label: t('import')        },
+    { href: '/categories',    icon: Tag,            label: t('categories')    },
+    { href: '/settings',      icon: Settings,       label: t('settings')      },
   ]
 
   const isMoreActive   = MORE_NAV.some((n) => pathname.startsWith(n.href))
