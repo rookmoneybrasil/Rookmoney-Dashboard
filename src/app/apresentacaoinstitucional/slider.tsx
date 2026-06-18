@@ -143,30 +143,30 @@ function SlideFrame({ children, className = '' }: { children: React.ReactNode; c
   )
 }
 
-function BannerSlide({ src, children, position = '70% center' }: { src: string; children: React.ReactNode; position?: string }) {
+function BannerSlide({ src, children, position = 'right center' }: { src: string; children: React.ReactNode; position?: string }) {
   return (
     <div className="flex-shrink-0 w-full h-full snap-start snap-always overflow-hidden relative">
       <div aria-hidden className="absolute inset-0">
         <Image src={src} alt="" fill style={{ objectFit: 'cover', objectPosition: position }} unoptimized />
       </div>
-      {/* Desktop: narrow gradient — Rookinho stays visible */}
+      {/* Desktop: solid left where text sits, fade in the middle, Rookinho clear on right */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none hidden sm:block"
-        style={{ background: 'linear-gradient(to right, var(--color-ink-900) 0%, rgba(8,14,29,0.85) 18%, rgba(8,14,29,0.5) 32%, rgba(8,14,29,0.15) 46%, transparent 60%)' }}
+        style={{ background: 'linear-gradient(to right, var(--color-ink-900) 0%, var(--color-ink-900) 28%, rgba(8,14,29,0.7) 38%, rgba(8,14,29,0.2) 50%, transparent 62%)' }}
       />
-      {/* Mobile: top solid for text, bottom reveals Rookinho */}
+      {/* Mobile: solid top for text, Rookinho visible at bottom */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none sm:hidden"
-        style={{ background: 'linear-gradient(to bottom, var(--color-ink-900) 0%, rgba(8,14,29,0.85) 35%, rgba(8,14,29,0.3) 55%, transparent 75%)' }}
+        style={{ background: 'linear-gradient(to bottom, var(--color-ink-900) 0%, var(--color-ink-900) 40%, rgba(8,14,29,0.5) 55%, rgba(8,14,29,0.15) 70%, transparent 85%)' }}
       />
       <div aria-hidden className="absolute top-0 inset-x-0 h-12 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-ink-900), transparent)' }} />
       <div aria-hidden className="absolute bottom-0 inset-x-0 h-12 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--color-ink-900), transparent)' }} />
 
       <div className="relative z-10 h-full w-full overflow-y-auto sm:overflow-y-hidden flex items-start sm:items-center px-5 py-16 sm:px-12 lg:px-16 scrollbar-hide">
         <div className="w-full max-w-5xl mx-auto">
-          <div className="sm:max-w-[40%] lg:max-w-[36%] flex flex-col items-center sm:items-start text-center sm:text-left">
+          <div className="sm:max-w-[42%] lg:max-w-[38%] flex flex-col items-center sm:items-start text-center sm:text-left">
             {children}
           </div>
         </div>
@@ -273,7 +273,7 @@ function Slide01() {
 
 function Slide02() {
   return (
-    <BannerSlide src="/apresentacao/fugindo-contas.png" position="75% center">
+    <BannerSlide src="/apresentacao/fugindo-contas.png">
       <Badge icon={TrendingUp} text="Cenário" color="red" />
       <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
         O desafio financeiro<br />
@@ -454,7 +454,7 @@ function Slide07() {
 
 function Slide08() {
   return (
-    <BannerSlide src="/apresentacao/metas-foco.png" position="75% center">
+    <BannerSlide src="/apresentacao/metas-foco.png">
       <Badge icon={Target} text="Metas" color="green" />
       <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
         Defina metas e<br />
