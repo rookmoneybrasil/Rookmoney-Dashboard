@@ -134,7 +134,7 @@ export function InstitutionalSlider() {
 function SlideFrame({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`flex-shrink-0 w-full h-full snap-start snap-always overflow-hidden relative ${className}`}>
-      <div className="h-full w-full flex items-center justify-center p-6 sm:p-12 lg:p-16">
+      <div className="h-full w-full overflow-y-auto sm:overflow-y-hidden flex items-start sm:items-center justify-center px-5 py-16 sm:p-12 lg:p-16 scrollbar-hide">
         <div className="w-full max-w-5xl mx-auto">
           {children}
         </div>
@@ -171,13 +171,13 @@ function GradientText({ children }: { children: React.ReactNode }) {
 
 function FeatureCard({ icon: Icon, title, desc }: { icon: typeof Zap; title: string; desc: string }) {
   return (
-    <div className="bg-ink-800 border border-white/6 rounded-2xl p-5 flex gap-4 items-start">
-      <div className="size-10 rounded-xl bg-brand-600/15 border border-brand-600/20 flex items-center justify-center shrink-0">
-        <Icon className="size-5 text-brand-400" />
+    <div className="bg-ink-800 border border-white/6 rounded-xl sm:rounded-2xl p-3 sm:p-5 flex gap-3 sm:gap-4 items-start">
+      <div className="size-8 sm:size-10 rounded-lg sm:rounded-xl bg-brand-600/15 border border-brand-600/20 flex items-center justify-center shrink-0">
+        <Icon className="size-4 sm:size-5 text-brand-400" />
       </div>
       <div>
-        <h4 className="font-semibold text-slate-100 text-sm mb-1">{title}</h4>
-        <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+        <h4 className="font-semibold text-slate-100 text-xs sm:text-sm mb-0.5 sm:mb-1">{title}</h4>
+        <p className="text-[11px] sm:text-xs text-slate-500 leading-relaxed">{desc}</p>
       </div>
     </div>
   )
@@ -339,26 +339,26 @@ function Slide04() {
 function Slide05() {
   return (
     <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
         <div className="shrink-0 order-1 lg:order-1">
           <Image
             src="/rookinho-organizando.png"
             alt="Rookinho organizando contas"
             width={380}
             height={280}
-            className="w-64 sm:w-80 h-auto rounded-2xl drop-shadow-xl"
+            className="w-40 sm:w-80 h-auto rounded-2xl drop-shadow-xl"
           />
         </div>
         <div className="flex-1 text-center lg:text-left order-2">
           <Badge icon={FileText} text="Contas" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
             Nunca mais esqueça<br />
             <GradientText>uma conta</GradientText>
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
             Cadastre suas contas, parcele, organize por categorias e receba alertas antes do vencimento.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
             <FeatureCard icon={Bell} title="Alertas automáticos" desc="Notificações antes do vencimento" />
             <FeatureCard icon={Repeat} title="Contas recorrentes" desc="Cadastre uma vez, gera todo mês" />
             <FeatureCard icon={Calendar} title="Parcelas" desc="Controle de parcelas e prestações" />
@@ -373,24 +373,24 @@ function Slide05() {
 function Slide06() {
   return (
     <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
         <div className="flex-1 text-center lg:text-left">
           <Badge icon={Wallet} text="Rendas" color="green" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
             Suas rendas<br />
             <GradientText>sob controle</GradientText>
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
             Registre todas as fontes de receita — salário, freelance, investimentos. Rendas recorrentes são geradas automaticamente todo mês.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
             <FeatureCard icon={DollarSign} title="Múltiplas fontes" desc="Salário, freelance, aluguel e mais" />
             <FeatureCard icon={Repeat} title="Rendas recorrentes" desc="Automático todo mês, sem esforço" />
             <FeatureCard icon={TrendingUp} title="Evolução mensal" desc="Acompanhe o crescimento da receita" />
             <FeatureCard icon={BarChart3} title="Receita vs gastos" desc="Compare e entenda seu saldo real" />
           </div>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 hidden sm:block">
           <Image
             src="/SVG/CONTANDO DINHEIRO.svg"
             alt="Rookinho contando dinheiro"
@@ -502,8 +502,8 @@ function Slide08() {
 function Slide09() {
   return (
     <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <div className="shrink-0 order-1">
+      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
+        <div className="shrink-0 order-1 hidden sm:block">
           <Image
             src="/SVG/CONTANDO ORGANIZANDO DINHEIRO.svg"
             alt="Rookinho organizando"
@@ -514,14 +514,14 @@ function Slide09() {
         </div>
         <div className="flex-1 text-center lg:text-left order-2">
           <Badge icon={Users} text="Pessoas" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
             Quem te deve?<br />
             <GradientText>Quanto você deve?</GradientText>
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
             Registre empréstimos, dívidas compartilhadas e acompanhe tudo com clareza. Saiba exatamente quem deve o quê a qualquer momento.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
             <FeatureCard icon={Users} title="Perfis de pessoas" desc="Cadastre amigos, familiares, colegas" />
             <FeatureCard icon={DollarSign} title="Empréstimos" desc="Quem te deve e quanto você deve" />
             <FeatureCard icon={FileText} title="Histórico completo" desc="Todas as transações por pessoa" />
@@ -579,24 +579,24 @@ function Slide10() {
 function Slide11() {
   return (
     <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
         <div className="flex-1 text-center lg:text-left">
           <Badge icon={BarChart3} text="Relatórios" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
             Insights que fazem<br />
             <GradientText>diferença</GradientText>
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
             Gráficos e tabelas que revelam padrões de consumo. Entenda pra onde vai cada centavo e tome decisões mais inteligentes.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
             <FeatureCard icon={BarChart3} title="Gráficos detalhados" desc="Gastos por categoria, evolução mensal" />
             <FeatureCard icon={TrendingUp} title="Tendências" desc="Compare meses e identifique padrões" />
             <FeatureCard icon={FileText} title="Exportar CSV" desc="Baixe seus dados para planilhas" />
             <FeatureCard icon={Eye} title="Visão 360°" desc="Receitas, gastos e saldo consolidados" />
           </div>
         </div>
-        <div className="shrink-0">
+        <div className="shrink-0 hidden sm:block">
           <Image
             src="/rookinho-usando-app.png"
             alt="Rookinho usando o app"
@@ -733,8 +733,8 @@ function Slide13() {
 function Slide14() {
   return (
     <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <div className="shrink-0 order-1">
+      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
+        <div className="shrink-0 order-1 hidden sm:block">
           <div className="relative w-44 sm:w-56 lg:w-64 flex items-center justify-center">
             <div
               aria-hidden
@@ -748,14 +748,14 @@ function Slide14() {
         </div>
         <div className="flex-1 text-center lg:text-left order-2">
           <Badge icon={Lock} text="Segurança" color="green" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
             Seus dados<br />
             <GradientText>protegidos</GradientText>
           </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
+          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
             Privacidade e segurança são prioridade. Seus dados financeiros são seus — nunca compartilhamos nem vendemos informações.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
             <FeatureCard icon={Lock} title="Criptografia TLS 256" desc="Dados protegidos em trânsito e em repouso" />
             <FeatureCard icon={Shield} title="Conformidade LGPD" desc="Respeito total à lei de proteção de dados" />
             <FeatureCard icon={Eye} title="Transparência total" desc="Você decide o que compartilhar" />
@@ -770,51 +770,51 @@ function Slide14() {
 function Slide15() {
   return (
     <SlideFrame>
-      <div className="flex flex-col items-center text-center gap-6 sm:gap-8">
+      <div className="flex flex-col items-center text-center gap-3 sm:gap-8">
         <Image
           src="/rookinho/rookinho-board.png"
           alt="Rookinho"
           width={200}
           height={240}
-          className="w-32 sm:w-40 h-auto drop-shadow-xl"
+          className="w-24 sm:w-40 h-auto drop-shadow-xl"
         />
         <div>
-          <h2 className="text-3xl sm:text-5xl font-bold leading-tight">
+          <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
             Comece agora.<br />
             <GradientText>É grátis.</GradientText>
           </h2>
-          <p className="mt-4 text-slate-400 text-base sm:text-lg max-w-lg mx-auto">
+          <p className="mt-2 sm:mt-4 text-sm sm:text-lg text-slate-400 max-w-lg mx-auto">
             Crie sua conta em segundos e comece a organizar suas finanças hoje. Sem cartão de crédito, sem compromisso.
           </p>
         </div>
 
         {/* Plan comparison */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg w-full">
-          <div className="bg-ink-800 border border-white/6 rounded-2xl p-5 text-center">
-            <p className="text-sm font-semibold text-slate-300 mb-1">Gratuito</p>
-            <p className="text-3xl font-bold text-white">R$ 0</p>
-            <p className="text-xs text-slate-500 mt-1">Para sempre</p>
-            <div className="flex flex-col gap-1.5 mt-4 text-xs text-left">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-lg w-full">
+          <div className="bg-ink-800 border border-white/6 rounded-xl sm:rounded-2xl p-3 sm:p-5 text-center">
+            <p className="text-xs sm:text-sm font-semibold text-slate-300 mb-0.5 sm:mb-1">Gratuito</p>
+            <p className="text-xl sm:text-3xl font-bold text-white">R$ 0</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">Para sempre</p>
+            <div className="flex flex-col gap-1 sm:gap-1.5 mt-2 sm:mt-4 text-[10px] sm:text-xs text-left">
               {['Dashboard completo', 'Até 15 contas/mês', 'Metas e conquistas', 'Relatórios básicos'].map((f) => (
-                <div key={f} className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
+                <div key={f} className="flex items-center gap-1.5 sm:gap-2">
+                  <CheckCircle2 className="size-3 sm:size-3.5 text-emerald-400 shrink-0" />
                   <span className="text-slate-400">{f}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="bg-ink-800 border border-brand-600/40 rounded-2xl p-5 text-center relative overflow-hidden">
+          <div className="bg-ink-800 border border-brand-600/40 rounded-xl sm:rounded-2xl p-3 sm:p-5 text-center relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-600 to-indigo-500" />
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <Crown className="size-3.5 text-amber-400" />
-              <p className="text-sm font-semibold text-brand-400">Pro</p>
+            <div className="flex items-center justify-center gap-1 mb-0.5 sm:mb-1">
+              <Crown className="size-3 sm:size-3.5 text-amber-400" />
+              <p className="text-xs sm:text-sm font-semibold text-brand-400">Pro</p>
             </div>
-            <p className="text-3xl font-bold text-white">R$ 9<span className="text-lg">,90</span></p>
-            <p className="text-xs text-slate-500 mt-1">/mês</p>
-            <div className="flex flex-col gap-1.5 mt-4 text-xs text-left">
+            <p className="text-xl sm:text-3xl font-bold text-white">R$ 9<span className="text-sm sm:text-lg">,90</span></p>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1">/mês</p>
+            <div className="flex flex-col gap-1 sm:gap-1.5 mt-2 sm:mt-4 text-[10px] sm:text-xs text-left">
               {['Tudo do Gratuito', 'Contas ilimitadas', 'Relatórios avançados', 'Suporte prioritário'].map((f) => (
-                <div key={f} className="flex items-center gap-2">
-                  <Star className="size-3.5 text-brand-400 shrink-0" />
+                <div key={f} className="flex items-center gap-1.5 sm:gap-2">
+                  <Star className="size-3 sm:size-3.5 text-brand-400 shrink-0" />
                   <span className="text-slate-400">{f}</span>
                 </div>
               ))}
