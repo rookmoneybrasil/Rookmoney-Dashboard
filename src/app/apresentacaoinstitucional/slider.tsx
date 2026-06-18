@@ -143,6 +143,41 @@ function SlideFrame({ children, className = '' }: { children: React.ReactNode; c
   )
 }
 
+function BannerSlide({ src, children, position = 'center' }: { src: string; children: React.ReactNode; position?: string }) {
+  return (
+    <div className="flex-shrink-0 w-full h-full snap-start snap-always overflow-hidden relative">
+      {/* Background image */}
+      <div aria-hidden className="absolute inset-0">
+        <Image src={src} alt="" fill className={`object-cover object-${position}`} unoptimized />
+      </div>
+      {/* Desktop: gradient overlay from left */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none hidden sm:block"
+        style={{ background: 'linear-gradient(to right, var(--color-ink-900) 0%, var(--color-ink-900) 35%, rgba(8,14,29,0.7) 55%, rgba(8,14,29,0.3) 75%, transparent 100%)' }}
+      />
+      {/* Mobile: solid top + fade to reveal image at bottom */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none sm:hidden"
+        style={{ background: 'linear-gradient(to bottom, var(--color-ink-900) 0%, var(--color-ink-900) 50%, rgba(8,14,29,0.5) 70%, transparent 90%)' }}
+      />
+      {/* Top + bottom fade */}
+      <div aria-hidden className="absolute top-0 inset-x-0 h-12 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-ink-900), transparent)' }} />
+      <div aria-hidden className="absolute bottom-0 inset-x-0 h-12 pointer-events-none" style={{ background: 'linear-gradient(to top, var(--color-ink-900), transparent)' }} />
+
+      {/* Content on the left */}
+      <div className="relative z-10 h-full w-full overflow-y-auto sm:overflow-y-hidden flex items-start sm:items-center px-5 py-16 sm:px-12 lg:px-16 scrollbar-hide">
+        <div className="w-full max-w-5xl mx-auto">
+          <div className="sm:max-w-[50%] lg:max-w-[45%] flex flex-col items-center sm:items-start text-center sm:text-left">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Badge({ icon: Icon, text, color = 'brand' }: { icon: typeof Zap; text: string; color?: string }) {
   const colors: Record<string, string> = {
     brand:  'bg-brand-800/60 border-brand-700/40 text-brand-400',
@@ -241,26 +276,22 @@ function Slide01() {
 
 function Slide02() {
   return (
-    <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <div className="flex-1 text-center lg:text-left">
-          <Badge icon={TrendingUp} text="Cenário" color="red" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
-            O desafio financeiro<br />
-            <GradientText>do brasileiro</GradientText>
-          </h2>
-          <p className="text-slate-400 leading-relaxed max-w-md mx-auto lg:mx-0">
-            A maioria dos brasileiros não controla suas finanças. O resultado? Dívidas, estresse e falta de perspectiva para o futuro.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 flex-1 w-full max-w-md">
-          <StatCard value="78%" label="não controlam gastos mensais" color="red" />
-          <StatCard value="72M" label="de inadimplentes no Brasil" color="red" />
-          <StatCard value="63%" label="não têm reserva de emergência" color="amber" />
-          <StatCard value="45%" label="já perderam o sono por dívidas" color="amber" />
-        </div>
+    <BannerSlide src="/apresentacao/fugindo-contas.png" position="right">
+      <Badge icon={TrendingUp} text="Cenário" color="red" />
+      <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
+        O desafio financeiro<br />
+        <GradientText>do brasileiro</GradientText>
+      </h2>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-5 sm:mb-6">
+        A maioria dos brasileiros não controla suas finanças. O resultado? Dívidas, estresse e falta de perspectiva para o futuro.
+      </p>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+        <StatCard value="78%" label="não controlam gastos mensais" color="red" />
+        <StatCard value="72M" label="de inadimplentes no Brasil" color="red" />
+        <StatCard value="63%" label="não têm reserva de emergência" color="amber" />
+        <StatCard value="45%" label="já perderam o sono por dívidas" color="amber" />
       </div>
-    </SlideFrame>
+    </BannerSlide>
   )
 }
 
@@ -338,35 +369,22 @@ function Slide04() {
 
 function Slide05() {
   return (
-    <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
-        <div className="shrink-0 order-1 lg:order-1">
-          <Image
-            src="/rookinho-organizando.png"
-            alt="Rookinho organizando contas"
-            width={380}
-            height={280}
-            className="w-40 sm:w-80 h-auto rounded-2xl drop-shadow-xl"
-          />
-        </div>
-        <div className="flex-1 text-center lg:text-left order-2">
-          <Badge icon={FileText} text="Contas" />
-          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
-            Nunca mais esqueça<br />
-            <GradientText>uma conta</GradientText>
-          </h2>
-          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
-            Cadastre suas contas, parcele, organize por categorias e receba alertas antes do vencimento.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
-            <FeatureCard icon={Bell} title="Alertas automáticos" desc="Notificações antes do vencimento" />
-            <FeatureCard icon={Repeat} title="Contas recorrentes" desc="Cadastre uma vez, gera todo mês" />
-            <FeatureCard icon={Calendar} title="Parcelas" desc="Controle de parcelas e prestações" />
-            <FeatureCard icon={CheckCircle2} title="Marcar como pago" desc="Um clique para registrar pagamento" />
-          </div>
-        </div>
+    <BannerSlide src="/apresentacao/organizando-contas.png">
+      <Badge icon={FileText} text="Contas" />
+      <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
+        Nunca mais esqueça<br />
+        <GradientText>uma conta</GradientText>
+      </h2>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6">
+        Cadastre suas contas, parcele, organize por categorias e receba alertas antes do vencimento.
+      </p>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+        <FeatureCard icon={Bell} title="Alertas automáticos" desc="Notificações antes do vencimento" />
+        <FeatureCard icon={Repeat} title="Contas recorrentes" desc="Cadastre uma vez, gera todo mês" />
+        <FeatureCard icon={Calendar} title="Parcelas" desc="Controle de parcelas e prestações" />
+        <FeatureCard icon={CheckCircle2} title="Marcar como pago" desc="Um clique para registrar pagamento" />
       </div>
-    </SlideFrame>
+    </BannerSlide>
   )
 }
 
@@ -406,96 +424,70 @@ function Slide06() {
 
 function Slide07() {
   return (
-    <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <div className="shrink-0 order-1">
-          <Image
-            src="/SVG/ACUMULANDO DINHEIRO.svg"
-            alt="Rookinho acumulando dinheiro"
-            width={260}
-            height={260}
-            className="w-44 sm:w-56 lg:w-64 h-auto drop-shadow-xl"
-          />
-        </div>
-        <div className="flex-1 text-center lg:text-left order-2">
-          <Badge icon={PiggyBank} text="Orçamento" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
-            Orçamento por<br />
-            <GradientText>categoria</GradientText>
-          </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
-            Defina limites de gastos por categoria e saiba exatamente quanto pode gastar. Alertas visuais avisam quando está chegando no limite.
-          </p>
-          <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0">
-            {[
-              { label: 'Alimentação', pct: 73, color: 'bg-amber-500' },
-              { label: 'Transporte', pct: 45, color: 'bg-brand-500' },
-              { label: 'Lazer', pct: 92, color: 'bg-rose-500' },
-              { label: 'Saúde', pct: 30, color: 'bg-emerald-500' },
-            ].map(({ label, pct, color }) => (
-              <div key={label}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-slate-300">{label}</span>
-                  <span className={pct > 80 ? 'text-rose-400 font-semibold' : 'text-slate-500'}>{pct}%</span>
-                </div>
-                <div className="h-2.5 bg-ink-700 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            ))}
+    <BannerSlide src="/apresentacao/comprando.png">
+      <Badge icon={PiggyBank} text="Orçamento" />
+      <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
+        Orçamento por<br />
+        <GradientText>categoria</GradientText>
+      </h2>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6">
+        Defina limites de gastos por categoria e saiba exatamente quanto pode gastar. Alertas visuais avisam quando está chegando no limite.
+      </p>
+      <div className="flex flex-col gap-3 sm:gap-4 w-full">
+        {[
+          { label: 'Alimentação', pct: 73, color: 'bg-amber-500' },
+          { label: 'Transporte', pct: 45, color: 'bg-brand-500' },
+          { label: 'Lazer', pct: 92, color: 'bg-rose-500' },
+          { label: 'Saúde', pct: 30, color: 'bg-emerald-500' },
+        ].map(({ label, pct, color }) => (
+          <div key={label}>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-slate-200">{label}</span>
+              <span className={pct > 80 ? 'text-rose-400 font-semibold' : 'text-slate-400'}>{pct}%</span>
+            </div>
+            <div className="h-2.5 bg-ink-700/80 rounded-full overflow-hidden backdrop-blur-sm">
+              <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+            </div>
           </div>
-        </div>
+        ))}
       </div>
-    </SlideFrame>
+    </BannerSlide>
   )
 }
 
 function Slide08() {
   return (
-    <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-        <div className="flex-1 text-center lg:text-left">
-          <Badge icon={Target} text="Metas" color="green" />
-          <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-4">
-            Defina metas e<br />
-            <GradientText>conquiste sonhos</GradientText>
-          </h2>
-          <p className="text-slate-400 leading-relaxed mb-6 max-w-md mx-auto lg:mx-0">
-            Quer uma viagem? Um carro novo? Reserva de emergência? Crie metas, faça depósitos e acompanhe o progresso até chegar lá.
-          </p>
-          <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0">
-            {[
-              { label: 'Viagem Europa', current: 8500, target: 15000, emoji: '✈️' },
-              { label: 'Reserva de emergência', current: 12000, target: 20000, emoji: '🛡️' },
-              { label: 'MacBook Pro', current: 6800, target: 8000, emoji: '💻' },
-            ].map(({ label, current, target, emoji }) => (
-              <div key={label} className="bg-ink-800 border border-white/6 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span>{emoji}</span>
-                  <span className="text-sm font-semibold text-slate-200">{label}</span>
-                </div>
-                <div className="h-2.5 bg-ink-700 rounded-full overflow-hidden mb-2">
-                  <div className="h-full rounded-full bg-brand-500" style={{ width: `${(current / target) * 100}%` }} />
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-brand-400 font-semibold">R$ {current.toLocaleString('pt-BR')}</span>
-                  <span className="text-slate-500">de R$ {target.toLocaleString('pt-BR')}</span>
-                </div>
-              </div>
-            ))}
+    <BannerSlide src="/apresentacao/metas-foco.png" position="right">
+      <Badge icon={Target} text="Metas" color="green" />
+      <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
+        Defina metas e<br />
+        <GradientText>conquiste sonhos</GradientText>
+      </h2>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6">
+        Quer uma viagem? Um carro novo? Reserva de emergência? Crie metas, faça depósitos e acompanhe o progresso até chegar lá.
+      </p>
+      <div className="flex flex-col gap-3 w-full">
+        {[
+          { label: 'Viagem Europa', current: 8500, target: 15000, emoji: '✈️' },
+          { label: 'Reserva de emergência', current: 12000, target: 20000, emoji: '🛡️' },
+          { label: 'MacBook Pro', current: 6800, target: 8000, emoji: '💻' },
+        ].map(({ label, current, target, emoji }) => (
+          <div key={label} className="bg-ink-800/80 backdrop-blur-sm border border-white/6 rounded-xl p-3 sm:p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span>{emoji}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-200">{label}</span>
+            </div>
+            <div className="h-2 sm:h-2.5 bg-ink-700 rounded-full overflow-hidden mb-2">
+              <div className="h-full rounded-full bg-brand-500" style={{ width: `${(current / target) * 100}%` }} />
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-brand-400 font-semibold">R$ {current.toLocaleString('pt-BR')}</span>
+              <span className="text-slate-400">de R$ {target.toLocaleString('pt-BR')}</span>
+            </div>
           </div>
-        </div>
-        <div className="shrink-0">
-          <Image
-            src="/rookinho/rookinho-coin.png"
-            alt="Rookinho com moeda"
-            width={260}
-            height={320}
-            className="w-40 sm:w-52 lg:w-56 h-auto drop-shadow-xl"
-          />
-        </div>
+        ))}
       </div>
-    </SlideFrame>
+    </BannerSlide>
   )
 }
 
@@ -578,35 +570,22 @@ function Slide10() {
 
 function Slide11() {
   return (
-    <SlideFrame>
-      <div className="flex flex-col lg:flex-row items-center gap-4 sm:gap-8 lg:gap-12">
-        <div className="flex-1 text-center lg:text-left">
-          <Badge icon={BarChart3} text="Relatórios" />
-          <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
-            Insights que fazem<br />
-            <GradientText>diferença</GradientText>
-          </h2>
-          <p className="text-sm sm:text-base text-slate-400 leading-relaxed mb-4 sm:mb-6 max-w-md mx-auto lg:mx-0">
-            Gráficos e tabelas que revelam padrões de consumo. Entenda pra onde vai cada centavo e tome decisões mais inteligentes.
-          </p>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3 max-w-md mx-auto lg:mx-0">
-            <FeatureCard icon={BarChart3} title="Gráficos detalhados" desc="Gastos por categoria, evolução mensal" />
-            <FeatureCard icon={TrendingUp} title="Tendências" desc="Compare meses e identifique padrões" />
-            <FeatureCard icon={FileText} title="Exportar CSV" desc="Baixe seus dados para planilhas" />
-            <FeatureCard icon={Eye} title="Visão 360°" desc="Receitas, gastos e saldo consolidados" />
-          </div>
-        </div>
-        <div className="shrink-0 hidden sm:block">
-          <Image
-            src="/rookinho-usando-app.png"
-            alt="Rookinho usando o app"
-            width={380}
-            height={280}
-            className="w-64 sm:w-80 h-auto rounded-2xl drop-shadow-xl"
-          />
-        </div>
+    <BannerSlide src="/apresentacao/usando-app.png">
+      <Badge icon={BarChart3} text="Relatórios" />
+      <h2 className="text-2xl sm:text-4xl font-bold mt-3 sm:mt-4 mb-2 sm:mb-4">
+        Insights que fazem<br />
+        <GradientText>diferença</GradientText>
+      </h2>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6">
+        Gráficos e tabelas que revelam padrões de consumo. Entenda pra onde vai cada centavo e tome decisões mais inteligentes.
+      </p>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+        <FeatureCard icon={BarChart3} title="Gráficos detalhados" desc="Gastos por categoria, evolução mensal" />
+        <FeatureCard icon={TrendingUp} title="Tendências" desc="Compare meses e identifique padrões" />
+        <FeatureCard icon={FileText} title="Exportar CSV" desc="Baixe seus dados para planilhas" />
+        <FeatureCard icon={Eye} title="Visão 360°" desc="Receitas, gastos e saldo consolidados" />
       </div>
-    </SlideFrame>
+    </BannerSlide>
   )
 }
 
