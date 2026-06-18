@@ -58,6 +58,7 @@ model User {
   feedbacks             Feedback[]
   recurringBills        RecurringBill[]
   pluggyItems           PluggyItem[]
+  achievements          UserAchievement[]
 }
 
 // ─── Category ───────────────────────────────────────────────────────
@@ -380,6 +381,20 @@ model AppSetting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// ─── UserAchievement ──────────────────────────────────────────────────────────
+
+model UserAchievement {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug       String
+  unlockedAt DateTime @default(now())
+  seen       Boolean  @default(false)
+
+  @@unique([userId, slug])
+  @@index([userId])
 }
 
 // ─── PluggyItem ───────────────────────────────────────────────────────────────

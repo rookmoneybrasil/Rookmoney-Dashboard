@@ -22,6 +22,7 @@ import {
   TrendingUp,
   Crown,
   LifeBuoy,
+  Trophy,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { WithTooltip } from '@/components/ui/tooltip'
@@ -98,8 +99,9 @@ const NAV_GROUPS = [
   {
     groupKey: 'planning',
     items: [
-      { href: '/goals',  icon: Target,   itemKey: 'goals',  color: 'orange', pro: false },
-      { href: '/budget', icon: PiggyBank,itemKey: 'budget', color: 'cyan',   pro: true  },
+      { href: '/goals',        icon: Target,   itemKey: 'goals',        color: 'orange', pro: false },
+      { href: '/budget',       icon: PiggyBank,itemKey: 'budget',       color: 'cyan',   pro: true  },
+      { href: '/achievements', icon: Trophy,   itemKey: 'achievements', color: 'amber',  pro: false },
     ],
   },
   {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Sidebar } from './sidebar'
 import { MobileNav } from './mobile-nav'
 import { Mascot } from '@/components/mascot/mascot'
+import { AchievementToastProvider } from '@/components/achievements/achievement-toast'
 
 interface Props {
   user:     { name: string; email: string; image?: string }
@@ -46,6 +47,9 @@ export function DashboardShell({ user, header, children, banner, badges, plan }:
       <div className="hidden sm:block">
         <Mascot />
       </div>
+
+      {/* Achievement unlock toasts */}
+      <AchievementToastProvider />
     </div>
   )
 }

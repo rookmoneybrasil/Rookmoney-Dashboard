@@ -128,6 +128,9 @@ export const serverApi = {
   // Notifications
   notifications: () => serverFetch<AppNotification[]>('/notifications'),
 
+  // Achievements
+  achievements: () => serverFetch<AchievementsResponse>('/achievements'),
+
   // Pluggy — Open Finance
   pluggyItems: () => serverFetch<PluggyItemRecord[]>('/pluggy/items').catch(() => [] as PluggyItemRecord[]),
   pluggyBoletos: () => serverFetch<{ boletos: PluggyBoleto[]; items: { id: string; connectorName: string; ok: boolean }[] }>('/pluggy/boletos').catch(() => ({ boletos: [], items: [] })),
@@ -269,6 +272,12 @@ export const clientApi = {
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
 
+  // Achievements
+  checkAchievements: (trigger: string, ctx?: Record<string, unknown>) =>
+    clientFetch<AchievementCheckResponse>('/achievements', { method: 'POST', body: JSON.stringify({ trigger, ctx }) }),
+  markAchievementsSeen: () =>
+    clientFetch<void>('/achievements/seen', { method: 'POST' }),
+
   // Export
   exportData: () => clientFetch<Record<string, unknown>>('/export'),
 
@@ -378,6 +387,12 @@ export interface PluggyItemRecord {
   id: string; itemId: string; connectorId: number; connectorName: string
   status: string; lastSyncAt: string | null; createdAt: string
 }
+// ─── Achievements ────────────────────────────────────────────────────────────
+export type AchievementCategory = 'onboarding' | 'organization' | 'payments' | 'goals' | 'volume' | 'financial'
+export interface AchievementItem { slug: string; category: AchievementCategory; icon: string; unlocked: boolean; unlockedAt: string | null; seen: boolean }
+export interface AchievementsResponse { achievements: AchievementItem[]; total: number; done: number; unseen: number }
+export interface AchievementCheckResponse { newlyUnlocked: { slug: string; icon: string }[] }
+
 export interface PluggyBoleto {
   id: string; description: string; amount: number; date: string
   type: string; status: string
