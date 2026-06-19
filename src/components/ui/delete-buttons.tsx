@@ -83,7 +83,7 @@ export function MarkBillPaidButton({ id, isPaid, showLabel }: { id: string; isPa
           if (!isPaid) playBillPaid()
           reload()
         }
-        catch  { setLoading(false) }
+        catch  { setLoading(false); alert('Erro ao atualizar a conta. Tente novamente.') }
       }}
       className={showLabel
         ? `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isPaid ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700 border border-ink-600' : 'text-success bg-success/10 hover:bg-success/20 border border-success/30'}`

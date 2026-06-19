@@ -24,11 +24,6 @@ const INCOME_TYPES = [
   { value: 'OTHER',      label: 'Outro',          emoji: '💡' },
 ]
 
-function todayStr() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
 export function OnboardingWizard({ firstName }: Props) {
   const t = useTranslations('onboarding')
   const [step, setStep] = useState(0)

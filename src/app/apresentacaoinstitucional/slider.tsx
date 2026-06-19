@@ -10,7 +10,6 @@ import {
   PiggyBank,
   BarChart3,
   ArrowRight,
-  ArrowLeft,
   Zap,
   Shield,
   TrendingUp,
@@ -31,7 +30,6 @@ import {
   Heart,
   DollarSign,
   Globe,
-  ChevronDown,
 } from 'lucide-react'
 
 const TOTAL = 15

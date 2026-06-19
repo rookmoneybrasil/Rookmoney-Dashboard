@@ -1,6 +1,7 @@
 'use client'
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 function ImpersonateInner() {
   const router  = useRouter()
@@ -33,7 +34,7 @@ function ImpersonateInner() {
     return (
       <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, background: '#080e1d' }}>
         <p style={{ color: '#ef4444', fontSize: 15 }}>{error}</p>
-        <a href="/" style={{ color: '#60a5fa', fontSize: 13 }}>Voltar para o início</a>
+        <Link href="/" style={{ color: '#60a5fa', fontSize: 13 }}>Voltar para o início</Link>
       </div>
     )
   }

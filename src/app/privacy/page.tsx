@@ -38,7 +38,7 @@ export default function PrivacyPage() {
         <div className="flex flex-col gap-8 text-sm leading-relaxed">
 
           <p className="text-slate-400">
-            O <strong className="text-slate-200">Rook Money</strong> ("nós", "nosso" ou "o aplicativo") é um
+            O <strong className="text-slate-200">Rook Money</strong> (&ldquo;nós&rdquo;, &ldquo;nosso&rdquo; ou &ldquo;o aplicativo&rdquo;) é um
             serviço de gestão financeira pessoal desenvolvido por <strong className="text-slate-200">Rookmoney
             Brasil</strong>. Esta Política de Privacidade descreve como coletamos, utilizamos, armazenamos e
             protegemos seus dados ao usar nosso aplicativo mobile e plataforma web. Ao criar uma conta ou usar
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
               <Li><strong className="text-slate-300">Vercel (EUA):</strong> hospedagem do aplicativo web e do painel.</Li>
               <Li><strong className="text-slate-300">Stripe (EUA):</strong> processamento de pagamentos. Dados de cartão nunca transitam pelos nossos servidores — são processados diretamente pela Stripe.</Li>
               <Li><strong className="text-slate-300">Resend (EUA):</strong> envio de e-mails transacionais (confirmação de conta, lembretes, resumo mensal).</Li>
-              <Li><strong className="text-slate-300">Google LLC:</strong> autenticação OAuth se você optar por "Entrar com o Google".</Li>
+              <Li><strong className="text-slate-300">Google LLC:</strong> autenticação OAuth se você optar por &ldquo;Entrar com o Google&rdquo;.</Li>
               <Li><strong className="text-slate-300">Expo (EUA):</strong> serviço de entrega de notificações push (Expo Push API). O token do dispositivo é repassado à Expo para entregar alertas — a Expo não tem acesso aos seus dados financeiros.</Li>
               <Li><strong className="text-slate-300">Autoridades públicas:</strong> quando exigido por lei, ordem judicial ou para proteger direitos legais.</Li>
             </ul>
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
               ou publicidade comportamental.
             </p>
             <p>
-              Se você desmarcar "Lembrar de mim" no login, o cookie expira ao fechar o navegador.
+              Se você desmarcar &ldquo;Lembrar de mim&rdquo; no login, o cookie expira ao fechar o navegador.
             </p>
           </Section>
 
@@ -176,7 +176,7 @@ export default function PrivacyPage() {
             <p>
               Podemos atualizar esta política periodicamente. Quando houver mudanças relevantes, notificaremos
               você por e-mail e/ou por aviso no aplicativo com pelo menos <strong className="text-slate-200">15 dias de antecedência</strong>.
-              A data de "última atualização" no topo desta página será sempre atualizada.
+              A data de &ldquo;última atualização&rdquo; no topo desta página será sempre atualizada.
             </p>
             <p>
               O uso contínuo do serviço após a vigência das alterações implica aceitação da nova política.
