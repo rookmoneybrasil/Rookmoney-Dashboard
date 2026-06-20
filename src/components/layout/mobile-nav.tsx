@@ -144,16 +144,14 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
               })}
 
               {/* Rookinho IA */}
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  window.dispatchEvent(new Event('mascot:openchat'))
-                }}
+              <Link
+                href="/chat"
+                onClick={() => setOpen(false)}
                 className="flex flex-col items-center gap-2 p-3 rounded-xl bg-brand-900/40 text-brand-300 border border-brand-700/40 hover:bg-brand-800/60 transition-colors"
               >
                 <Sparkles className="size-5" />
                 <span className="text-xs font-medium leading-none">Rookinho IA</span>
-              </button>
+              </Link>
 
               {/* Logout */}
               <button

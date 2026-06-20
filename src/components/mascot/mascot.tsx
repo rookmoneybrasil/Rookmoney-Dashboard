@@ -69,13 +69,8 @@ export function Mascot({ baseMood = 'idle' }: Props) {
       const { mood, message } = (e as CustomEvent<MascotEvent>).detail
       showPopup(mood, message)
     }
-    const openChatHandler = () => setChatOpen(true)
     window.addEventListener('mascot:react', handler)
-    window.addEventListener('mascot:openchat', openChatHandler)
-    return () => {
-      window.removeEventListener('mascot:react', handler)
-      window.removeEventListener('mascot:openchat', openChatHandler)
-    }
+    return () => window.removeEventListener('mascot:react', handler)
   }, [showPopup])
 
   useEffect(() => {
