@@ -8,6 +8,7 @@ import {
   LayoutDashboard, ArrowLeftRight, FileText, Banknote,
   Target, PiggyBank, BarChart3, Tag, Settings, LogOut,
   X, Menu, Upload, Users, CalendarDays, TrendingUp, Trophy,
+  Sparkles,
 } from 'lucide-react'
 import { logout } from '@/app/actions/auth'
 import { useTranslations } from 'next-intl'
@@ -141,6 +142,18 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
                   </Link>
                 )
               })}
+
+              {/* Rookinho IA */}
+              <button
+                onClick={() => {
+                  setOpen(false)
+                  window.dispatchEvent(new Event('mascot:openchat'))
+                }}
+                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-brand-900/40 text-brand-300 border border-brand-700/40 hover:bg-brand-800/60 transition-colors"
+              >
+                <Sparkles className="size-5" />
+                <span className="text-xs font-medium leading-none">Rookinho IA</span>
+              </button>
 
               {/* Logout */}
               <button

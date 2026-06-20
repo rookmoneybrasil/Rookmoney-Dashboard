@@ -3,10 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useActionState } from 'react'
 import Image from 'next/image'
-import { ArrowRight, ArrowLeft, CheckCircle2, Banknote, FileText, Target, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowLeft, CheckCircle2, Banknote, FileText, Target, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input, FormField } from '@/components/ui/input'
+import { Input, FormField, Textarea } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { MASCOT_SRCS } from '@/lib/mascot'
+import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
+import { formatCurrency } from '@/lib/utils'
 import {
   createOnboardingIncome,
   createOnboardingBill,
@@ -33,11 +37,13 @@ export function OnboardingWizard({ firstName }: Props) {
   const [incomeType,        setIncomeType]      = useState('EMPLOYMENT')
 
   // Bill state
-  const [showInstallments, setShowInstallments] = useState(false)
-  const [billIsRecurring,  setBillRecurring]    = useState(false)
-  const [billAmount,       setBillAmount]       = useState('')
-  const [billInstallments, setBillInstallments] = useState('')
-  const [billAlreadyPaid,  setBillAlreadyPaid]  = useState('0')
+  type BillMode = 'avulso' | 'parcelado' | 'recorrente'
+  const [billMode,         setBillMode]         = useState<BillMode>('avulso')
+  const [billAmountNum,    setBillAmountNum]    = useState(0)
+  const [billInstallments, setBillInstallments] = useState(2)
+  const [billAlreadyPaid,  setBillAlreadyPaid]  = useState(0)
+  const [billName,         setBillName]         = useState('')
+  const [showBillServices, setShowBillSvc]      = useState(false)
 
   const [incomeState, incomeAction, incomePending] = useActionState(createOnboardingIncome, undefined)
   const [billState,   billAction,   billPending]   = useActionState(createOnboardingBill,   undefined)
@@ -140,57 +146,54 @@ export function OnboardingWizard({ firstName }: Props) {
                   <input type="hidden" name="isRecurring" value={String(incomeIsRecurring)} />
 
                   {/* Recorrente / Eventual */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: true,  label: 'Recorrente', desc: 'Entra todo mês', emoji: '🔁' },
-                      { value: false, label: 'Eventual',   desc: 'Renda pontual',  emoji: '💡' },
-                    ].map((opt) => (
-                      <button key={opt.label} type="button"
-                        onClick={() => setIncomeRecurring(opt.value)}
-                        className={`flex flex-col items-center gap-1 py-3 rounded-xl border transition-colors text-sm font-medium
-                          ${incomeIsRecurring === opt.value
-                            ? 'border-brand-500 bg-brand-900/30 text-brand-400'
-                            : 'border-white/8 bg-ink-800 text-slate-400 hover:border-white/20'}`}>
-                        <span className="text-lg">{opt.emoji}</span>
-                        {opt.label}
-                        <span className="text-xs font-normal text-slate-500">{opt.desc}</span>
+                  <div className="flex gap-2">
+                    {([
+                      { val: true,  label: 'Recorrente', icon: '🔁', desc: 'Entra todo mês' },
+                      { val: false, label: 'Eventual',   icon: '💡', desc: 'Renda pontual' },
+                    ]).map(({ val, label, icon, desc }) => (
+                      <button key={label} type="button" onClick={() => setIncomeRecurring(val)}
+                        className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 rounded-xl border text-xs font-medium transition-all ${
+                          incomeIsRecurring === val
+                            ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                            : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                        }`}>
+                        <span className="text-base">{icon}</span>
+                        <span>{label}</span>
+                        <span className="text-[10px] text-slate-600">{desc}</span>
                       </button>
                     ))}
                   </div>
 
-                  <FormField label="Nome *" htmlFor="name" required>
-                    <Input id="name" name="name" placeholder="Ex: Salário, Freela Design..." autoFocus required />
+                  <FormField label="Nome" htmlFor="name" required>
+                    <Input id="name" name="name" placeholder="Ex.: Empresa X, Cliente Y" autoFocus required />
                   </FormField>
 
-                  {/* Tipo */}
-                  <div>
-                    <p className="text-xs text-slate-500 mb-2">Tipo de renda</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {INCOME_TYPES.map((it) => (
-                        <button key={it.value} type="button"
-                          onClick={() => setIncomeType(it.value)}
-                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-colors
-                            ${incomeType === it.value
-                              ? 'border-brand-500 bg-brand-900/30 text-brand-400'
-                              : 'border-white/8 bg-ink-800 text-slate-400 hover:border-white/20'}`}>
-                          <span>{it.emoji}</span>
-                          <span className="font-medium">{it.label}</span>
-                        </button>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <FormField label="Tipo" htmlFor="type">
+                      <Select value={incomeType} onValueChange={setIncomeType}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {INCOME_TYPES.map(({ value, label, emoji }) => (
+                            <SelectItem key={value} value={value}>{emoji} {label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormField>
+                    <FormField label="Valor (R$)" htmlFor="amount" required>
+                      <CurrencyInput id="amount" name="amount" required />
+                    </FormField>
                   </div>
-
-                  <FormField label="Valor (R$) *" htmlFor="amount" required>
-                    <Input id="amount" name="amount" type="number" step="0.01" min="1" placeholder="0,00" required />
-                  </FormField>
 
                   {incomeIsRecurring && (
                     <div className="grid grid-cols-2 gap-3">
                       <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
-                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min="1" max="31" placeholder="Ex: 5" />
+                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                          placeholder="Ex.: 5" />
                       </FormField>
-                      <FormField label="Primeiro pagamento" htmlFor="startDate">
-                        <Input id="startDate" name="startDate" placeholder="AAAA-MM-DD" maxLength={10} />
+                      <FormField label="Primeiro pagamento" htmlFor="startDate"
+                        hint="Deixe vazio para começar este mês">
+                        <Input id="startDate" name="startDate" type="date"
+                          defaultValue={new Date().toISOString().split('T')[0]} />
                       </FormField>
                     </div>
                   )}
@@ -224,80 +227,145 @@ export function OnboardingWizard({ firstName }: Props) {
                 )}
 
                 <form action={billAction} className="flex flex-col gap-4">
-                  <input type="hidden" name="isRecurring" value={String(!showInstallments && billIsRecurring)} />
+                  <input type="hidden" name="mode" value={billMode} />
+                  <input type="hidden" name="isRecurring" value={String(billMode === 'recorrente')} />
 
+                  {/* Mode tabs */}
+                  <div className="flex gap-2">
+                    {([
+                      { key: 'avulso' as BillMode,     label: 'Avulso',     icon: '💸' },
+                      { key: 'parcelado' as BillMode,  label: 'Parcelado',  icon: '📅' },
+                      { key: 'recorrente' as BillMode, label: 'Recorrente', icon: '🔁' },
+                    ]).map((m) => (
+                      <button key={m.key} type="button" onClick={() => setBillMode(m.key)}
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
+                          billMode === m.key
+                            ? 'bg-brand-800/60 border-brand-600/50 text-brand-300'
+                            : 'bg-ink-800 border-ink-600 text-slate-500 hover:border-ink-500'
+                        }`}>
+                        <span>{m.icon}</span>{m.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Name field with service quick-select */}
                   <FormField label={t('step2.nameLabel')} htmlFor="billName" required>
-                    <Input id="billName" name="name" placeholder={t('step2.namePlaceholder')} autoFocus required />
+                    <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowBillSvc(!showBillServices)}
+                        className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-ink-700 border border-ink-600 hover:border-ink-500 text-xs text-slate-400 transition-colors"
+                      >
+                        <span>{billName ? billName : 'Selecionar serviço rápido...'}</span>
+                        {showBillServices ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                      </button>
+
+                      {showBillServices && (
+                        <div className="flex flex-wrap gap-1.5 p-2 bg-ink-800/60 border border-ink-600 rounded-xl max-h-32 overflow-y-auto">
+                          {QUICK_BILL_SERVICES.map(({ key, label, brand }) => {
+                            const active = billName.toLowerCase() === label.toLowerCase()
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={() => { setBillName(active ? '' : label); setShowBillSvc(false) }}
+                                className="flex items-center gap-1.5 h-7 px-2 rounded-lg text-xs font-medium transition-all border shrink-0"
+                                style={
+                                  active
+                                    ? { backgroundColor: brand.color, color: brand.text, borderColor: brand.color }
+                                    : { backgroundColor: brand.color + '18', color: brand.color, borderColor: brand.color + '40' }
+                                }
+                              >
+                                <span className="size-4 rounded flex items-center justify-center text-[9px] font-bold shrink-0"
+                                  style={{ backgroundColor: brand.color, color: brand.text }}>
+                                  {brand.short}
+                                </span>
+                                {label}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      <div className="relative">
+                        <Input id="billName" name="name" type="text"
+                          placeholder={t('step2.namePlaceholder')}
+                          value={billName} onChange={(e) => setBillName(e.target.value)} autoFocus required />
+                        {(() => { const b = getServiceBrand(billName, undefined); return b ? (
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                            <div className="size-5 rounded-md flex items-center justify-center text-[10px] font-bold"
+                              style={{ backgroundColor: b.color, color: b.text }}>
+                              {b.short}
+                            </div>
+                          </div>
+                        ) : null })()}
+                      </div>
+                    </div>
                   </FormField>
 
                   <div className="grid grid-cols-2 gap-3">
-                    <FormField label={t('step2.amountLabel')} htmlFor="billAmount" required>
-                      <Input
-                        id="billAmount" name="amount" type="number" step="0.01" min="1"
-                        placeholder="0,00" required
-                        onChange={(e) => setBillAmount(e.target.value)}
-                      />
+                    <FormField label={billMode === 'parcelado' ? 'Valor da parcela (R$)' : t('step2.amountLabel')} htmlFor="billAmount" required>
+                      <CurrencyInput id="billAmount" name="amount" required onValueChange={setBillAmountNum} />
                     </FormField>
-                    <FormField label="Vencimento" htmlFor="dueDate" required>
-                      <Input id="dueDate" name="dueDate" placeholder="AAAA-MM-DD" maxLength={10} required />
-                    </FormField>
+                    {billMode === 'recorrente' ? (
+                      <FormField label="Dia do vencimento" htmlFor="dayOfMonth" required>
+                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                          defaultValue={1} placeholder="1-28" required />
+                      </FormField>
+                    ) : (
+                      <FormField label="1º vencimento" htmlFor="dueDate" required>
+                        <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />
+                      </FormField>
+                    )}
                   </div>
 
-                  {/* Parcelado */}
-                  <label className="flex items-center justify-between px-3 py-3 rounded-xl bg-ink-800 border border-white/8 cursor-pointer">
-                    <div>
-                      <p className="text-sm font-medium text-slate-200">Parcelado</p>
-                      <p className="text-xs text-slate-500">Dividido em várias parcelas</p>
-                    </div>
-                    <input type="checkbox" className="sr-only" checked={showInstallments} onChange={e => {
-                      setShowInstallments(e.target.checked)
-                      if (e.target.checked) setBillRecurring(false)
-                    }} />
-                    <div className={`w-11 h-6 rounded-full transition-colors relative ${showInstallments ? 'bg-brand-500' : 'bg-ink-600'}`}>
-                      <div className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform ${showInstallments ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                    </div>
-                  </label>
-
-                  {showInstallments && (
-                    <div className="flex flex-col gap-3 pl-1">
-                      <div className="grid grid-cols-2 gap-3">
-                        <FormField label="Total de parcelas" htmlFor="installments">
-                          <Input id="installments" name="installments" type="number" min="2" max="96" placeholder="12"
-                            onChange={e => setBillInstallments(e.target.value)} />
-                        </FormField>
-                        <FormField label="Já pagas" htmlFor="alreadyPaid">
-                          <Input id="alreadyPaid" name="alreadyPaid" type="number" min="0" placeholder="0"
-                            value={billAlreadyPaid} onChange={e => setBillAlreadyPaid(e.target.value)} />
-                        </FormField>
-                      </div>
-                      {billAmount && billInstallments && Number(billInstallments) > 0 && (
-                        <p className="text-xs text-slate-500 bg-ink-800 border border-white/6 rounded-lg px-3 py-2">
-                          {Number(billInstallments) - Number(billAlreadyPaid)} parcelas restantes de{' '}
-                          <span className="text-slate-300 font-medium">
-                            R$ {(Number(billAmount) / Number(billInstallments)).toFixed(2)}
-                          </span>
-                        </p>
+                  {billMode === 'recorrente' && (
+                    <div className="flex flex-col gap-1 p-3 rounded-lg bg-brand-900/30 border border-brand-700/40">
+                      <p className="text-sm text-brand-300 font-medium">Conta fixa mensal</p>
+                      {billAmountNum > 0 && (
+                        <p className="text-xs text-slate-400">{formatCurrency(billAmountNum)} será gerado automaticamente todo mês</p>
                       )}
                     </div>
                   )}
 
-                  {/* Recorrente (só se não for parcelado) */}
-                  {!showInstallments && (
-                    <label className="flex items-center justify-between px-3 py-3 rounded-xl bg-ink-800 border border-white/8 cursor-pointer">
-                      <div>
-                        <p className="text-sm font-medium text-slate-200">Recorrente</p>
-                        <p className="text-xs text-slate-500">Repete todo mês automaticamente</p>
+                  {/* Parcelado options */}
+                  {billMode === 'parcelado' && (
+                    <div className="flex flex-col gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-600">
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField label="Total de parcelas" htmlFor="installments">
+                          <div className="flex items-center gap-2">
+                            <input type="number" name="installments" min={2} max={120} value={billInstallments}
+                              onChange={(e) => { const v = Number(e.target.value); setBillInstallments(v); if (billAlreadyPaid >= v) setBillAlreadyPaid(v - 1) }}
+                              className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
+                            <span className="text-xs text-slate-500 shrink-0">parcelas</span>
+                          </div>
+                        </FormField>
+                        <FormField label="Já pagas" htmlFor="alreadyPaid">
+                          <div className="flex items-center gap-2">
+                            <input type="number" name="alreadyPaid" min={0} max={billInstallments - 1} value={billAlreadyPaid}
+                              onChange={(e) => setBillAlreadyPaid(Math.min(Number(e.target.value), billInstallments - 1))}
+                              className="w-full bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50" />
+                            <span className="text-xs text-slate-500 shrink-0">pagas</span>
+                          </div>
+                        </FormField>
                       </div>
-                      <input type="checkbox" className="sr-only" checked={billIsRecurring} onChange={e => setBillRecurring(e.target.checked)} />
-                      <div className={`w-11 h-6 rounded-full transition-colors relative ${billIsRecurring ? 'bg-brand-500' : 'bg-ink-600'}`}>
-                        <div className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform ${billIsRecurring ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                      </div>
-                    </label>
+                      {billAmountNum > 0 && (
+                        <div className="flex flex-col gap-1">
+                          <p className="text-xs text-slate-400">
+                            <span className="font-medium text-slate-200">{billInstallments - billAlreadyPaid} restantes</span>
+                            {' '}× {formatCurrency(billAmountNum)} = <span className="font-medium text-brand-300">{formatCurrency(billAmountNum * (billInstallments - billAlreadyPaid))}</span>
+                          </p>
+                          {billAlreadyPaid > 0 && (
+                            <p className="text-[11px] text-slate-600">{billAlreadyPaid} parcela{billAlreadyPaid > 1 ? 's' : ''} já paga{billAlreadyPaid > 1 ? 's' : ''} não serão cadastradas</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   <div className="flex gap-3 pt-2">
                     <Button type="button" variant="secondary" onClick={() => setStep(3)} className="flex-1">{t('skip2')}</Button>
-                    <Button type="submit" loading={billPending} className="flex-1 gap-2">
+                    <Button type="submit" loading={billPending} disabled={!billName.trim()} className="flex-1 gap-2">
                       {t('add')} <ArrowRight className="size-4" />
                     </Button>
                   </div>

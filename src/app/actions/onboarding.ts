@@ -74,43 +74,71 @@ export async function createOnboardingBill(
 
   const name         = (formData.get('name') as string)?.trim()
   const amount       = Number(formData.get('amount'))
+  const mode         = (formData.get('mode') as string) || 'avulso'
   const dueDateStr   = (formData.get('dueDate') as string)?.trim()
-  const isRecurring  = formData.get('isRecurring') === 'true'
+  const dayOfMonth   = parseInt(formData.get('dayOfMonth') as string) || 1
   const installments = parseInt(formData.get('installments') as string) || 1
   const alreadyPaid  = parseInt(formData.get('alreadyPaid') as string)  || 0
 
   if (!name || name.length < 2) return { error: 'Nome muito curto.' }
   if (!amount || amount <= 0)   return { error: 'Valor inválido.' }
-  if (!dueDateStr?.match(/^\d{4}-\d{2}-\d{2}$/)) return { error: 'Data inválida (AAAA-MM-DD).' }
 
-  const baseDate = parseISO(dueDateStr)
+  if (mode === 'recorrente') {
+    if (dayOfMonth < 1 || dayOfMonth > 28) return { error: 'Dia deve ser entre 1 e 28.' }
 
-  if (installments > 1) {
-    const remaining   = installments - alreadyPaid
-    const groupId     = randomUUID()
-    const perInstallment = Math.round((amount / installments) * 100) / 100
-    await db.bill.createMany({
-      data: Array.from({ length: remaining }, (_, i) => ({
+    const now = new Date()
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const dueDate = new Date(now.getFullYear(), now.getMonth(), dayOfMonth)
+
+    await db.recurringBill.create({
+      data: {
         name,
-        amount:             perInstallment,
-        dueDate:            addMonths(baseDate, i),
-        isRecurring:        false,
-        userId:             session.userId,
-        installmentTotal:   installments,
-        installmentCurrent: alreadyPaid + i + 1,
-        installmentGroupId: groupId,
-      })),
+        amount,
+        dayOfMonth,
+        userId: session.userId,
+        lastAutoMonth: thisMonth,
+      },
     })
-  } else {
+
     await db.bill.create({
       data: {
         name,
         amount,
-        dueDate:     baseDate,
-        isRecurring,
-        userId:      session.userId,
+        dueDate,
+        isRecurring: false,
+        userId: session.userId,
       },
     })
+  } else {
+    if (!dueDateStr?.match(/^\d{4}-\d{2}-\d{2}$/)) return { error: 'Data inválida.' }
+    const baseDate = parseISO(dueDateStr)
+
+    if (mode === 'parcelado' && installments > 1) {
+      const remaining = installments - alreadyPaid
+      const groupId = randomUUID()
+      await db.bill.createMany({
+        data: Array.from({ length: remaining }, (_, i) => ({
+          name,
+          amount,
+          dueDate:            addMonths(baseDate, i),
+          isRecurring:        false,
+          userId:             session.userId,
+          installmentTotal:   installments,
+          installmentCurrent: alreadyPaid + i + 1,
+          installmentGroupId: groupId,
+        })),
+      })
+    } else {
+      await db.bill.create({
+        data: {
+          name,
+          amount,
+          dueDate: baseDate,
+          isRecurring: false,
+          userId: session.userId,
+        },
+      })
+    }
   }
 
   revalidatePath('/bills')
