@@ -239,14 +239,15 @@ export async function createPersonEntry(
     })
   } else {
     // Multiple installments — each = total / installments, monthly cadence
-    const groupId        = randomUUID()
-    const perInstallment = Math.round((entryBase.amount / installments) * 100) / 100
+    const groupId          = randomUUID()
+    const baseInstallment  = Math.floor((entryBase.amount / installments) * 100) / 100
+    const lastInstallment  = Math.round((entryBase.amount - baseInstallment * (installments - 1)) * 100) / 100
 
     await db.personEntry.createMany({
       data: Array.from({ length: installments }, (_, i) => ({
         type:               entryBase.type,
         description:        `${entryBase.description} (${i + 1}/${installments})`,
-        amount:             perInstallment,
+        amount:             i === installments - 1 ? lastInstallment : baseInstallment,
         date:               addMonths(baseDate, i),
         notes:              entryBase.notes ?? null,
         installmentTotal:   installments,

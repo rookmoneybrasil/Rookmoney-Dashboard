@@ -65,12 +65,13 @@ export async function createBill(
   const baseDate = parseISO(dueDateStr)
 
   if (installments > 1) {
-    const groupId        = randomUUID()
-    const perInstallment = Math.round((rest.amount / installments) * 100) / 100
+    const groupId          = randomUUID()
+    const baseInstallment  = Math.floor((rest.amount / installments) * 100) / 100
+    const lastInstallment  = Math.round((rest.amount - baseInstallment * (installments - 1)) * 100) / 100
     await db.bill.createMany({
       data: Array.from({ length: installments }, (_, i) => ({
         ...rest,
-        amount:             perInstallment,
+        amount:             i === installments - 1 ? lastInstallment : baseInstallment,
         dueDate:            addMonths(baseDate, i),
         userId:             session.userId,
         categoryId:         rest.categoryId || null,
