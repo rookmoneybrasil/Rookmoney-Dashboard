@@ -62,6 +62,7 @@ export async function createIncomeSource(
   })
 
   revalidatePath('/income')
+  revalidatePath('/dashboard')
   return {}
 }
 
@@ -92,6 +93,7 @@ export async function updateIncomeSource(
   })
 
   revalidatePath('/income')
+  revalidatePath('/dashboard')
   return {}
 }
 

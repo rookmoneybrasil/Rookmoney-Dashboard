@@ -136,5 +136,6 @@ export async function updateTransaction(
 
   revalidatePath('/dashboard')
   revalidatePath('/transactions')
+  revalidatePath('/reports')
   return {}
 }
