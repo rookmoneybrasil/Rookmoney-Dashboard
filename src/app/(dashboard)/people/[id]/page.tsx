@@ -516,8 +516,9 @@ export default async function PersonPage({ params }: Props) {
         </div>
 
         {pendingCount === 0 ? (
-          <div className="py-10 text-center text-sm text-slate-600 bg-ink-800 rounded-xl border border-ink-700 border-dashed">
+          <div className="py-10 flex flex-col items-center gap-3 text-sm text-slate-600 bg-ink-800 rounded-xl border border-ink-700 border-dashed">
             Nenhum lançamento pendente
+            <EntryModal personId={person.id} personName={person.name} categories={categories} label="Criar primeiro lançamento" variant="secondary" />
           </div>
         ) : (
           <div className="flex flex-col gap-2">

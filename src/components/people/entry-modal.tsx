@@ -14,11 +14,11 @@ import { useMutation } from '@/hooks/use-mutation'
 import { formatCurrency } from '@/lib/utils'
 
 interface Category { id: string; name: string; icon: string; color: string }
-interface Props { personId: string; personName: string; categories: Category[] }
+interface Props { personId: string; personName: string; categories: Category[]; label?: string; variant?: 'primary' | 'secondary' }
 type EntryType = 'THEY_OWE_ME' | 'I_OWE_THEM'
 type Mode = 'single' | 'parcelado' | 'recorrente'
 
-export function EntryModal({ personId, personName, categories }: Props) {
+export function EntryModal({ personId, personName, categories, label, variant }: Props) {
   const [open, setOpen]           = useState(false)
   const [entryType, setEntryType] = useState<EntryType>('THEY_OWE_ME')
   const [mode, setMode]           = useState<Mode>('single')
@@ -63,10 +63,14 @@ export function EntryModal({ personId, personName, categories }: Props) {
     <Modal open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors shrink-0"
+        className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium transition-colors shrink-0 ${
+          variant === 'secondary'
+            ? 'bg-ink-700 hover:bg-ink-600 text-slate-300 border border-ink-600'
+            : 'bg-brand-600 hover:bg-brand-500 text-white'
+        }`}
       >
         <Plus className="size-3.5" />
-        Novo lançamento
+        {label ?? 'Novo lançamento'}
       </button>
 
       <ModalContent size="sm">
