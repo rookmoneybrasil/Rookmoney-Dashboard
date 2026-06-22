@@ -298,28 +298,36 @@ export default async function PersonPage({ params }: Props) {
   const capMonth = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)
   const shareLines: string[] = [`📋 *${person.name}* — ${capMonth}/${now.getFullYear()}`, '']
 
-  // Current-month entries: recurring + pending singles + installment entries due this month
-  const shareIOwe: { desc: string; amount: number }[] = []
-  const shareTheyOwe: { desc: string; amount: number }[] = []
+  // Collect ALL entries for the current month (pending + settled), including recurring
+  type ShareItem = { desc: string; amount: number; settled: boolean }
+  const shareIOwe: ShareItem[] = []
+  const shareTheyOwe: ShareItem[] = []
 
+  // Recurring templates
   for (const r of recurring) {
     const entry = recurringEntryMap.get(r.id)
-    if (entry?.isSettled) continue
+    const settled = entry?.isSettled ?? false
     const bucket = r.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
-    bucket.push({ desc: `${r.description} (recorrente, dia ${r.dayOfMonth})`, amount: Number(r.amount) })
+    bucket.push({ desc: `${r.description} (recorrente, dia ${r.dayOfMonth})`, amount: Number(r.amount), settled })
   }
 
-  for (const e of singleOpen) {
+  // All single entries this month (open + settled), skip those already covered by recurring
+  const recurringDescs = new Set(recurring.map(r => `${r.description}|${r.type}`))
+  const allSingles = allEntries.filter(e => {
     const d = new Date(e.date)
-    if (d < monthStart || d > monthEnd) continue
+    return !e.installmentGroupId && d >= monthStart && d <= monthEnd
+  })
+  for (const e of allSingles) {
+    if (recurringDescs.has(`${e.description}|${e.type}`)) continue
     const bucket = e.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
-    bucket.push({ desc: e.description, amount: Number(e.amount) })
+    bucket.push({ desc: e.description, amount: Number(e.amount), settled: e.isSettled })
   }
 
-  for (const grp of activeGroups) {
+  // Installment entries due this month (from ALL groups, not just active)
+  for (const [, grp] of allGroupMap.entries()) {
     const due = grp.find(e => {
       const d = new Date(e.date)
-      return d >= monthStart && d <= monthEnd && !e.isSettled
+      return d >= monthStart && d <= monthEnd
     })
     if (!due) continue
     const total = due.installmentTotal ?? grp.length
@@ -329,30 +337,25 @@ export default async function PersonPage({ params }: Props) {
     bucket.push({
       desc: `${due.description} (parcela ${current}/${total}, faltam ${remaining})`,
       amount: Number(due.amount),
+      settled: due.isSettled,
     })
   }
 
-  if (shareIOwe.length > 0) {
-    shareLines.push('💸 Eu devo:')
+  function renderShareSection(title: string, items: ShareItem[]) {
+    if (items.length === 0) return
+    shareLines.push(title)
     let subtotal = 0
-    for (const item of shareIOwe) {
-      shareLines.push(`  • ${item.desc} — ${formatCurrency(item.amount)}`)
+    for (const item of items) {
+      const check = item.settled ? ' ✅' : ''
+      shareLines.push(`  • ${item.desc} — ${formatCurrency(item.amount)}${check}`)
       subtotal += item.amount
     }
-    if (shareIOwe.length > 1) shareLines.push(`  *Total: ${formatCurrency(subtotal)}*`)
+    if (items.length > 1) shareLines.push(`  *Total: ${formatCurrency(subtotal)}*`)
     shareLines.push('')
   }
 
-  if (shareTheyOwe.length > 0) {
-    shareLines.push('💰 Me deve:')
-    let subtotal = 0
-    for (const item of shareTheyOwe) {
-      shareLines.push(`  • ${item.desc} — ${formatCurrency(item.amount)}`)
-      subtotal += item.amount
-    }
-    if (shareTheyOwe.length > 1) shareLines.push(`  *Total: ${formatCurrency(subtotal)}*`)
-    shareLines.push('')
-  }
+  renderShareSection('💸 Eu devo:', shareIOwe)
+  renderShareSection('💰 Me deve:', shareTheyOwe)
 
   const nextMonth = projection[1]
   if (nextMonth && (nextMonth.iOwe > 0 || nextMonth.theyOwe > 0)) {
