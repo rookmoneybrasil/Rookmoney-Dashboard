@@ -11,6 +11,7 @@ interface ChatFile {
   mediaType: string
   name: string
   isPdf: boolean
+  spreadsheetText?: string
 }
 
 interface ChatMessage {
@@ -46,7 +47,8 @@ const PAGE_LABELS: Record<string, string> = {
   '/billing':      'Assinatura',
 }
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'] as const
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const SPREADSHEET_EXTS = ['.xlsx', '.xls', '.csv']
 
 function fileToBase64(file: File): Promise<ChatFile> {
   return new Promise((resolve, reject) => {
@@ -58,6 +60,33 @@ function fileToBase64(file: File): Promise<ChatFile> {
     reader.onerror = reject
     reader.readAsDataURL(file)
   })
+}
+
+async function readSpreadsheet(file: File): Promise<ChatFile> {
+  const XLSX = (await import('xlsx'))
+  const buf = await file.arrayBuffer()
+  const wb = XLSX.read(buf, { type: 'array' })
+  const lines: string[] = []
+  for (const name of wb.SheetNames) {
+    if (wb.SheetNames.length > 1) lines.push(`[Aba: ${name}]`)
+    const csv = XLSX.utils.sheet_to_csv(wb.Sheets[name])
+    lines.push(csv.trim())
+  }
+  const text = lines.join('\n').slice(0, 15000)
+  return { base64: '', mediaType: file.type, name: file.name, isPdf: false, spreadsheetText: text }
+}
+
+function isAcceptedFile(file: File): boolean {
+  if (IMAGE_TYPES.includes(file.type)) return true
+  if (file.type === 'application/pdf') return true
+  const ext = '.' + file.name.split('.').pop()?.toLowerCase()
+  if (SPREADSHEET_EXTS.includes(ext)) return true
+  return false
+}
+
+function isSpreadsheet(file: File): boolean {
+  const ext = '.' + file.name.split('.').pop()?.toLowerCase()
+  return SPREADSHEET_EXTS.includes(ext)
 }
 
 export default function ChatPage() {
@@ -92,10 +121,10 @@ export default function ChatPage() {
   }, [])
 
   const processFile = useCallback(async (file: File) => {
-    if (!ACCEPTED_TYPES.includes(file.type as typeof ACCEPTED_TYPES[number])) return
-    if (file.size > 5 * 1024 * 1024) { alert('Imagem muito grande (máx 5MB)'); return }
-    const img = await fileToBase64(file)
-    setPendingFile(img)
+    if (!isAcceptedFile(file)) return
+    if (file.size > 10 * 1024 * 1024) { alert('Arquivo muito grande (máx 10MB)'); return }
+    const parsed = isSpreadsheet(file) ? await readSpreadsheet(file) : await fileToBase64(file)
+    setPendingFile(parsed)
     inputRef.current?.focus()
   }, [])
 
@@ -114,6 +143,10 @@ export default function ChatPage() {
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => {
           if (m.role === 'user' && m.file) {
+            if (m.file.spreadsheetText) {
+              const text = `[Planilha: ${m.file.name}]\n${m.file.spreadsheetText}\n\n${m.content || 'Analise esta planilha.'}`
+              return { role: m.role, content: text }
+            }
             const contentBlocks: unknown[] = []
             if (m.file.isPdf) {
               contentBlocks.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: m.file.base64 } })
@@ -187,7 +220,7 @@ export default function ChatPage() {
     setDragging(false)
     dragCounter.current = 0
     const file = e.dataTransfer.files[0]
-    if (file?.type.startsWith('image/') || file?.type === 'application/pdf') processFile(file)
+    if (file && isAcceptedFile(file)) processFile(file)
   }, [processFile])
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -290,7 +323,12 @@ export default function ChatPage() {
               >
                 {msg.file && (
                   <div className="mb-2 rounded-lg overflow-hidden">
-                    {msg.file.isPdf ? (
+                    {msg.file.spreadsheetText ? (
+                      <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                        <span className="text-lg">📊</span>
+                        <span className="text-xs truncate max-w-[180px]">{msg.file.name}</span>
+                      </div>
+                    ) : msg.file.isPdf ? (
                       <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
                         <span className="text-lg">📄</span>
                         <span className="text-xs truncate max-w-[180px]">{msg.file.name}</span>
@@ -364,7 +402,12 @@ export default function ChatPage() {
         {pendingFile && (
           <div className="max-w-2xl mx-auto px-4 pt-3">
             <div className="inline-flex items-start gap-2 bg-ink-700 border border-white/8 rounded-xl p-2">
-              {pendingFile.isPdf ? (
+              {pendingFile.spreadsheetText ? (
+                <div className="size-16 rounded-lg bg-white/5 flex flex-col items-center justify-center gap-1">
+                  <span className="text-xl">📊</span>
+                  <span className="text-[9px] text-slate-500 truncate max-w-14">{pendingFile.name}</span>
+                </div>
+              ) : pendingFile.isPdf ? (
                 <div className="size-16 rounded-lg bg-white/5 flex flex-col items-center justify-center gap-1">
                   <span className="text-xl">📄</span>
                   <span className="text-[9px] text-slate-500 truncate max-w-14">{pendingFile.name}</span>
@@ -390,7 +433,7 @@ export default function ChatPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,.xlsx,.xls,.csv"
             className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); e.target.value = '' }}
           />
