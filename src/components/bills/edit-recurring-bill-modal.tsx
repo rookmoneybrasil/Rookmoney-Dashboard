@@ -65,7 +65,7 @@ export function EditRecurringBillModal({ bill, categories }: Props) {
               <CurrencyInput id="rb-amount" name="amount" defaultValue={bill.amount} required />
             </FormField>
             <FormField label="Todo dia" htmlFor="rb-day" required>
-              <Input id="rb-day" name="dayOfMonth" type="number" min={1} max={28}
+              <Input id="rb-day" name="dayOfMonth" type="number" min={1} max={31}
                 defaultValue={bill.dayOfMonth} required />
             </FormField>
           </div>

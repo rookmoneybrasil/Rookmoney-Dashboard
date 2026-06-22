@@ -187,7 +187,7 @@ export function OnboardingWizard({ firstName }: Props) {
                   {incomeIsRecurring && (
                     <div className="grid grid-cols-2 gap-3">
                       <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
-                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={31}
                           placeholder="Ex.: 5" />
                       </FormField>
                       <FormField label="Primeiro pagamento" htmlFor="startDate"
@@ -309,8 +309,8 @@ export function OnboardingWizard({ firstName }: Props) {
                     </FormField>
                     {billMode === 'recorrente' ? (
                       <FormField label="Dia do vencimento" htmlFor="dayOfMonth" required>
-                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
-                          defaultValue={1} placeholder="1-28" required />
+                        <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={31}
+                          defaultValue={1} placeholder="1-31" required />
                       </FormField>
                     ) : (
                       <FormField label="1º vencimento" htmlFor="dueDate" required>

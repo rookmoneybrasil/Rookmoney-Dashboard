@@ -66,7 +66,7 @@ export function EditRecurringModal({ item, categories }: Props) {
               <CurrencyInput id="er-amount" name="amount" defaultValue={item.amount} required />
             </FormField>
             <FormField label="Todo dia" htmlFor="er-day" required>
-              <Input id="er-day" name="dayOfMonth" type="number" min={1} max={28} defaultValue={item.dayOfMonth} required />
+              <Input id="er-day" name="dayOfMonth" type="number" min={1} max={31} defaultValue={item.dayOfMonth} required />
             </FormField>
           </div>
 

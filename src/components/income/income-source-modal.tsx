@@ -132,7 +132,7 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
           {isRecurring && (
             <div className="grid grid-cols-2 gap-3">
               <FormField label="Dia do recebimento" htmlFor="dayOfMonth">
-                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
+                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={31}
                   placeholder="Ex.: 5"
                   defaultValue={source?.dayOfMonth ?? undefined} />
               </FormField>

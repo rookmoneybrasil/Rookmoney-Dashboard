@@ -191,8 +191,8 @@ export function EntryModal({ personId, personName, categories }: Props) {
                 <Calendar className="size-3.5 text-slate-500 shrink-0" />
                 <label className="text-xs text-slate-400 shrink-0">Todo dia</label>
                 <input
-                  type="number" min={1} max={28} value={dayOfMonth}
-                  onChange={e => setDay(Math.min(28, Math.max(1, parseInt(e.target.value) || 1)))}
+                  type="number" min={1} max={31} value={dayOfMonth}
+                  onChange={e => setDay(Math.min(31, Math.max(1, parseInt(e.target.value) || 1)))}
                   className="w-16 bg-ink-700 border border-white/8 rounded-lg px-2 py-1 text-sm text-slate-200 text-center focus:outline-none focus:border-brand-500/50"
                 />
                 <span className="text-xs text-slate-500">de cada mês</span>

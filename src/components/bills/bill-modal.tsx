@@ -208,8 +208,8 @@ export function BillModal({ categories }: Props) {
             </FormField>
             {mode === 'recorrente' ? (
               <FormField label={t('everyDay')} htmlFor="dayOfMonth" required>
-                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={28}
-                  defaultValue={1} placeholder="1-28" required />
+                <Input id="dayOfMonth" name="dayOfMonth" type="number" min={1} max={31}
+                  defaultValue={1} placeholder="1-31" required />
               </FormField>
             ) : (
               <FormField label={dateLabel} htmlFor="dueDate" required>

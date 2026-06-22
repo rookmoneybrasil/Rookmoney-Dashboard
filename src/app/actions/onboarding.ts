@@ -84,7 +84,7 @@ export async function createOnboardingBill(
   if (!amount || amount <= 0)   return { error: 'Valor inválido.' }
 
   if (mode === 'recorrente') {
-    if (dayOfMonth < 1 || dayOfMonth > 28) return { error: 'Dia deve ser entre 1 e 28.' }
+    if (dayOfMonth < 1 || dayOfMonth > 31) return { error: 'Dia deve ser entre 1 e 31.' }
 
     const now = new Date()
     const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
