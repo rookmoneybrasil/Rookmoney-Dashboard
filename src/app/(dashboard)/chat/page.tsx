@@ -14,12 +14,12 @@ interface ChatMessage {
 }
 
 const SUGGESTIONS = [
+  'Analisa minha renda e me ajuda a organizar',
   'Ver meu resumo financeiro',
   'Quais contas vencem essa semana?',
   'Registrar uma despesa',
   'Criar uma meta de economia',
-  'Adicionar uma conta a pagar',
-  'Como estão minhas finanças este mês?',
+  'Adicionar uma conta parcelada',
   'Quem me deve dinheiro?',
   'Quanto gastei com alimentação?',
 ]

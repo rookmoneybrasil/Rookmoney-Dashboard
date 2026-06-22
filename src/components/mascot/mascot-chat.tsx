@@ -12,10 +12,10 @@ interface ChatMessage {
 }
 
 const SUGGESTIONS = [
+  'Analisa minha renda e me ajuda a organizar',
   'Ver meu resumo financeiro',
   'Registrar uma despesa',
   'Quais contas vencem essa semana?',
-  'Como estão minhas metas?',
 ]
 
 const PAGE_LABELS: Record<string, string> = {
