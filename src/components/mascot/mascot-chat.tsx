@@ -1,13 +1,18 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { X, Send, Loader2, ArrowRight, Sparkles, ExternalLink } from 'lucide-react'
+import { X, Send, Loader2, ArrowRight, Sparkles, ExternalLink, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
-import type Anthropic from '@anthropic-ai/sdk'
+
+interface ChatImage {
+  base64: string
+  mediaType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+}
 
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
+  image?: ChatImage | null
   navigate?: { path: string; reason: string } | null
 }
 
@@ -33,6 +38,20 @@ const PAGE_LABELS: Record<string, string> = {
   '/billing':      'Assinatura',
 }
 
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
+
+function fileToBase64(file: File): Promise<ChatImage> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      resolve({ base64: dataUrl.split(',')[1], mediaType: file.type as ChatImage['mediaType'] })
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 interface Props {
   onClose: () => void
 }
@@ -41,15 +60,17 @@ export function MascotChat({ onClose }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA. Posso registrar transações, consultar contas, acompanhar metas e dar dicas. O que deseja?',
+      content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA. Posso registrar transações, consultar contas, acompanhar metas e dar dicas. Envie fotos de comprovantes também!',
     },
   ])
   const [input, setInput]             = useState('')
   const [loading, setLoading]         = useState(false)
   const [proRequired, setProRequired] = useState(false)
   const [remaining, setRemaining]     = useState<number | null>(null)
+  const [pendingImage, setPendingImage] = useState<ChatImage | null>(null)
   const bottomRef                     = useRef<HTMLDivElement>(null)
   const inputRef                      = useRef<HTMLInputElement>(null)
+  const fileInputRef                  = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -59,19 +80,38 @@ export function MascotChat({ onClose }: Props) {
     setTimeout(() => inputRef.current?.focus(), 100)
   }, [])
 
-  const send = useCallback(async (text: string) => {
-    if (!text.trim() || loading) return
+  const processFile = useCallback(async (file: File) => {
+    if (!ACCEPTED_TYPES.includes(file.type as typeof ACCEPTED_TYPES[number])) return
+    if (file.size > 5 * 1024 * 1024) return
+    const img = await fileToBase64(file)
+    setPendingImage(img)
+    inputRef.current?.focus()
+  }, [])
 
-    const userMsg: ChatMessage = { role: 'user', content: text.trim() }
+  const send = useCallback(async (text: string, image?: ChatImage | null) => {
+    if ((!text.trim() && !image) || loading) return
+
+    const userMsg: ChatMessage = { role: 'user', content: text.trim(), image: image ?? null }
     const history = [...messages, userMsg]
     setMessages(history)
     setInput('')
+    setPendingImage(null)
     setLoading(true)
 
     try {
-      const apiMessages: Anthropic.MessageParam[] = history
+      const apiMessages = history
         .filter(m => m.role === 'user' || m.role === 'assistant')
-        .map(m => ({ role: m.role, content: m.content }))
+        .map(m => {
+          if (m.role === 'user' && m.image) {
+            const contentBlocks: unknown[] = [
+              { type: 'image', source: { type: 'base64', media_type: m.image.mediaType, data: m.image.base64 } },
+            ]
+            if (m.content) contentBlocks.push({ type: 'text', text: m.content })
+            else contentBlocks.push({ type: 'text', text: 'Analise esta imagem.' })
+            return { role: m.role, content: contentBlocks }
+          }
+          return { role: m.role, content: m.content }
+        })
 
       const res = await fetch('/api/v1/chat', {
         method:  'POST',
@@ -112,8 +152,21 @@ export function MascotChat({ onClose }: Props) {
   }, [messages, loading])
 
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input, pendingImage) }
   }
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (file) processFile(file)
+        return
+      }
+    }
+  }, [processFile])
 
   if (proRequired) {
     return (
@@ -193,6 +246,15 @@ export function MascotChat({ onClose }: Props) {
                   : 'bg-ink-700 text-slate-200 rounded-bl-sm border border-white/6'
               }`}
             >
+              {msg.image && (
+                <div className="mb-2 rounded-lg overflow-hidden">
+                  <img
+                    src={`data:${msg.image.mediaType};base64,${msg.image.base64}`}
+                    alt="Imagem enviada"
+                    className="max-w-full max-h-32 rounded-lg"
+                  />
+                </div>
+              )}
               {msg.content}
 
               {msg.navigate && (
@@ -242,20 +304,53 @@ export function MascotChat({ onClose }: Props) {
       )}
 
       {/* Input */}
-      <div className="border-t border-white/8 shrink-0">
+      <div className="border-t border-white/8 shrink-0" onPaste={handlePaste}>
+        {pendingImage && (
+          <div className="px-3 pt-2">
+            <div className="inline-flex items-start gap-1.5 bg-ink-700 border border-white/8 rounded-lg p-1.5">
+              <img
+                src={`data:${pendingImage.mediaType};base64,${pendingImage.base64}`}
+                alt="Preview"
+                className="size-12 rounded object-cover"
+              />
+              <button
+                onClick={() => setPendingImage(null)}
+                className="size-4 rounded-full bg-ink-600 hover:bg-ink-500 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors"
+              >
+                <X className="size-2.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 px-3 py-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); e.target.value = '' }}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading}
+            className="size-9 rounded-xl bg-ink-700 border border-white/8 hover:bg-ink-600 disabled:opacity-40 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors shrink-0"
+            title="Enviar imagem"
+          >
+            <ImageIcon className="size-3.5" />
+          </button>
           <input
             ref={inputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Digite sua mensagem..."
+            placeholder={pendingImage ? 'Descreva ou envie...' : 'Digite sua mensagem...'}
             disabled={loading}
             className="flex-1 bg-ink-700 border border-white/8 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-600/60 transition-colors disabled:opacity-50"
           />
           <button
-            onClick={() => send(input)}
-            disabled={!input.trim() || loading}
+            onClick={() => send(input, pendingImage)}
+            disabled={(!input.trim() && !pendingImage) || loading}
             className="size-9 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-white transition-colors shrink-0"
           >
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
