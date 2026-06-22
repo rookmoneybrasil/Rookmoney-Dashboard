@@ -20,6 +20,8 @@ const SUGGESTIONS = [
   'Criar uma meta de economia',
   'Adicionar uma conta a pagar',
   'Como estão minhas finanças este mês?',
+  'Quem me deve dinheiro?',
+  'Quanto gastei com alimentação?',
 ]
 
 const PAGE_LABELS: Record<string, string> = {
@@ -34,18 +36,20 @@ const PAGE_LABELS: Record<string, string> = {
   '/recurring':    'Recorrências',
   '/income':       'Rendas',
   '/settings':     'Configurações',
+  '/billing':      'Assinatura',
 }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA. Posso te ajudar a registrar transações, criar metas, analisar seus gastos e muito mais. O que deseja fazer?',
+      content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA. Posso registrar transações, consultar contas, pagar boletos, acompanhar metas e dar dicas sobre suas finanças. O que deseja fazer?',
     },
   ])
   const [input, setInput]             = useState('')
   const [loading, setLoading]         = useState(false)
   const [proRequired, setProRequired] = useState(false)
+  const [remaining, setRemaining]     = useState<number | null>(null)
   const bottomRef                     = useRef<HTMLDivElement>(null)
   const inputRef                      = useRef<HTMLInputElement>(null)
 
@@ -71,21 +75,26 @@ export default function ChatPage() {
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => ({ role: m.role, content: m.content }))
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/v1/chat`, {
+      const res = await fetch('/api/v1/chat', {
         method:  'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ messages: apiMessages }),
       })
 
-      if (res.status === 403) {
-        setProRequired(true)
+      if (res.status === 403) { setProRequired(true); return }
+
+      const data = await res.json() as { message: string; navigate?: { path: string; reason: string } | null; error?: string; remaining?: number }
+
+      if (data.remaining != null) setRemaining(data.remaining)
+
+      if (data.error === 'rate_limited') {
+        setMessages(prev => [...prev, { role: 'assistant', content: '⏳ Você atingiu o limite de mensagens deste mês. O limite renova no início do próximo mês.' }])
         return
       }
 
-      const data = await res.json() as { message: string; navigate: { path: string; reason: string } | null; error?: string }
-
-      if (data.error === 'rate_limited') {
-        setMessages(prev => [...prev, { role: 'assistant', content: '⏳ Você atingiu o limite de mensagens por hora. Tente novamente mais tarde.' }])
+      if (data.error === 'ai_unavailable' || data.error === 'ai_error') {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message ?? 'Ops, estou temporariamente indisponível. Tente novamente em alguns minutos.' }])
         return
       }
 
@@ -97,7 +106,7 @@ export default function ChatPage() {
     } catch {
       setMessages(prev => [...prev, {
         role:    'assistant',
-        content: 'Ops, ocorreu um erro. Tente novamente. 😅',
+        content: 'Ops, ocorreu um erro de conexão. Tente novamente. 😅',
       }])
     } finally {
       setLoading(false)
@@ -129,7 +138,7 @@ export default function ChatPage() {
           className="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-8 rounded-xl transition-colors text-sm"
         >
           <Sparkles className="size-4" />
-          Ver plano Pro — R$ 14,90/mês
+          Ver plano Pro — R$ 19,90/mês
         </Link>
       </div>
     )
@@ -143,7 +152,6 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
 
-          {/* Welcome header — only before first message */}
           {!hasUserMessage && (
             <div className="flex flex-col items-center text-center gap-4 py-8">
               <div className="relative size-24">
@@ -157,7 +165,6 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Messages */}
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'assistant' && (
@@ -187,7 +194,6 @@ export default function ChatPage() {
             </div>
           ))}
 
-          {/* Loading dots */}
           {loading && (
             <div className="flex gap-3">
               <div className="size-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -209,7 +215,6 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Suggestions — only before first user message */}
       {!hasUserMessage && (
         <div className="shrink-0 border-t border-white/6 bg-ink-800/40">
           <div className="max-w-2xl mx-auto px-4 py-3">
@@ -228,7 +233,7 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Input bar — fixed at bottom */}
+      {/* Input bar */}
       <div className="shrink-0 border-t border-white/6 bg-ink-800/80 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <input
@@ -248,6 +253,11 @@ export default function ChatPage() {
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           </button>
         </div>
+        {remaining != null && (
+          <p className="text-center text-[10px] text-slate-600 pb-2">
+            {remaining} mensagens restantes este mês
+          </p>
+        )}
       </div>
     </div>
   )

@@ -63,8 +63,9 @@ export function ReceiptScanner({ categories }: Props) {
 
       setScanning(true)
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? ''}/api/v1/scan-receipt`, {
+        const res = await fetch('/api/v1/scan-receipt', {
           method:  'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ imageBase64: base64, mediaType }),
         })
