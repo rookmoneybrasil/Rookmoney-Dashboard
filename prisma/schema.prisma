@@ -44,6 +44,9 @@ model User {
   proPlanReason       String?
   adminNotes          String?
   tokenVersion        Int       @default(0)
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
   lastActiveAt        DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt

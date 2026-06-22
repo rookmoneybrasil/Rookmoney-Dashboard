@@ -2,18 +2,39 @@
 
 import Link from 'next/link'
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { useState, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { clientApi } from '@/lib/api-client'
 import { GoogleButton } from '@/components/auth/google-button'
+
+function getStoredUtm() {
+  try {
+    const raw = sessionStorage.getItem('rook_utm')
+    return raw ? JSON.parse(raw) as { utmSource?: string; utmMedium?: string; utmCampaign?: string } : {}
+  } catch { return {} }
+}
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [pending, setPending]           = useState(false)
   const [error, setError]               = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const source   = searchParams.get('utm_source')
+    const medium   = searchParams.get('utm_medium')
+    const campaign = searchParams.get('utm_campaign')
+    if (source || medium || campaign) {
+      sessionStorage.setItem('rook_utm', JSON.stringify({
+        ...(source   && { utmSource: source }),
+        ...(medium   && { utmMedium: medium }),
+        ...(campaign && { utmCampaign: campaign }),
+      }))
+    }
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -25,7 +46,9 @@ export default function RegisterPage() {
     const password = fd.get('password') as string
     if (password.length < 8) { setError('Senha deve ter no mínimo 8 caracteres.'); setPending(false); return }
     try {
-      await clientApi.register({ name, email, password })
+      const utm = getStoredUtm()
+      const result = await clientApi.register({ name, email, password, ...utm })
+      window.fbq?.('track', 'CompleteRegistration', {}, { eventID: result.eventId })
       router.push('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta')

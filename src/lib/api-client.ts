@@ -146,7 +146,7 @@ export const clientApi = {
   // Auth
   login:    (data: { email: string; password: string; rememberMe?: boolean }) =>
     clientFetch<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-  register: (data: { name: string; email: string; password: string }) =>
+  register: (data: { name: string; email: string; password: string; utmSource?: string; utmMedium?: string; utmCampaign?: string }) =>
     clientFetch<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   logout:   () => clientFetch<void>('/auth/logout', { method: 'POST' }),
   me:       () => clientFetch<User>('/auth/me'),
@@ -331,7 +331,7 @@ function toQs(params?: Record<string, string>): string {
 export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number; recurring: number }
 export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; recurring: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
 export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits; hasGoogle?: boolean; notifBillReminder?: boolean; notifCategoryLimit?: boolean; notifMonthlyEmail?: boolean; currency?: string; dateFormat?: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; stripeCancelAtPeriodEnd?: boolean; stripeCurrentPeriodEnd?: string | null }
-export interface AuthResponse { token: string; user: User }
+export interface AuthResponse { token: string; user: User; eventId?: string }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }
 export interface Transaction { id: string; amount: number; type: 'INCOME' | 'EXPENSE'; description: string | null; date: string; category: Category; categoryId: string; userId: string; createdAt: string; updatedAt: string }

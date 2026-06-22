@@ -26,6 +26,7 @@ export function WelcomeProModal() {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- opens welcome modal in response to ?upgraded=1 URL param on mount
       setOpen(true)
       playProUpgrade()
+      window.fbq?.('track', 'Subscribe', { value: 19.90, currency: 'BRL' })
       router.replace('/dashboard', { scroll: false })
     }
   }, [params, router])

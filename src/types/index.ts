@@ -1,3 +1,9 @@
+/* ─── Globals ─────────────────────────────────────────────────────── */
+
+declare global {
+  interface Window { fbq?: (...args: unknown[]) => void }
+}
+
 /* ─── Enums ───────────────────────────────────────────────────────── */
 
 export type TransactionType = 'INCOME' | 'EXPENSE'

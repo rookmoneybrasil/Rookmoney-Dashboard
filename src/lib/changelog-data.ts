@@ -40,7 +40,7 @@ export const changelog: ChangelogEntry[] = [
     version: 'v1.1',
     title: 'Plano Pro e melhorias de UX',
     changes: [
-      { category: 'novo', text: 'Plano Pro — R$14,90/mês com limites ampliados e funcionalidades exclusivas' },
+      { category: 'novo', text: 'Plano Pro — R$19,90/mês com limites ampliados e funcionalidades exclusivas' },
       { category: 'novo', text: 'Orçamento mensal por categoria' },
       { category: 'melhoria', text: 'Interface do dashboard redesenhada com cards de insight' },
       { category: 'melhoria', text: 'Onboarding guiado para novos usuários' },

@@ -51,7 +51,7 @@ export async function getAdminStats() {
     }),
   ])
 
-  const MRR_PRO = 14.90
+  const MRR_PRO = 19.90
   const mrr = proUsers * MRR_PRO
 
   return {

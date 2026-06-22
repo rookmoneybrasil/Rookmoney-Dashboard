@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
 import {
@@ -27,6 +28,7 @@ import LaserFlow from '@/components/ui/laser-flow'
 import { FadeIn } from '@/components/ui/fade-in'
 import { PricingSection } from '@/components/landing/pricing-section'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { UtmCapture } from '@/components/utm-capture'
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,8 @@ export default async function LandingPage() {
   const t = await getTranslations('landing')
   return (
     <div className="min-h-screen bg-ink-900 text-slate-100 flex flex-col overflow-x-hidden">
+
+      <Suspense><UtmCapture /></Suspense>
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 border-b border-white/6 bg-ink-900/80 backdrop-blur-md">

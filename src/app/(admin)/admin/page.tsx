@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
         <KPICard
           label="MRR"
           value={formatCurrency(s.mrr)}
-          sub={`${s.proUsers} assinantes × R$ 14,90`}
+          sub={`${s.proUsers} assinantes × R$ 19,90`}
           icon={TrendingUp}
           color="bg-success/10 text-success"
         />
