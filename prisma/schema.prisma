@@ -16,7 +16,7 @@ model User {
   password            String?   // null for OAuth-only users
   googleId            String?   @unique
   hasOnboarded        Boolean   @default(false)
-  plan                String    @default("FREE")   // FREE | PRO
+  plan                String    @default("FREE")   // FREE | PRO | PRO_PLUS
   isAdmin             Boolean   @default(false)
   stripeCustomerId    String?
   stripeSubscriptionId String?
@@ -36,6 +36,10 @@ model User {
   dateFormat          String    @default("dd/MM/yyyy")
   chatUsageMonth      String?
   chatUsageCount      Int       @default(0)
+  chatFileMonth       String?
+  chatFileCount       Int       @default(0)
+  chatAnalysisMonth   String?
+  chatAnalysisCount   Int       @default(0)
   scannerUsageMonth   String?
   scannerUsageCount   Int       @default(0)
   stripeCancelAtPeriodEnd Boolean  @default(false)

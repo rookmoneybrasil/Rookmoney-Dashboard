@@ -1,4 +1,4 @@
-export type Plan = 'FREE' | 'PRO'
+export type Plan = 'FREE' | 'PRO' | 'PRO_PLUS'
 
 export interface PlanLimits {
   transactionsPerMonth: number | null
@@ -12,6 +12,8 @@ export interface PlanLimits {
   projection:           boolean
   import:               boolean
   chat:                 number | null
+  chatFiles:            number | null
+  chatAnalysis:         number | null
   scanner:              number | null
 }
 
@@ -28,6 +30,8 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     projection:           false,
     import:               false,
     chat:                 null,
+    chatFiles:            null,
+    chatAnalysis:         null,
     scanner:              null,
   },
   PRO: {
@@ -42,12 +46,34 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     projection:           true,
     import:               true,
     chat:                 30,
+    chatFiles:            10,
+    chatAnalysis:         4,
     scanner:              20,
+  },
+  PRO_PLUS: {
+    transactionsPerMonth: null,
+    bills:                null,
+    goals:                null,
+    people:               null,
+    customCategories:     null,
+    recurring:            null,
+    budget:               true,
+    reports:              true,
+    projection:           true,
+    import:               true,
+    chat:                 null,
+    chatFiles:            null,
+    chatAnalysis:         null,
+    scanner:              null,
   },
 }
 
 export function isPro(plan?: string | null) {
-  return plan === 'PRO'
+  return plan === 'PRO' || plan === 'PRO_PLUS'
+}
+
+export function isProPlus(plan?: string | null) {
+  return plan === 'PRO_PLUS'
 }
 
 export function getLimits(plan?: string | null): PlanLimits {
