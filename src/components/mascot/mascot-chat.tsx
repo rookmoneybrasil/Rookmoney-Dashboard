@@ -4,15 +4,17 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, Send, Loader2, ArrowRight, Sparkles, ExternalLink, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 
-interface ChatImage {
+interface ChatFile {
   base64: string
-  mediaType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+  mediaType: string
+  name: string
+  isPdf: boolean
 }
 
 interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
-  image?: ChatImage | null
+  file?: ChatFile | null
   navigate?: { path: string; reason: string } | null
 }
 
@@ -38,14 +40,14 @@ const PAGE_LABELS: Record<string, string> = {
   '/billing':      'Assinatura',
 }
 
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'] as const
 
-function fileToBase64(file: File): Promise<ChatImage> {
+function fileToBase64(file: File): Promise<ChatFile> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       const dataUrl = reader.result as string
-      resolve({ base64: dataUrl.split(',')[1], mediaType: file.type as ChatImage['mediaType'] })
+      resolve({ base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name, isPdf: file.type === 'application/pdf' })
     }
     reader.onerror = reject
     reader.readAsDataURL(file)
@@ -67,7 +69,7 @@ export function MascotChat({ onClose }: Props) {
   const [loading, setLoading]         = useState(false)
   const [proRequired, setProRequired] = useState(false)
   const [remaining, setRemaining]     = useState<number | null>(null)
-  const [pendingImage, setPendingImage] = useState<ChatImage | null>(null)
+  const [pendingFile, setPendingFile] = useState<ChatFile | null>(null)
   const bottomRef                     = useRef<HTMLDivElement>(null)
   const inputRef                      = useRef<HTMLInputElement>(null)
   const fileInputRef                  = useRef<HTMLInputElement>(null)
@@ -84,30 +86,33 @@ export function MascotChat({ onClose }: Props) {
     if (!ACCEPTED_TYPES.includes(file.type as typeof ACCEPTED_TYPES[number])) return
     if (file.size > 5 * 1024 * 1024) return
     const img = await fileToBase64(file)
-    setPendingImage(img)
+    setPendingFile(img)
     inputRef.current?.focus()
   }, [])
 
-  const send = useCallback(async (text: string, image?: ChatImage | null) => {
-    if ((!text.trim() && !image) || loading) return
+  const send = useCallback(async (text: string, file?: ChatFile | null) => {
+    if ((!text.trim() && !file) || loading) return
 
-    const userMsg: ChatMessage = { role: 'user', content: text.trim(), image: image ?? null }
+    const userMsg: ChatMessage = { role: 'user', content: text.trim(), file: file ?? null }
     const history = [...messages, userMsg]
     setMessages(history)
     setInput('')
-    setPendingImage(null)
+    setPendingFile(null)
     setLoading(true)
 
     try {
       const apiMessages = history
         .filter(m => m.role === 'user' || m.role === 'assistant')
         .map(m => {
-          if (m.role === 'user' && m.image) {
-            const contentBlocks: unknown[] = [
-              { type: 'image', source: { type: 'base64', media_type: m.image.mediaType, data: m.image.base64 } },
-            ]
+          if (m.role === 'user' && m.file) {
+            const contentBlocks: unknown[] = []
+            if (m.file.isPdf) {
+              contentBlocks.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: m.file.base64 } })
+            } else {
+              contentBlocks.push({ type: 'image', source: { type: 'base64', media_type: m.file.mediaType, data: m.file.base64 } })
+            }
             if (m.content) contentBlocks.push({ type: 'text', text: m.content })
-            else contentBlocks.push({ type: 'text', text: 'Analise esta imagem.' })
+            else contentBlocks.push({ type: 'text', text: m.file.isPdf ? 'Analise este documento.' : 'Analise esta imagem.' })
             return { role: m.role, content: contentBlocks }
           }
           return { role: m.role, content: m.content }
@@ -152,7 +157,7 @@ export function MascotChat({ onClose }: Props) {
   }, [messages, loading])
 
   const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input, pendingImage) }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input, pendingFile) }
   }
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -246,13 +251,20 @@ export function MascotChat({ onClose }: Props) {
                   : 'bg-ink-700 text-slate-200 rounded-bl-sm border border-white/6'
               }`}
             >
-              {msg.image && (
+              {msg.file && (
                 <div className="mb-2 rounded-lg overflow-hidden">
-                  <img
-                    src={`data:${msg.image.mediaType};base64,${msg.image.base64}`}
-                    alt="Imagem enviada"
-                    className="max-w-full max-h-32 rounded-lg"
-                  />
+                  {msg.file.isPdf ? (
+                    <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
+                      <span className="text-base">📄</span>
+                      <span className="text-xs truncate max-w-[140px]">{msg.file.name}</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={`data:${msg.file.mediaType};base64,${msg.file.base64}`}
+                      alt="Imagem enviada"
+                      className="max-w-full max-h-32 rounded-lg"
+                    />
+                  )}
                 </div>
               )}
               {msg.content}
@@ -305,16 +317,23 @@ export function MascotChat({ onClose }: Props) {
 
       {/* Input */}
       <div className="border-t border-white/8 shrink-0" onPaste={handlePaste}>
-        {pendingImage && (
+        {pendingFile && (
           <div className="px-3 pt-2">
             <div className="inline-flex items-start gap-1.5 bg-ink-700 border border-white/8 rounded-lg p-1.5">
-              <img
-                src={`data:${pendingImage.mediaType};base64,${pendingImage.base64}`}
-                alt="Preview"
-                className="size-12 rounded object-cover"
-              />
+              {pendingFile.isPdf ? (
+                <div className="size-12 rounded bg-white/5 flex flex-col items-center justify-center gap-0.5">
+                  <span className="text-base">📄</span>
+                  <span className="text-[8px] text-slate-500 truncate max-w-10">{pendingFile.name}</span>
+                </div>
+              ) : (
+                <img
+                  src={`data:${pendingFile.mediaType};base64,${pendingFile.base64}`}
+                  alt="Preview"
+                  className="size-12 rounded object-cover"
+                />
+              )}
               <button
-                onClick={() => setPendingImage(null)}
+                onClick={() => setPendingFile(null)}
                 className="size-4 rounded-full bg-ink-600 hover:bg-ink-500 flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors"
               >
                 <X className="size-2.5" />
@@ -327,7 +346,7 @@ export function MascotChat({ onClose }: Props) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
             className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); e.target.value = '' }}
           />
@@ -344,13 +363,13 @@ export function MascotChat({ onClose }: Props) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
-            placeholder={pendingImage ? 'Descreva ou envie...' : 'Digite sua mensagem...'}
+            placeholder={pendingFile ? 'Descreva o arquivo...' : 'Digite sua mensagem...'}
             disabled={loading}
             className="flex-1 bg-ink-700 border border-white/8 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-600/60 transition-colors disabled:opacity-50"
           />
           <button
-            onClick={() => send(input, pendingImage)}
-            disabled={(!input.trim() && !pendingImage) || loading}
+            onClick={() => send(input, pendingFile)}
+            disabled={(!input.trim() && !pendingFile) || loading}
             className="size-9 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center text-white transition-colors shrink-0"
           >
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
