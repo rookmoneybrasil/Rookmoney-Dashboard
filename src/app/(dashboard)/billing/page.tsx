@@ -6,5 +6,12 @@ export default async function BillingPage() {
     serverApi.me(),
     serverApi.settings(),
   ])
-  return <BillingClient user={user} hasStripeSubscription={!!settings.stripeCustomerId} />
+  return (
+    <BillingClient
+      user={user}
+      hasStripeSubscription={!!settings.stripeCustomerId}
+      cancelAtPeriodEnd={settings.stripeCancelAtPeriodEnd ?? false}
+      currentPeriodEnd={settings.stripeCurrentPeriodEnd ?? null}
+    />
+  )
 }

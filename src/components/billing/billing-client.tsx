@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Crown, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight } from 'lucide-react'
+import { Crown, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight, AlertTriangle } from 'lucide-react'
 import { clientApi, type User } from '@/lib/api-client'
 import { UsageBar } from '@/components/ui/limit-banner'
 
@@ -14,9 +14,14 @@ const PRO_FEATURES = [
   { icon: Shield,    label: 'Suporte prioritário' },
 ]
 
-interface Props { user: User; hasStripeSubscription?: boolean }
+interface Props {
+  user: User
+  hasStripeSubscription?: boolean
+  cancelAtPeriodEnd?: boolean
+  currentPeriodEnd?: string | null
+}
 
-export function BillingClient({ user, hasStripeSubscription = false }: Props) {
+export function BillingClient({ user, hasStripeSubscription = false, cancelAtPeriodEnd = false, currentPeriodEnd = null }: Props) {
   const [annual,      setAnnual]      = useState(false)
   const [loadingUp,   setLoadingUp]   = useState(false)
   const [loadingPort, setLoadingPort] = useState(false)
@@ -78,8 +83,12 @@ export function BillingClient({ user, hasStripeSubscription = false }: Props) {
           <div className="flex items-center gap-2">
             <p className="font-semibold text-slate-100">Plano {isPro ? 'PRO' : 'Gratuito'}</p>
             {isPro && (
-              <span className="text-[10px] font-bold bg-amber-400/15 text-amber-400 border border-amber-400/30 px-1.5 py-0.5 rounded-full">
-                ATIVO
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+                cancelAtPeriodEnd
+                  ? 'bg-amber-500/15 text-amber-500 border-amber-500/30'
+                  : 'bg-amber-400/15 text-amber-400 border-amber-400/30'
+              }`}>
+                {cancelAtPeriodEnd ? 'CANCELANDO' : 'ATIVO'}
               </span>
             )}
           </div>
@@ -99,6 +108,32 @@ export function BillingClient({ user, hasStripeSubscription = false }: Props) {
           </button>
         )}
       </div>
+
+      {/* Cancellation pending banner */}
+      {isPro && cancelAtPeriodEnd && currentPeriodEnd && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 flex items-start gap-4">
+          <div className="size-10 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+            <AlertTriangle className="size-5 text-amber-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-300">Cancelamento agendado</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Seu plano PRO será cancelado em{' '}
+              <strong className="text-slate-200">
+                {new Date(currentPeriodEnd).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+              </strong>
+              . Até lá, você mantém acesso a todos os recursos.
+            </p>
+            <button
+              onClick={handlePortal}
+              disabled={loadingPort}
+              className="mt-3 text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors"
+            >
+              {loadingPort ? '...' : 'Reativar assinatura →'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Usage (Free only) */}
       {!isPro && user.usage && user.limits && (
