@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, Loader2, ArrowRight, Sparkles, ImageIcon, X } from 'lucide-react'
+import { Send, Loader2, ArrowRight, Sparkles, ImageIcon, X, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MASCOT_SRCS } from '@/lib/mascot'
@@ -89,13 +89,31 @@ function isSpreadsheet(file: File): boolean {
   return SPREADSHEET_EXTS.includes(ext)
 }
 
+const WELCOME_MSG: ChatMessage = {
+  role: 'assistant',
+  content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA.\n\nPosso te ajudar a:\n• Registrar transações e contas\n• Consultar seus gastos e metas\n• Analisar comprovantes, boletos e planilhas\n• Dar dicas personalizadas sobre suas finanças\n\nO que deseja fazer?',
+}
+
+const STORAGE_KEY = 'rookinho-chat-history'
+
+function loadHistory(): ChatMessage[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return [WELCOME_MSG]
+    const parsed = JSON.parse(raw) as ChatMessage[]
+    return parsed.length > 0 ? parsed : [WELCOME_MSG]
+  } catch { return [WELCOME_MSG] }
+}
+
+function saveHistory(msgs: ChatMessage[]) {
+  try {
+    const toSave = msgs.map(m => ({ role: m.role, content: m.content, navigate: m.navigate ?? null }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+  } catch { /* quota exceeded — ignore */ }
+}
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: 'assistant',
-      content: 'Olá! 👋 Sou o Rookinho, seu assistente financeiro com IA. Posso registrar transações, consultar contas, pagar boletos, acompanhar metas e dar dicas. Envie fotos de comprovantes, boletos ou PDFs!',
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => loadHistory())
   const [input, setInput]             = useState('')
   const [loading, setLoading]         = useState(false)
   const [proRequired, setProRequired] = useState(false)
@@ -112,12 +130,19 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
+  useEffect(() => { saveHistory(messages) }, [messages])
+
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100)
     fetch('/api/v1/chat', { credentials: 'include' })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) { setRemaining(d.remaining); setUsageLimit(d.limit) } })
       .catch(() => {})
+  }, [])
+
+  const clearHistory = useCallback(() => {
+    setMessages([WELCOME_MSG])
+    localStorage.removeItem(STORAGE_KEY)
   }, [])
 
   const processFile = useCallback(async (file: File) => {
@@ -284,6 +309,26 @@ export default function ChatPage() {
         </div>
       )}
 
+      {/* Header */}
+      {hasUserMessage && (
+        <div className="shrink-0 border-b border-white/6 bg-ink-800/80 backdrop-blur-sm">
+          <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-[10px] font-bold">R</div>
+              <span className="text-sm font-medium text-slate-200">Rookinho IA</span>
+            </div>
+            <button
+              onClick={clearHistory}
+              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+              title="Limpar histórico"
+            >
+              <Trash2 className="size-3.5" />
+              Limpar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto min-h-0">
         <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">
@@ -342,7 +387,7 @@ export default function ChatPage() {
                     )}
                   </div>
                 )}
-                {msg.content}
+                <span className="whitespace-pre-wrap">{msg.content}</span>
 
                 {msg.navigate && (
                   <Link

@@ -305,7 +305,7 @@ export function MascotChat({ onClose }: Props) {
                   )}
                 </div>
               )}
-              {msg.content}
+              <span className="whitespace-pre-wrap">{msg.content}</span>
 
               {msg.navigate && (
                 <Link
