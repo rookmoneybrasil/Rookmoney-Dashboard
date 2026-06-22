@@ -9,6 +9,7 @@ import { serverApi } from '@/lib/api-client'
 import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
+import { EditInstallmentGroupModal } from '@/components/bills/edit-installment-group-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
 // import { BillsTabs } from '@/components/bills/bills-tabs' // Open Finance — reativar quando Pluggy pago
 import { ProjectionSection, type ProjectionBill, type ProjectionMonth } from '@/components/bills/projection-section'
@@ -432,7 +433,19 @@ export default async function BillsPage() {
                             )
                           })}
                         </div>
-                        <DeleteBillGroupButton groupId={group.groupId} />
+                        <div className="flex items-center gap-2">
+                          <EditInstallmentGroupModal
+                            groupId={group.groupId}
+                            name={group.name}
+                            amount={group.amount}
+                            categoryId={group.items[0]?.category?.id ?? null}
+                            notes={group.items[0]?.notes ?? null}
+                            total={group.total}
+                            paidCount={group.paidCount}
+                            categories={categories}
+                          />
+                          <DeleteBillGroupButton groupId={group.groupId} />
+                        </div>
                       </div>
                     </details>
                   </CardContent>
