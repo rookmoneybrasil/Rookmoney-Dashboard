@@ -50,6 +50,7 @@ export default function ChatPage() {
   const [loading, setLoading]         = useState(false)
   const [proRequired, setProRequired] = useState(false)
   const [remaining, setRemaining]     = useState<number | null>(null)
+  const [usageLimit, setUsageLimit]   = useState<number | null>(null)
   const bottomRef                     = useRef<HTMLDivElement>(null)
   const inputRef                      = useRef<HTMLInputElement>(null)
 
@@ -59,6 +60,10 @@ export default function ChatPage() {
 
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100)
+    fetch('/api/v1/chat', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) { setRemaining(d.remaining); setUsageLimit(d.limit) } })
+      .catch(() => {})
   }, [])
 
   const send = useCallback(async (text: string) => {
@@ -161,6 +166,11 @@ export default function ChatPage() {
               <div>
                 <h1 className="text-xl font-bold text-slate-100">Rookinho IA</h1>
                 <p className="text-sm text-slate-500 mt-1">Seu assistente financeiro pessoal</p>
+                {remaining != null && usageLimit != null && (
+                  <p className="text-xs text-slate-600 mt-2">
+                    {usageLimit - remaining}/{usageLimit} mensagens usadas este mês
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -253,9 +263,9 @@ export default function ChatPage() {
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           </button>
         </div>
-        {remaining != null && (
+        {remaining != null && usageLimit != null && (
           <p className="text-center text-[10px] text-slate-600 pb-2">
-            {remaining} mensagens restantes este mês
+            {usageLimit - remaining}/{usageLimit} mensagens usadas este mês
           </p>
         )}
       </div>
