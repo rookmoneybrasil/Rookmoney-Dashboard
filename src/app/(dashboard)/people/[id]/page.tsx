@@ -10,6 +10,7 @@ import { EditEntryModal } from '@/components/people/edit-entry-modal'
 import { InstallmentGroup } from '@/components/people/installment-group'
 import { EditPersonButton } from '@/components/people/person-modal'
 import { DeletePersonButton } from '@/components/people/delete-person-button'
+import { SharePersonButton } from '@/components/people/share-person-button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import type { PersonEntryRow } from '@/lib/api-client'
 import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
@@ -293,6 +294,77 @@ export default async function PersonPage({ params }: Props) {
   const pendingCount = singleOpen.length + activeGroups.length
   const settledCount = singleSettled.length + doneGroups.length
 
+  // ── Share text ────────────────────────────────────────────────────────────
+  const capMonth = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)
+  const shareLines: string[] = [`📋 *${person.name}* — ${capMonth}/${now.getFullYear()}`, '']
+
+  // Current-month entries: recurring + pending singles + installment entries due this month
+  const shareIOwe: { desc: string; amount: number }[] = []
+  const shareTheyOwe: { desc: string; amount: number }[] = []
+
+  for (const r of recurring) {
+    const entry = recurringEntryMap.get(r.id)
+    if (entry?.isSettled) continue
+    const bucket = r.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
+    bucket.push({ desc: `${r.description} (recorrente, dia ${r.dayOfMonth})`, amount: Number(r.amount) })
+  }
+
+  for (const e of singleOpen) {
+    const d = new Date(e.date)
+    if (d < monthStart || d > monthEnd) continue
+    const bucket = e.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
+    bucket.push({ desc: e.description, amount: Number(e.amount) })
+  }
+
+  for (const grp of activeGroups) {
+    const due = grp.find(e => {
+      const d = new Date(e.date)
+      return d >= monthStart && d <= monthEnd && !e.isSettled
+    })
+    if (!due) continue
+    const total = due.installmentTotal ?? grp.length
+    const current = due.installmentCurrent ?? 1
+    const remaining = total - current
+    const bucket = due.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
+    bucket.push({
+      desc: `${due.description} (parcela ${current}/${total}, faltam ${remaining})`,
+      amount: Number(due.amount),
+    })
+  }
+
+  if (shareIOwe.length > 0) {
+    shareLines.push('💸 Eu devo:')
+    let subtotal = 0
+    for (const item of shareIOwe) {
+      shareLines.push(`  • ${item.desc} — ${formatCurrency(item.amount)}`)
+      subtotal += item.amount
+    }
+    if (shareIOwe.length > 1) shareLines.push(`  *Total: ${formatCurrency(subtotal)}*`)
+    shareLines.push('')
+  }
+
+  if (shareTheyOwe.length > 0) {
+    shareLines.push('💰 Me deve:')
+    let subtotal = 0
+    for (const item of shareTheyOwe) {
+      shareLines.push(`  • ${item.desc} — ${formatCurrency(item.amount)}`)
+      subtotal += item.amount
+    }
+    if (shareTheyOwe.length > 1) shareLines.push(`  *Total: ${formatCurrency(subtotal)}*`)
+    shareLines.push('')
+  }
+
+  const nextMonth = projection[1]
+  if (nextMonth && (nextMonth.iOwe > 0 || nextMonth.theyOwe > 0)) {
+    shareLines.push(`📅 Próximo mês (${nextMonth.label}):`)
+    if (nextMonth.iOwe > 0)    shareLines.push(`  Eu devo: ${formatCurrency(nextMonth.iOwe)}`)
+    if (nextMonth.theyOwe > 0) shareLines.push(`  Me deve: ${formatCurrency(nextMonth.theyOwe)}`)
+    shareLines.push('')
+  }
+
+  shareLines.push('— Enviado pelo Rook Money 🐂')
+  const shareText = shareLines.join('\n')
+
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto">
       {/* Back */}
@@ -313,6 +385,7 @@ export default async function PersonPage({ params }: Props) {
           <div className="flex items-center gap-2 mt-3 flex-wrap">
             <EditPersonButton person={person} />
             <DeletePersonButton personId={person.id} />
+            <SharePersonButton text={shareText} />
           </div>
         </div>
         <EntryModal personId={person.id} personName={person.name} categories={categories} />
