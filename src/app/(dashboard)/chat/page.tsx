@@ -428,8 +428,8 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="shrink-0 border-b border-white/6 bg-ink-800/80 backdrop-blur-sm">
+      {/* Header — always visible */}
+      <div className="shrink-0 sticky top-0 z-20 border-b border-white/6 bg-ink-800/80 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="size-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-[10px] font-bold">R</div>
@@ -456,7 +456,7 @@ export default function ChatPage() {
 
       {/* History panel */}
       {showHistory && (
-        <div className="shrink-0 border-b border-white/6 bg-ink-900/80 max-h-72 overflow-y-auto">
+        <div className="shrink-0 sticky top-[45px] z-10 border-b border-white/6 bg-ink-900/80 max-h-72 overflow-y-auto">
           <div className="max-w-2xl mx-auto px-4 py-3">
             {conversations.length === 0 ? (
               <p className="text-xs text-slate-600 text-center py-4">Nenhuma conversa salva</p>
@@ -609,8 +609,8 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Input bar */}
-      <div className="shrink-0 border-t border-white/6 bg-ink-800/80 backdrop-blur-sm" onPaste={handlePaste}>
+      {/* Input bar — always visible */}
+      <div className="shrink-0 sticky bottom-0 z-20 border-t border-white/6 bg-ink-800/80 backdrop-blur-sm" onPaste={handlePaste}>
         {/* Pending image preview */}
         {pendingFile && (
           <div className="max-w-2xl mx-auto px-4 pt-3">
