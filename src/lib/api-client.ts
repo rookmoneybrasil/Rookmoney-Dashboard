@@ -288,7 +288,7 @@ export const clientApi = {
   createPortal:   () => clientFetch<{ url: string }>('/billing/portal',   { method: 'POST' }),
 
   // Admin
-  adminSetPlan:  (id: string, plan: 'FREE' | 'PRO') =>
+  adminSetPlan:  (id: string, plan: 'FREE' | 'PRO' | 'PRO_PLUS') =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ plan }) }),
   adminSetAdmin: (id: string, isAdmin: boolean) =>
     clientFetch<void>(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify({ isAdmin }) }),
@@ -379,7 +379,7 @@ export interface CategoryTrend { categoryId: string; name: string; icon: string;
 export interface TopExpense { id: string; description: string | null; amount: number; date: string; category: Category }
 export interface SpendingDay { day: number; total: number; count?: number }
 export interface IncomeSourceReport { name: string; total: number; icon?: string; color?: string; pct?: number }
-export interface AdminStats { totalUsers: number; proUsers: number; freeUsers: number; proRate: number; newToday: number; newThisWeek: number; newThisMonth: number; totalTransactions: number; transactionsThisMonth: number; totalGoals: number; mrr: number; arr: number; recentUsers: { id: string; name: string; email: string; plan: string; createdAt: string }[] }
+export interface AdminStats { totalUsers: number; proUsers: number; proPlusUsers: number; totalPaidUsers: number; freeUsers: number; proRate: number; newToday: number; newThisWeek: number; newThisMonth: number; totalTransactions: number; transactionsThisMonth: number; totalGoals: number; mrr: number; arr: number; recentUsers: { id: string; name: string; email: string; plan: string; createdAt: string }[] }
 export interface AdminUser { id: string; name: string; email: string; plan: string; isAdmin: boolean; createdAt: string; updatedAt: string; whatsappPhone?: string | null; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; _count: { transactions: number; goals: number; bills: number; budgets: number; people: number } }
 export interface AdminUserDetail { user: AdminUser; recentTransactions: Transaction[] }
 export interface AdminUsersPage { users: AdminUser[]; total: number; page: number; totalPages: number }

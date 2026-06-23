@@ -136,7 +136,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: SidebarProps) {
   const pathname = usePathname()
-  const isPro    = plan === 'PRO'
+  const isPro    = plan === 'PRO' || plan === 'PRO_PLUS'
   const t        = useTranslations('nav')
 
   // Build translated nav groups

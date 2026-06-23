@@ -199,7 +199,7 @@ export default function ProjectionPage() {
   useEffect(() => {
     fetch('/api/v1/auth/me')
       .then(r => r.json())
-      .then(j => setIsPro(j.data?.plan === 'PRO'))
+      .then(j => setIsPro(j.data?.plan === 'PRO' || j.data?.plan === 'PRO_PLUS'))
       .catch(() => setIsPro(false))
   }, [])
 

@@ -1,5 +1,5 @@
 export function isPro(plan: string): boolean {
-  return plan === 'PRO'
+  return plan === 'PRO' || plan === 'PRO_PLUS'
 }
 
 export const FREE_LIMITS = {

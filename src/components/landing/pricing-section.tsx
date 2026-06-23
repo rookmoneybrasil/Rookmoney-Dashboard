@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Check, Crown, Zap } from 'lucide-react'
+import { Check, Crown, Zap, Sparkles } from 'lucide-react'
 import { BorderGlow } from '@/components/ui/border-glow'
 import { FadeIn } from '@/components/ui/fade-in'
 
@@ -24,21 +24,33 @@ const proPlan = [
   'Orçamento por categoria',
   'Relatórios avançados',
   'Importação de extratos CSV',
-  'Chat com IA (Rookinho)',
-  'Scanner de recibos',
+  'Chat com IA — 30/mês',
+  'Scanner de recibos — 20/mês',
   'Categorias personalizadas',
+]
+
+const proPlusPlan = [
+  'Tudo do PRO, sem limites',
+  'Chat IA ilimitado',
+  'Scanner de recibos ilimitado',
+  'Análises financeiras ilimitadas',
+  'Arquivos no chat ilimitados',
+  'Suporte VIP prioritário',
 ]
 
 export function PricingSection() {
   const [annual, setAnnual] = useState(false)
 
-  const monthlyPrice = 19.90
-  const annualPrice  = 15.90
-  const price        = annual ? annualPrice : monthlyPrice
+  const proMonthly     = 19.90
+  const proAnnual      = 15.90
+  const proPrice       = annual ? proAnnual : proMonthly
+  const plusMonthly    = 34.90
+  const plusAnnual     = 27.90
+  const plusPrice      = annual ? plusAnnual : plusMonthly
 
   return (
     <section id="pricing" className="py-24 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <FadeIn className="flex flex-col items-center mb-10">
           <div className="relative w-24 sm:w-28 mb-4">
             <img
@@ -72,11 +84,11 @@ export function PricingSection() {
 
         {annual && (
           <FadeIn className="text-center mb-6">
-            <p className="text-sm text-success">🎉 Você economiza R${((monthlyPrice - annualPrice) * 12).toFixed(0).replace('.', ',')} por ano — equivale a 2 meses grátis!</p>
+            <p className="text-sm text-success">🎉 Economize ate 20% com o plano anual!</p>
           </FadeIn>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
           {/* ── Free ── */}
           <FadeIn from="left">
@@ -144,23 +156,23 @@ export function PricingSection() {
                     </div>
                     <span className="text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30 px-2.5 py-1 rounded-full flex items-center gap-1">
                       <Zap className="size-3 fill-amber-300" />
-                      Recomendado
+                      Popular
                     </span>
                   </div>
 
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-bold text-slate-100">
-                      R$&nbsp;{price.toFixed(2).replace('.', ',')}
+                      R$&nbsp;{proPrice.toFixed(2).replace('.', ',')}
                     </span>
-                    <span className="text-slate-400 mb-1">/mês</span>
+                    <span className="text-slate-400 mb-1">/mes</span>
                   </div>
 
                   {annual && (
-                    <p className="text-xs text-slate-500 mt-1">cobrado R$&nbsp;190,80/ano</p>
+                    <p className="text-xs text-slate-500 mt-1">cobrado R$&nbsp;{(proAnnual * 12).toFixed(2).replace('.', ',')}/ano</p>
                   )}
 
                   <p className="text-sm text-slate-400 mt-2">
-                    Controle total das suas finanças, sem limites.
+                    Controle total das suas financas, sem limites.
                   </p>
                 </div>
 
@@ -179,10 +191,80 @@ export function PricingSection() {
                   href="/register"
                   className="relative block text-center bg-gradient-to-r from-brand-600 to-indigo-500 hover:from-brand-500 hover:to-indigo-400 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-600/30 hover:shadow-brand-500/40 hover:scale-[1.01]"
                 >
-                  {annual ? 'Assinar anual — 2 meses grátis' : 'Começar com PRO'}
+                  {annual ? 'Assinar anual' : 'Comecar com PRO'}
                 </Link>
 
-                <p className="text-center text-xs text-slate-600">Cancele quando quiser · Sem multa</p>
+                <p className="text-center text-xs text-slate-600">Cancele quando quiser</p>
+              </div>
+            </BorderGlow>
+          </FadeIn>
+
+          {/* ── PRO+ ── */}
+          <FadeIn from="right" delay={200}>
+            <BorderGlow
+              glowColor="245 120 40"
+              colors={['#f59e0b', '#f97316', '#ea580c']}
+              borderRadius={20}
+              glowIntensity={1.4}
+              fillOpacity={0.2}
+              backgroundColor="#1a1000"
+              animated
+            >
+              <div className="relative p-8 flex flex-col gap-6 overflow-hidden">
+                {/* Glow backdrop */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse 100% 60% at 50% -20%, rgba(249,115,22,0.18) 0%, transparent 70%)' }}
+                />
+
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="size-4 text-orange-400" />
+                      <p className="text-sm font-bold text-orange-400 uppercase tracking-wider">PRO+</p>
+                    </div>
+                    <span className="text-xs font-semibold bg-orange-400/15 text-orange-300 border border-orange-400/30 px-2.5 py-1 rounded-full flex items-center gap-1">
+                      <Sparkles className="size-3" />
+                      Ilimitado
+                    </span>
+                  </div>
+
+                  <div className="flex items-end gap-1">
+                    <span className="text-4xl font-bold text-slate-100">
+                      R$&nbsp;{plusPrice.toFixed(2).replace('.', ',')}
+                    </span>
+                    <span className="text-slate-400 mb-1">/mes</span>
+                  </div>
+
+                  {annual && (
+                    <p className="text-xs text-slate-500 mt-1">cobrado R$&nbsp;{(plusAnnual * 12).toFixed(2).replace('.', ',')}/ano</p>
+                  )}
+
+                  <p className="text-sm text-slate-400 mt-2">
+                    Para quem quer o maximo, sem nenhum limite.
+                  </p>
+                </div>
+
+                <ul className="relative flex flex-col gap-3">
+                  {proPlusPlan.map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-slate-200">
+                      <div className="size-4 rounded-full bg-orange-600/30 flex items-center justify-center shrink-0">
+                        <Check className="size-2.5 text-orange-300" />
+                      </div>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/register"
+                  className="relative block text-center bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-ink-900 font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-400/40 hover:scale-[1.01]"
+                >
+                  {annual ? 'Assinar anual' : 'Comecar com PRO+'}
+                </Link>
+
+                <p className="text-center text-xs text-slate-600">Cancele quando quiser</p>
               </div>
             </BorderGlow>
           </FadeIn>

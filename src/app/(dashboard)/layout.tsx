@@ -5,6 +5,7 @@ import { DashboardShell } from '@/components/layout/dashboard-shell'
 import { Header } from '@/components/layout/header'
 import { LimitBanner } from '@/components/ui/limit-banner'
 import { ImpersonationBanner } from '@/components/ui/impersonation-banner'
+import { isPro } from '@/lib/plans'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let user
@@ -26,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     })
   }
 
-  const showLimitBanner = !isImpersonating && user.plan !== 'PRO' && user.usage && user.limits
+  const showLimitBanner = !isImpersonating && !isPro(user.plan) && user.usage && user.limits
 
   return (
     <DashboardShell

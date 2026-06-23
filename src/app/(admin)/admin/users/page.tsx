@@ -1,6 +1,7 @@
 import { serverApi } from '@/lib/api-client'
 import { formatDate } from '@/lib/utils'
-import { Search, ArrowUpRight, Crown } from 'lucide-react'
+import { Search, ArrowUpRight, Crown, Sparkles } from 'lucide-react'
+import { isPro as checkIsPro, isProPlus } from '@/lib/plans'
 import Link from 'next/link'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
@@ -41,6 +42,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
         >
           <option value="">Todos os planos</option>
           <option value="PRO">Pro</option>
+          <option value="PRO_PLUS">Pro+</option>
           <option value="FREE">Gratuito</option>
         </select>
         <button
@@ -94,12 +96,15 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
                 <td className="px-5 py-3 text-slate-500 text-xs hidden md:table-cell">{u.email}</td>
                 <td className="px-5 py-3">
                   <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    u.plan === 'PRO'
-                      ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
-                      : 'bg-ink-700 text-slate-500 border border-white/6'
+                    isProPlus(u.plan)
+                      ? 'bg-gradient-to-r from-amber-900/60 to-orange-900/60 text-orange-400 border border-orange-700/40'
+                      : checkIsPro(u.plan)
+                        ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
+                        : 'bg-ink-700 text-slate-500 border border-white/6'
                   }`}>
+                    {isProPlus(u.plan) && <Sparkles className="size-3" />}
                     {u.plan === 'PRO' && <Crown className="size-3" />}
-                    {u.plan}
+                    {isProPlus(u.plan) ? 'PRO+' : u.plan}
                   </span>
                 </td>
                 <td className="px-5 py-3 text-right text-slate-400 tabular-nums hidden lg:table-cell">

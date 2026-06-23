@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { Crown, X, Check } from 'lucide-react'
+import { Crown, X, Check, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { playProUpgrade } from '@/lib/sounds'
 
-const PERKS = [
+const PRO_PERKS = [
   'Transações, metas e contas ilimitadas',
   'Relatórios avançados e projeção financeira',
   'Chat com IA — Rookinho responde tudo',
@@ -16,17 +16,29 @@ const PERKS = [
   'Suporte prioritário',
 ]
 
+const PRO_PLUS_PERKS = [
+  'Tudo do PRO, sem nenhum limite',
+  'Chat IA ilimitado com Rookinho',
+  'Scanner de recibos ilimitado',
+  'Análises financeiras ilimitadas',
+  'Importação de extratos ilimitada',
+  'Suporte VIP prioritário',
+]
+
 export function WelcomeProModal() {
   const [open, setOpen] = useState(false)
+  const [upgradedPlan, setUpgradedPlan] = useState<string>('PRO')
   const router = useRouter()
   const params = useSearchParams()
 
   useEffect(() => {
     if (params.get('upgraded') === '1') {
+      const plan = params.get('plan') === 'PRO_PLUS' ? 'PRO_PLUS' : 'PRO'
       // eslint-disable-next-line react-hooks/set-state-in-effect -- opens welcome modal in response to ?upgraded=1 URL param on mount
+      setUpgradedPlan(plan)
       setOpen(true)
       playProUpgrade()
-      window.fbq?.('track', 'Subscribe', { value: 19.90, currency: 'BRL' })
+      window.fbq?.('track', 'Subscribe', { value: plan === 'PRO_PLUS' ? 34.90 : 19.90, currency: 'BRL' })
       router.replace('/dashboard', { scroll: false })
     }
   }, [params, router])
@@ -64,21 +76,33 @@ export function WelcomeProModal() {
         {/* Content */}
         <div className="px-6 pb-6 flex flex-col gap-4 -mt-4 relative z-10">
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-xl bg-amber-400/15 flex items-center justify-center">
-              <Crown className="size-4 text-amber-400 fill-amber-400/30" />
+            <div className={`size-8 rounded-xl flex items-center justify-center ${
+              upgradedPlan === 'PRO_PLUS' ? 'bg-gradient-to-br from-amber-400/15 to-orange-400/15' : 'bg-amber-400/15'
+            }`}>
+              {upgradedPlan === 'PRO_PLUS'
+                ? <Sparkles className="size-4 text-orange-400" />
+                : <Crown className="size-4 text-amber-400 fill-amber-400/30" />}
             </div>
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">PRO Ativo</span>
+            <span className={`text-xs font-bold uppercase tracking-wider ${
+              upgradedPlan === 'PRO_PLUS' ? 'text-orange-400' : 'text-amber-400'
+            }`}>
+              {upgradedPlan === 'PRO_PLUS' ? 'PRO+ Ativo' : 'PRO Ativo'}
+            </span>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold text-white">Bem-vindo ao PRO! 🎉</h2>
+            <h2 className="text-2xl font-bold text-white">
+              {upgradedPlan === 'PRO_PLUS' ? 'Bem-vindo ao PRO+!' : 'Bem-vindo ao PRO!'} 🎉
+            </h2>
             <p className="text-slate-400 text-sm mt-1">
-              Agora você tem acesso completo a tudo que o Rook Money tem a oferecer.
+              {upgradedPlan === 'PRO_PLUS'
+                ? 'Agora você tem acesso ilimitado a tudo — sem nenhuma restricao.'
+                : 'Agora você tem acesso completo a tudo que o Rook Money tem a oferecer.'}
             </p>
           </div>
 
           <ul className="flex flex-col gap-2">
-            {PERKS.map(p => (
+            {(upgradedPlan === 'PRO_PLUS' ? PRO_PLUS_PERKS : PRO_PERKS).map(p => (
               <li key={p} className="flex items-center gap-2.5 text-sm text-slate-300">
                 <div className="size-5 rounded-full bg-success/15 flex items-center justify-center shrink-0">
                   <Check className="size-3 text-success" />
@@ -89,7 +113,7 @@ export function WelcomeProModal() {
           </ul>
 
           <Button onClick={() => setOpen(false)} className="w-full mt-1">
-            Começar a usar ⚡
+            Começar a usar
           </Button>
         </div>
       </div>

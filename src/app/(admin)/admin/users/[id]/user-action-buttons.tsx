@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Crown, Shield, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Crown, Shield, Trash2, Sparkles, ChevronDown } from 'lucide-react'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -9,29 +10,60 @@ interface PlanToggleProps { userId: string; currentPlan: string }
 interface AdminToggleProps { userId: string; isAdmin: boolean }
 interface DeleteButtonProps { userId: string }
 
+const PLAN_OPTIONS: { value: 'FREE' | 'PRO' | 'PRO_PLUS'; label: string; icon: React.ReactNode; color: string }[] = [
+  { value: 'FREE',     label: 'Free',  icon: null,                                      color: 'text-slate-400' },
+  { value: 'PRO',      label: 'Pro',   icon: <Crown className="size-3" />,               color: 'text-amber-400' },
+  { value: 'PRO_PLUS', label: 'Pro+',  icon: <Sparkles className="size-3" />,            color: 'text-orange-400' },
+]
+
 export function PlanToggle({ userId, currentPlan }: PlanToggleProps) {
-  const isProNow = currentPlan === 'PRO'
-  const nextPlan = isProNow ? 'FREE' : 'PRO'
-  const router   = useRouter()
+  const [open, setOpen] = useState(false)
+  const router = useRouter()
 
   const { mutate, pending } = useMutation<void>(
-    () => clientApi.adminSetPlan(userId, nextPlan as 'FREE' | 'PRO'),
+    async () => { /* placeholder, overridden by setPlan below */ },
     { onSuccess: () => router.refresh() },
   )
 
+  function setPlan(plan: 'FREE' | 'PRO' | 'PRO_PLUS') {
+    if (plan === currentPlan) { setOpen(false); return }
+    setOpen(false)
+    clientApi.adminSetPlan(userId, plan).then(() => {
+      window.location.reload()
+    })
+  }
+
+  const current = PLAN_OPTIONS.find(p => p.value === currentPlan) ?? PLAN_OPTIONS[0]
+
   return (
-    <button
-      onClick={() => mutate()}
-      disabled={pending}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 ${
-        isProNow
-          ? 'bg-ink-700 hover:bg-ink-600 border border-white/8 text-slate-300'
-          : 'bg-amber-900/60 hover:bg-amber-800/60 border border-amber-700/40 text-amber-300'
-      }`}
-    >
-      <Crown className="size-4" />
-      {isProNow ? 'Rebaixar para Free' : 'Promover para Pro'}
-    </button>
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        disabled={pending}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 bg-ink-700 hover:bg-ink-600 border border-white/8 text-slate-300"
+      >
+        <Crown className="size-4" />
+        Plano: <span className={current.color}>{current.label}</span>
+        <ChevronDown className="size-3.5" />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-ink-800 border border-white/10 rounded-xl shadow-xl py-1 min-w-[160px]">
+          {PLAN_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setPlan(opt.value)}
+              className={`flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-ink-700 transition-colors ${
+                opt.value === currentPlan ? 'font-bold' : 'font-medium'
+              } ${opt.color}`}
+            >
+              {opt.icon}
+              {opt.label}
+              {opt.value === currentPlan && <span className="ml-auto text-[10px] text-slate-600">atual</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

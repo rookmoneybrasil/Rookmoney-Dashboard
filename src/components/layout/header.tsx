@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { serverApi } from '@/lib/api-client'
 import { NotificationBell } from './notification-bell'
 import { Avatar } from '@/components/ui/avatar'
-import { Settings, Crown } from 'lucide-react'
+import { Settings, Crown, Sparkles } from 'lucide-react'
 import { LogoutButton } from './logout-button'
+import { isPro, isProPlus } from '@/lib/plans'
 
 export async function Header() {
   const [notifications, user] = await Promise.all([
@@ -12,7 +13,8 @@ export async function Header() {
     serverApi.me().catch(() => null),
   ])
 
-  const isPro = user?.plan === 'PRO'
+  const userIsPro = isPro(user?.plan)
+  const userIsProPlus = isProPlus(user?.plan)
 
   return (
     <header className="relative z-40 flex items-center gap-3 h-14 px-4 lg:px-6 border-b border-white/6 bg-ink-800/50 backdrop-blur-sm shrink-0 print:hidden">
@@ -29,7 +31,7 @@ export async function Header() {
         <NotificationBell notifications={notifications} />
 
         {/* PRO upgrade — only for Free users */}
-        {user && !isPro && (
+        {user && !userIsPro && (
           <Link href="/billing"
             className="hidden sm:flex items-center gap-1.5 bg-amber-400/10 hover:bg-amber-400/15 border border-amber-400/25 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
             <Crown className="size-3.5 fill-amber-400/30" />
@@ -52,11 +54,13 @@ export async function Header() {
               <span className="text-xs font-medium text-slate-300">{user.name.split(' ')[0]}</span>
               <span className="text-[10px] text-slate-600 truncate max-w-[120px]">{user.email}</span>
             </div>
-            {isPro ? (
-              <Link href="/billing" title="Gerenciar plano PRO" className="relative shrink-0">
+            {userIsPro ? (
+              <Link href="/billing" title={userIsProPlus ? 'Gerenciar plano PRO+' : 'Gerenciar plano PRO'} className="relative shrink-0">
                 <Avatar src={user.profileImage ?? undefined} name={user.name} size="sm" />
-                <div className="absolute -bottom-1 -right-1 size-4 rounded-full bg-amber-400 border-2 border-ink-800 flex items-center justify-center">
-                  <Crown className="size-2.5 text-ink-900 fill-ink-900" />
+                <div className={`absolute -bottom-1 -right-1 size-4 rounded-full border-2 border-ink-800 flex items-center justify-center ${userIsProPlus ? 'bg-gradient-to-br from-amber-400 to-orange-500' : 'bg-amber-400'}`}>
+                  {userIsProPlus
+                    ? <Sparkles className="size-2.5 text-ink-900" />
+                    : <Crown className="size-2.5 text-ink-900 fill-ink-900" />}
                 </div>
               </Link>
             ) : (

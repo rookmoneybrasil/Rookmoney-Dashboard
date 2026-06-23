@@ -28,6 +28,7 @@ export async function getAdminStats() {
   const [
     totalUsers,
     proUsers,
+    proPlusUsers,
     newToday,
     newThisWeek,
     newThisMonth,
@@ -38,6 +39,7 @@ export async function getAdminStats() {
   ] = await Promise.all([
     db.user.count(),
     db.user.count({ where: { plan: 'PRO' } }),
+    db.user.count({ where: { plan: 'PRO_PLUS' } }),
     db.user.count({ where: { createdAt: { gte: today } } }),
     db.user.count({ where: { createdAt: { gte: weekAgo } } }),
     db.user.count({ where: { createdAt: { gte: monthStart } } }),
@@ -51,14 +53,18 @@ export async function getAdminStats() {
     }),
   ])
 
-  const MRR_PRO = 19.90
-  const mrr = proUsers * MRR_PRO
+  const MRR_PRO      = 19.90
+  const MRR_PRO_PLUS = 34.90
+  const totalPaidUsers = proUsers + proPlusUsers
+  const mrr = (proUsers * MRR_PRO) + (proPlusUsers * MRR_PRO_PLUS)
 
   return {
     totalUsers,
     proUsers,
-    freeUsers: totalUsers - proUsers,
-    proRate: totalUsers > 0 ? Math.round((proUsers / totalUsers) * 100) : 0,
+    proPlusUsers,
+    totalPaidUsers,
+    freeUsers: totalUsers - totalPaidUsers,
+    proRate: totalUsers > 0 ? Math.round((totalPaidUsers / totalUsers) * 100) : 0,
     newToday,
     newThisWeek,
     newThisMonth,
@@ -86,7 +92,7 @@ export async function getAdminUsers({
   await requireAdmin()
 
   const where: Record<string, unknown> = {}
-  if (plan === 'PRO' || plan === 'FREE') where.plan = plan
+  if (plan === 'PRO' || plan === 'PRO_PLUS' || plan === 'FREE') where.plan = plan
   if (search.trim()) {
     where.OR = [
       { name:  { contains: search, mode: 'insensitive' } },
@@ -165,7 +171,7 @@ export async function getAdminUser(id: string) {
 
 // ─── Plan management ────────────────────────────────────────────────────────────
 
-export async function setUserPlan(userId: string, plan: 'FREE' | 'PRO') {
+export async function setUserPlan(userId: string, plan: 'FREE' | 'PRO' | 'PRO_PLUS') {
   await requireAdmin()
   await db.user.update({ where: { id: userId }, data: { plan } })
   revalidatePath('/admin/users')

@@ -4,8 +4,9 @@ import { serverApi } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {
   ArrowLeft, Crown, TrendingUp, TrendingDown,
-  ReceiptText, Target, FileText, PiggyBank, Users,
+  ReceiptText, Target, FileText, PiggyBank, Users, Sparkles,
 } from 'lucide-react'
+import { isPro as checkIsPro, isProPlus } from '@/lib/plans'
 import { PlanToggle, AdminToggle, DeleteButton } from './user-action-buttons'
 
 interface Props { params: Promise<{ id: string }> }
@@ -44,12 +45,15 @@ export default async function AdminUserPage({ params }: Props) {
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-slate-100">{user.name}</h1>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 ${
-              user.plan === 'PRO'
-                ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
-                : 'bg-ink-700 text-slate-500 border border-white/8'
+              isProPlus(user.plan)
+                ? 'bg-gradient-to-r from-amber-900/60 to-orange-900/60 text-orange-400 border border-orange-700/40'
+                : checkIsPro(user.plan)
+                  ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
+                  : 'bg-ink-700 text-slate-500 border border-white/8'
             }`}>
+              {isProPlus(user.plan) && <Sparkles className="size-3" />}
               {user.plan === 'PRO' && <Crown className="size-3" />}
-              {user.plan}
+              {isProPlus(user.plan) ? 'PRO+' : user.plan}
             </span>
             {user.isAdmin && (
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-danger/15 text-danger border border-danger/30">

@@ -8,6 +8,7 @@ import { DashboardGreeting } from '@/components/dashboard/greeting'
 import { MonthPace } from '@/components/dashboard/month-pace'
 import { NextBillHighlight } from '@/components/dashboard/next-bill-highlight'
 import { CategoryDonut } from '@/components/dashboard/category-donut'
+import { isPro as checkIsPro } from '@/lib/plans'
 import { RookinhoInsight } from '@/components/dashboard/rookinho-insight'
 import { DashboardKPIs } from '@/components/dashboard/stat-card-modals'
 import { ThemedBillCard } from '@/components/dashboard/themed-bill-card'
@@ -35,7 +36,7 @@ export default async function DashboardPage() {
     serverApi.budget(currentMonth).catch(() => [] as Awaited<ReturnType<typeof serverApi.budget>>),
     serverApi.me().catch(() => null),
   ])
-  const isPro = me?.plan === 'PRO'
+  const isPro = checkIsPro(me?.plan)
   const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR })
   const firstName  = data.userName.split(' ')[0]
   const mood       = data.mood as MascotMood

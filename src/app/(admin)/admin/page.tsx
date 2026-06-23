@@ -1,6 +1,7 @@
 import { serverApi } from '@/lib/api-client'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Users, Crown, TrendingUp, ArrowUpRight, Receipt, Target } from 'lucide-react'
+import { Users, Crown, TrendingUp, ArrowUpRight, Receipt, Target, Sparkles } from 'lucide-react'
+import { isPro as checkIsPro, isProPlus } from '@/lib/plans'
 import Link from 'next/link'
 
 function KPICard({ label, value, sub, icon: Icon, color }: {
@@ -44,16 +45,16 @@ export default async function AdminDashboard() {
           color="bg-brand-800/60 text-brand-400"
         />
         <KPICard
-          label="Plano Pro"
-          value={s.proUsers.toLocaleString('pt-BR')}
-          sub={`${s.proRate}% da base · ${s.freeUsers} gratuitos`}
+          label="Assinantes"
+          value={s.totalPaidUsers.toLocaleString('pt-BR')}
+          sub={`${s.proUsers} PRO · ${s.proPlusUsers} PRO+ · ${s.proRate}% da base`}
           icon={Crown}
           color="bg-amber-900/60 text-amber-400"
         />
         <KPICard
           label="MRR"
           value={formatCurrency(s.mrr)}
-          sub={`${s.proUsers} assinantes × R$ 19,90`}
+          sub={`${s.proUsers}x R$19,90 + ${s.proPlusUsers}x R$34,90`}
           icon={TrendingUp}
           color="bg-success/10 text-success"
         />
@@ -116,12 +117,16 @@ export default async function AdminDashboard() {
                   </td>
                   <td className="px-5 py-3 text-slate-500 text-xs">{u.email}</td>
                   <td className="px-5 py-3">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      u.plan === 'PRO'
-                        ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
-                        : 'bg-ink-700 text-slate-500 border border-white/6'
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                      isProPlus(u.plan)
+                        ? 'bg-gradient-to-r from-amber-900/60 to-orange-900/60 text-orange-400 border border-orange-700/40'
+                        : checkIsPro(u.plan)
+                          ? 'bg-amber-900/60 text-amber-400 border border-amber-700/40'
+                          : 'bg-ink-700 text-slate-500 border border-white/6'
                     }`}>
-                      {u.plan}
+                      {isProPlus(u.plan) && <Sparkles className="size-3" />}
+                      {u.plan === 'PRO' && <Crown className="size-3" />}
+                      {isProPlus(u.plan) ? 'PRO+' : u.plan}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-slate-600 text-xs">{formatDate(u.createdAt)}</td>

@@ -1,6 +1,7 @@
-import { Crown, Zap, ArrowRight } from 'lucide-react'
+import { Crown, Zap, ArrowRight, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import type { UserUsage, UserLimits } from '@/lib/api-client'
+import { isPro as checkIsPro, isProPlus } from '@/lib/plans'
 
 interface Props {
   plan:   string
@@ -35,26 +36,36 @@ function Bar({ used, limit, label }: { used: number; limit: number | null; label
 }
 
 export function PlanUsageCard({ plan, usage, limits }: Props) {
-  const isPro = plan === 'PRO'
+  const isPro = checkIsPro(plan)
+  const isPlus = isProPlus(plan)
+
+  const planLabel = isPlus ? 'PRO+' : isPro ? 'PRO' : 'Gratuito'
+  const planDesc  = isPlus
+    ? 'Todos os recursos ilimitados — sem limites'
+    : isPro
+      ? 'Todos os recursos desbloqueados'
+      : 'Até atingir os limites do plano Free'
 
   return (
     <div className="flex flex-col gap-5">
       {/* Plan header */}
       <div className={`flex items-center gap-3 p-4 rounded-xl border ${
-        isPro ? 'bg-amber-400/5 border-amber-400/20' : 'bg-ink-700/60 border-white/6'
+        isPlus ? 'bg-gradient-to-r from-amber-400/5 to-orange-400/5 border-orange-400/20'
+          : isPro ? 'bg-amber-400/5 border-amber-400/20' : 'bg-ink-700/60 border-white/6'
       }`}>
         <div className={`size-10 rounded-xl flex items-center justify-center shrink-0 ${
-          isPro ? 'bg-amber-400/15' : 'bg-ink-600'
+          isPlus ? 'bg-gradient-to-br from-amber-400/15 to-orange-400/15'
+            : isPro ? 'bg-amber-400/15' : 'bg-ink-600'
         }`}>
-          {isPro
-            ? <Crown className="size-5 text-amber-400 fill-amber-400/30" />
-            : <Zap   className="size-5 text-brand-400" />}
+          {isPlus
+            ? <Sparkles className="size-5 text-orange-400" />
+            : isPro
+              ? <Crown className="size-5 text-amber-400 fill-amber-400/30" />
+              : <Zap   className="size-5 text-brand-400" />}
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-slate-200">Plano {isPro ? 'PRO' : 'Gratuito'}</p>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {isPro ? 'Todos os recursos desbloqueados' : 'Até atingir os limites do plano Free'}
-          </p>
+          <p className="text-sm font-semibold text-slate-200">Plano {planLabel}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{planDesc}</p>
         </div>
         {!isPro && (
           <Link href="/billing"
@@ -101,7 +112,13 @@ export function PlanUsageCard({ plan, usage, limits }: Props) {
       {!isPro && (
         <Link href="/billing"
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/15 border border-amber-400/20 text-amber-400 text-sm font-semibold transition-colors">
-          Ver planos e preços <ArrowRight className="size-4" />
+          Ver planos e precos <ArrowRight className="size-4" />
+        </Link>
+      )}
+      {isPro && !isPlus && (
+        <Link href="/billing"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-orange-400/10 hover:bg-orange-400/15 border border-orange-400/20 text-orange-400 text-sm font-semibold transition-colors">
+          <Sparkles className="size-4" /> Fazer upgrade para PRO+
         </Link>
       )}
     </div>

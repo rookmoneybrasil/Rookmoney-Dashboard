@@ -6,6 +6,7 @@ import {
   Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue,
 } from './select'
 import { clientApi } from '@/lib/api-client'
+import { isPro as checkIsPro } from '@/lib/plans'
 import Link from 'next/link'
 
 interface Category { id: string; name: string; icon: string; color: string; isDefault?: boolean; userId?: string | null }
@@ -37,7 +38,7 @@ export function CategorySelect({ categories, value, onChange, placeholder = 'Sel
   async function checkPlanAndCreate() {
     if (isPro === null) {
       const user = await clientApi.me().catch(() => null)
-      const pro  = user?.plan === 'PRO'
+      const pro  = checkIsPro(user?.plan)
       setIsPro(pro)
       const customCount = categories.filter(c => !c.isDefault && c.userId !== null).length
       if (!pro && customCount >= maxFree) { setCreating(true); return }
