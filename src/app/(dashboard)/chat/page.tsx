@@ -202,7 +202,10 @@ export default function ChatPage() {
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100)
     fetch('/api/v1/chat', { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
+      .then(r => {
+        if (r.status === 403) { setProRequired(true); return null }
+        return r.ok ? r.json() : null
+      })
       .then(d => { if (d) { setRemaining(d.remaining); setUsageLimit(d.limit) } })
       .catch(() => {})
   }, [])

@@ -109,6 +109,9 @@ export function MascotChat({ onClose }: Props) {
 
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100)
+    fetch('/api/v1/chat', { credentials: 'include' })
+      .then(r => { if (r.status === 403) setProRequired(true) })
+      .catch(() => {})
   }, [])
 
   const processFile = useCallback(async (file: File) => {
