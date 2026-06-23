@@ -4,10 +4,11 @@ import { OFXImporter } from '@/components/import/ofx-importer'
 import { ReceiptScanner } from '@/components/import/receipt-scanner'
 import { Tabs } from '@/components/import/import-tabs'
 import { ProGate } from '@/components/ui/pro-gate'
+import { isPro } from '@/lib/plans'
 
 export default async function ImportPage() {
   const user = await serverApi.me()
-  if (user.plan !== 'PRO') {
+  if (!isPro(user.plan)) {
     return (
       <ProGate feature="Importação de dados e Scanner de recibo" locked>
         <div className="h-64 rounded-xl bg-ink-800 border border-white/6" />

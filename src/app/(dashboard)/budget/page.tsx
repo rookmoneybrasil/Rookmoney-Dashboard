@@ -10,6 +10,7 @@ import { serverApi } from '@/lib/api-client'
 import { BudgetModal } from '@/components/budget/budget-modal'
 import { BudgetMonthPicker } from '@/components/budget/budget-month-picker'
 import { ProGate } from '@/components/ui/pro-gate'
+import { isPro } from '@/lib/plans'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -18,7 +19,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
   const month = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
 
   const user = await serverApi.me()
-  if (user.plan !== 'PRO') {
+  if (!isPro(user.plan)) {
     return (
       <ProGate feature="Orçamento por categoria" locked>
         <div className="h-96 rounded-xl bg-ink-800 border border-white/6" />

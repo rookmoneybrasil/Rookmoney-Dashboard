@@ -13,6 +13,7 @@ import { SpendingPattern } from '@/components/reports/spending-pattern'
 import { IncomeSourcesChart } from '@/components/reports/income-sources-chart'
 import { format } from 'date-fns'
 import { ProGate } from '@/components/ui/pro-gate'
+import { isPro } from '@/lib/plans'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -22,7 +23,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
   const month  = (sp.month as string) ?? format(new Date(), 'yyyy-MM')
 
   const user = await serverApi.me()
-  if (user.plan !== 'PRO') {
+  if (!isPro(user.plan)) {
     return (
       <ProGate feature="Relatórios avançados" locked>
         <div className="h-96 rounded-xl bg-ink-800 border border-white/6" />
