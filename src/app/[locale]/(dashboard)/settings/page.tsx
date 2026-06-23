@@ -81,17 +81,6 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="size-4 text-green-400" /> WhatsApp
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <WhatsAppForm currentPhone={user.whatsappPhone ?? null} />
-        </CardContent>
-      </Card>
-
       {/* ─── PREFERÊNCIAS ───────────────────────────────────────────── */}
       <SectionLabel>Preferências</SectionLabel>
 
