@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Sparkles, X, Receipt, RefreshCw, Users, Crown } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Sparkles, X, Receipt, RefreshCw, Users } from 'lucide-react'
+import { ProGate } from '@/components/ui/pro-gate'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -252,29 +253,13 @@ export default function ProjectionPage() {
   // PRO gate
   if (isPro === false) {
     return (
-      <div className="relative max-w-5xl mx-auto">
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
-          <div className="size-14 rounded-2xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center">
-            <Crown className="size-7 text-amber-400 fill-amber-400/20" />
-          </div>
-          <div className="text-center">
-            <p className="text-base font-semibold text-slate-100">Projeção financeira é PRO</p>
-            <p className="text-sm text-slate-500 mt-1">Veja para onde seu dinheiro vai nos próximos meses</p>
-          </div>
-          <Link href="/settings?tab=billing"
-            className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-ink-900 font-bold text-sm px-5 py-2.5 rounded-xl transition-colors">
-            <Crown className="size-4 fill-ink-900" />
-            Assinar PRO — R$19,90/mês
-          </Link>
+      <ProGate feature="Projeção financeira" locked>
+        <div className="flex gap-3 overflow-hidden blur-sm opacity-20 pointer-events-none">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="min-w-[110px] h-[172px] bg-ink-800 border border-ink-700 rounded-xl shrink-0" />
+          ))}
         </div>
-        <div className="blur-sm opacity-20 pointer-events-none">
-          <div className="flex gap-3 overflow-hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="min-w-[110px] h-[172px] bg-ink-800 border border-ink-700 rounded-xl shrink-0" />
-            ))}
-          </div>
-        </div>
-      </div>
+      </ProGate>
     )
   }
 
