@@ -43,7 +43,7 @@ export function ContributeButton({ goalId, goalName, remaining, current, categor
 
   const { mutate: withdraw, pending: pendingW, error: errW } = useMutation(
     (data: { amount: string }) =>
-      clientApi.withdrawFromGoal(goalId, parseFloat(data.amount), categoryId || undefined),
+      clientApi.withdrawFromGoal(goalId, parseFloat(data.amount)),
     {
       onSuccess: () => {
         setOpen(false)
@@ -103,20 +103,22 @@ export function ContributeButton({ goalId, goalName, remaining, current, categor
             <CurrencyInput id="amount" name="amount" required />
           </FormField>
 
-          <FormField label="Categoria" htmlFor="categoryId">
-            <Select value={categoryId} onValueChange={setCatId}>
-              <SelectTrigger><SelectValue placeholder="Metas / Poupança" /></SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
+          {mode === 'contribute' && (
+            <FormField label="Categoria" htmlFor="categoryId">
+              <Select value={categoryId} onValueChange={setCatId}>
+                <SelectTrigger><SelectValue placeholder="Metas / Poupança" /></SelectTrigger>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+          )}
 
           {mode === 'withdraw' && (
             <p className="text-xs text-slate-500 bg-ink-700/60 border border-white/6 rounded-lg px-3 py-2">
-              💡 A retirada cria uma receita revertendo a despesa do aporte original.
+              💡 A retirada reverte a despesa do aporte original — seu saldo volta ao normal.
             </p>
           )}
 
