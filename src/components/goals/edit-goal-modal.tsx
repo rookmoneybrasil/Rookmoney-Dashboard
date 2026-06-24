@@ -61,7 +61,7 @@ export function EditGoalModal({ goal }: Props) {
   return (
     <Modal open={open} onOpenChange={setOpen}>
       <button onClick={() => setOpen(true)}
-        className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10"
+        className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10 transition-colors"
         title="Editar meta">
         <Pencil className="size-3.5" />
       </button>

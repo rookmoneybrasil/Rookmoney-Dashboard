@@ -23,7 +23,7 @@ export function ConfirmDeleteButton({
   const [confirming, setConfirming]   = useState(false)
   const [isPending, startTransition]  = useTransition()
 
-  const triggerClass = className ?? `sm:opacity-0 sm:group-hover:opacity-100 transition-opacity size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10`
+  const triggerClass = className ?? `size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10 transition-colors`
 
   if (confirming) {
     return (
