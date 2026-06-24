@@ -158,6 +158,7 @@ export default async function GoalsPage() {
                 <span className="text-sm font-semibold text-success">
                   {formatCurrency(Number(goal.targetAmount))}
                 </span>
+                <DeleteGoalButton id={goal.id} />
               </div>
             </Card>
           ))}
