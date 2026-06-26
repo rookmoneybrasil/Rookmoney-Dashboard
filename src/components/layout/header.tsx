@@ -6,10 +6,11 @@ import { Avatar } from '@/components/ui/avatar'
 import { Settings, Crown, Sparkles } from 'lucide-react'
 import { LogoutButton } from './logout-button'
 import { isPro, isProPlus } from '@/lib/plans'
+import { getNotifications } from '@/app/actions/notifications'
 
 export async function Header() {
   const [notifications, user] = await Promise.all([
-    serverApi.notifications().catch(() => []),
+    getNotifications().catch(() => []),
     serverApi.me().catch(() => null),
   ])
 

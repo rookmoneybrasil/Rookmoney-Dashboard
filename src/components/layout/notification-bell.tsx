@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, Receipt, Target, PieChart, Users, TrendingUp, CheckCheck } from 'lucide-react'
+import { Bell, Receipt, Target, PieChart, Users, TrendingUp, CheckCheck, Bird } from 'lucide-react'
 import type { AppNotification } from '@/lib/api-client'
 
 interface Props {
@@ -10,11 +10,12 @@ interface Props {
 }
 
 const TYPE_CONFIG: Record<AppNotification['type'], { icon: React.ReactNode; color: string }> = {
-  bill:   { icon: <Receipt   className="size-3.5" />, color: 'text-warning   bg-warning/10   border-warning/20'   },
-  goal:   { icon: <Target    className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
-  budget: { icon: <PieChart  className="size-3.5" />, color: 'text-danger    bg-danger/10    border-danger/20'    },
-  person: { icon: <Users     className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
-  income: { icon: <TrendingUp className="size-3.5" />, color: 'text-success  bg-success/10   border-success/20'  },
+  bill:     { icon: <Receipt    className="size-3.5" />, color: 'text-warning   bg-warning/10   border-warning/20'   },
+  goal:     { icon: <Target     className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
+  budget:   { icon: <PieChart   className="size-3.5" />, color: 'text-danger    bg-danger/10    border-danger/20'    },
+  person:   { icon: <Users      className="size-3.5" />, color: 'text-brand-400 bg-brand-400/10 border-brand-400/20' },
+  income:   { icon: <TrendingUp className="size-3.5" />, color: 'text-success   bg-success/10   border-success/20'  },
+  rookinho: { icon: <Bird       className="size-3.5" />, color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
 }
 
 const URGENCY_DOT: Record<AppNotification['urgency'], string> = {

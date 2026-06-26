@@ -311,7 +311,7 @@ export const clientApi = {
 export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected' | 'received'; href: string; color: string }
 export interface CalendarData { month: string; daysInMonth: number; firstWeekday: number; events: CalendarEvent[]; byDay: Record<string, CalendarEvent[]> }
 
-export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low' }
+export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income' | 'rookinho'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low' }
 
 // ─── Types for dashboard components ──────────────────────────────────────────
 export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
