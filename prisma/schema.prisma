@@ -44,6 +44,9 @@ model User {
   scannerUsageCount   Int       @default(0)
   stripeCancelAtPeriodEnd Boolean  @default(false)
   stripeCurrentPeriodEnd DateTime?
+  googlePlayToken     String?
+  googlePlayOrderId   String?
+  subscriptionSource  String?
   proPlanExpiresAt    DateTime?
   proPlanReason       String?
   adminNotes          String?
@@ -51,6 +54,7 @@ model User {
   utmSource           String?
   utmMedium           String?
   utmCampaign         String?
+  platform            String?
   lastActiveAt        DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -69,6 +73,7 @@ model User {
   recurringBills        RecurringBill[]
   pluggyItems           PluggyItem[]
   achievements          UserAchievement[]
+  pushLogs              PushLog[]
 }
 
 // ─── Category ───────────────────────────────────────────────────────
@@ -405,6 +410,21 @@ model UserAchievement {
 
   @@unique([userId, slug])
   @@index([userId])
+}
+
+// ─── PushLog ─────────────────────────────────────────────────────────────────
+
+model PushLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  screen    String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 // ─── PluggyItem ───────────────────────────────────────────────────────────────
