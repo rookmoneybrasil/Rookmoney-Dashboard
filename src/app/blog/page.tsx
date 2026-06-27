@@ -5,6 +5,8 @@ import { getAllPosts, CATEGORY_LABELS, type BlogCategory } from '@/lib/blog'
 import { ArticleCard } from '@/components/blog/article-card'
 import { HeroSlider } from '@/components/blog/hero-slider'
 import { SearchBar } from '@/components/blog/search-bar'
+import { MarketOverview } from '@/components/blog/market-overview'
+import { NewsletterBanner } from '@/components/blog/newsletter-banner'
 
 export const metadata: Metadata = {
   title: 'Blog · Rook Money',
@@ -53,6 +55,10 @@ export default async function BlogPage({
       </div>
 
       {showSlider && <div className="mb-10"><HeroSlider posts={featured} /></div>}
+
+      {showSlider && <MarketOverview />}
+
+      {showSlider && <div className="mb-10"><NewsletterBanner /></div>}
 
       <div className="flex flex-wrap gap-2 mb-8">
         <Link href="/blog"

@@ -7,6 +7,7 @@ import { ArticleHeader } from '@/components/blog/article-header'
 import { ArticleCTA } from '@/components/blog/article-cta'
 import { ShareButtons } from '@/components/blog/share-buttons'
 import { AdSenseUnit } from '@/components/blog/adsense-unit'
+import { NewsletterBanner } from '@/components/blog/newsletter-banner'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
@@ -96,6 +97,11 @@ export default async function BlogPostPage({
       </div>
 
       <ShareButtons title={post.title} />
+
+      <div className="my-10">
+        <NewsletterBanner />
+      </div>
+
       <ArticleCTA />
 
       <script
