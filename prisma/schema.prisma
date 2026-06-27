@@ -427,6 +427,28 @@ model PushLog {
   @@index([userId, createdAt])
 }
 
+// ─── BlogPost ─────────────────────────────────────────────────────────────────
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String
+  content   String
+  category  String
+  image     String
+  imageAlt  String
+  author    String   @default("Equipe Rook Money")
+  published Boolean  @default(true)
+  source    String   @default("manual")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, createdAt])
+  @@index([category])
+  @@index([slug])
+}
+
 // ─── PluggyItem ───────────────────────────────────────────────────────────────
 // Open Finance bank connections via Pluggy.
 

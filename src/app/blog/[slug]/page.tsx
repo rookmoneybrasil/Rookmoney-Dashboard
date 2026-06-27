@@ -10,19 +10,13 @@ import { AdSenseUnit } from '@/components/blog/adsense-unit'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
-export async function generateStaticParams() {
-  return getAllPosts().map(post => ({ slug: post.slug }))
-}
-
-export const dynamicParams = false
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlug(slug)
   if (!post) return {}
 
   return {
@@ -51,7 +45,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
   const parts = post.content.split('<!-- ad -->')
