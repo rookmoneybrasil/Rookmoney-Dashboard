@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
+import Link from 'next/link'
 import {
   LayoutDashboard,
   FileText,
@@ -104,7 +104,7 @@ export default async function LandingPage() {
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features"   className="text-sm text-slate-400 hover:text-slate-100 transition-colors">{t('nav.features')}</a>
             <a href="#pricing"    className="text-sm text-slate-400 hover:text-slate-100 transition-colors">{t('nav.pricing')}</a>
-            <Link href="/support" className="text-sm text-slate-400 hover:text-slate-100 transition-colors">{t('nav.support')}</Link>
+            <Link href="/blog" className="text-sm text-slate-400 hover:text-slate-100 transition-colors">Blog</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -764,6 +764,12 @@ export default async function LandingPage() {
             <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain opacity-60" />
           </Link>
           <nav className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+            <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              Blog
+            </Link>
+            <Link href="/support" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+              {t('nav.support')}
+            </Link>
             <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
               {t('footer.privacy')}
             </Link>
