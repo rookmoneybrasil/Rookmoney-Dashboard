@@ -11,38 +11,41 @@ interface MarketResponse {
   updatedAt: string
 }
 
+const BRAPI_TOKEN = process.env.BRAPI_TOKEN ?? ''
+const ALL_TICKERS = ['IBOV', 'PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5']
+
 let cache: { data: MarketResponse; expiresAt: number } | null = null
 
-async function fetchStocks(tickers: string): Promise<TickerItem[]> {
+async function fetchSingleStock(ticker: string): Promise<TickerItem | null> {
   try {
-    const res = await fetch(`https://brapi.dev/api/quote/${tickers}`, {
-      signal: AbortSignal.timeout(8000),
-      headers: { 'User-Agent': 'RookMoney/1.0' },
-    })
-    if (!res.ok) return []
+    const url = BRAPI_TOKEN
+      ? `https://brapi.dev/api/quote/${ticker}?token=${BRAPI_TOKEN}`
+      : `https://brapi.dev/api/quote/${ticker}`
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) })
+    if (!res.ok) return null
     const json = await res.json()
-    return (json.results ?? []).map((s: Record<string, unknown>) => ({
+    const s = json.results?.[0]
+    if (!s) return null
+    return {
       symbol: s.symbol as string,
       price: Number(s.regularMarketPrice ?? 0),
       change: Number(Number(s.regularMarketChangePercent ?? 0).toFixed(2)),
-    }))
-  } catch { return [] }
+    }
+  } catch { return null }
 }
 
 async function fetchMarket(): Promise<MarketResponse> {
-  const [batch1, batch2, cryptoRes, fxRes] = await Promise.all([
-    fetchStocks('IBOV,PETR4,VALE3,ITUB4,ABEV3,MGLU3,BBDC4,WEGE3'),
-    fetchStocks('TOTS3,LREN3,SUZB3,BRKM5,AZZA3,CSNA3,USIM5'),
+  const [stockResults, cryptoRes, fxRes] = await Promise.all([
+    Promise.all(ALL_TICKERS.map(fetchSingleStock)),
     fetch('https://brapi.dev/api/v2/crypto?coin=BTC,ETH&currency=BRL', {
       signal: AbortSignal.timeout(8000),
-      headers: { 'User-Agent': 'RookMoney/1.0' },
     }).catch(() => null),
     fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL', {
       signal: AbortSignal.timeout(8000),
     }).catch(() => null),
   ])
 
-  const stocks = [...batch1, ...batch2]
+  const stocks = stockResults.filter((s): s is TickerItem => s !== null)
 
   const crypto: CryptoItem[] = []
   if (cryptoRes?.ok) {
