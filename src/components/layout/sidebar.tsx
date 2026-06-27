@@ -121,7 +121,7 @@ const NAV_GROUPS = [
     groupKey: 'help',
     items: [
       { href: '/billing', icon: Crown,    itemKey: 'billing', color: 'amber', pro: false },
-      { href: '/support', icon: LifeBuoy, itemKey: 'support', color: 'blue',  pro: false },
+      { href: '/support', icon: LifeBuoy, itemKey: 'support', color: 'blue',  pro: false, external: true },
     ],
   },
 ]
@@ -143,12 +143,13 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
   const navGroups = NAV_GROUPS.map(g => ({
     label: t(`groups.${g.groupKey}`),
     items: g.items.map(item => ({
-      href:  item.href,
-      icon:  item.icon,
-      label: t(`items.${item.itemKey}`),
-      desc:  t(`desc.${item.itemKey}`),
-      color: item.color,
-      pro:   item.pro,
+      href:     item.href,
+      icon:     item.icon,
+      label:    t(`items.${item.itemKey}`),
+      desc:     t(`desc.${item.itemKey}`),
+      color:    item.color,
+      pro:      item.pro,
+      external: (item as Record<string, unknown>).external === true,
     })),
   }))
   const navItems = navGroups.flatMap(g => g.items)
@@ -178,9 +179,11 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
         {collapsed ? (
           // Collapsed: flat list com ícones
           <div className="flex flex-col gap-3">
-            {navItems.map(({ href, icon: Icon, label, desc, pro }) => {
-              const isActive = pathname === href || pathname.startsWith(href + '/')
+            {navItems.map(({ href, icon: Icon, label, desc, pro, external }) => {
+              const isActive = !external && (pathname === href || pathname.startsWith(href + '/'))
               const count    = badges[href] ?? 0
+              const Wrapper  = external ? 'a' : Link
+              const linkProps = external ? { href, target: '_blank', rel: 'noopener noreferrer' } : { href }
               return (
                 <WithTooltip key={href} content={
                   <div className="flex flex-col gap-0.5 max-w-[200px]">
@@ -188,14 +191,14 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
                     <span className="text-slate-400 font-normal text-[11px] leading-snug">{desc}</span>
                   </div>
                 } side="right" delayDuration={1500}>
-                  <Link href={href} className="relative flex justify-center">
+                  <Wrapper {...linkProps} className="relative flex justify-center">
                     <GlassNavIcon icon={<Icon size={16} />} color="slate" active={isActive} />
                     {count > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-[14px] rounded-full bg-brand-500 text-[9px] font-bold text-white flex items-center justify-center px-0.5 leading-none z-10">
                         {count > 99 ? '99+' : count}
                       </span>
                     )}
-                  </Link>
+                  </Wrapper>
                 </WithTooltip>
               )
             })}
@@ -207,10 +210,12 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
               <div key={group.label}>
                 <p className="text-[10px] font-semibold text-slate-700 uppercase tracking-wider px-2 mb-1">{group.label}</p>
                 <div className="flex flex-col gap-0.5">
-                  {group.items.map(({ href, icon: Icon, label, desc, pro }) => {
-                    const isActive  = pathname === href || pathname.startsWith(href + '/')
+                  {group.items.map(({ href, icon: Icon, label, desc, pro, external }) => {
+                    const isActive  = !external && (pathname === href || pathname.startsWith(href + '/'))
                     const count     = badges[href] ?? 0
                     const showBadge = pro && !isPro
+                    const Wrapper   = external ? 'a' : Link
+                    const linkProps = external ? { href, target: '_blank', rel: 'noopener noreferrer' } : { href }
 
                     return (
                       <WithTooltip key={href} content={
@@ -219,8 +224,8 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
                           <span className="text-slate-400 font-normal text-[11px] leading-snug">{desc}</span>
                         </div>
                       } side="right" delayDuration={1500}>
-                        <Link
-                          href={href}
+                        <Wrapper
+                          {...linkProps}
                           className={cn(
                             'flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm font-medium transition-all duration-150',
                             isActive
@@ -239,7 +244,7 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
                           {count === 0 && !showBadge && isActive && (
                             <span className="size-1.5 rounded-full bg-brand-400" />
                           )}
-                        </Link>
+                        </Wrapper>
                       </WithTooltip>
                     )
                   })}
