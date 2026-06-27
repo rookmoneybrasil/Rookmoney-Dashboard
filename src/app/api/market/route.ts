@@ -1,22 +1,34 @@
 import { NextResponse } from 'next/server'
 
-interface TickerItem { symbol: string; price: number; change: number }
+interface StockItem {
+  symbol: string
+  price: number
+  change: number
+  changePercent: number
+  previousClose: number
+  open: number
+  high: number
+  low: number
+  volume: number
+  marketCap: number
+  logo: string
+}
 interface CurrencyItem { name: string; buy: number; sell: number; change: number }
 interface CryptoItem { name: string; price: number; change: number }
 
 interface MarketResponse {
-  stocks: TickerItem[]
+  stocks: StockItem[]
   currencies: CurrencyItem[]
   crypto: CryptoItem[]
   updatedAt: string
 }
 
 const BRAPI_TOKEN = process.env.BRAPI_TOKEN ?? ''
-const ALL_TICKERS = ['IBOV', 'PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5']
+const ALL_TICKERS = ['PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5', 'DIRR3', 'CEAB3', 'MBRF3']
 
 let cache: { data: MarketResponse; expiresAt: number } | null = null
 
-async function fetchSingleStock(ticker: string): Promise<TickerItem | null> {
+async function fetchSingleStock(ticker: string): Promise<StockItem | null> {
   try {
     const url = BRAPI_TOKEN
       ? `https://brapi.dev/api/quote/${ticker}?token=${BRAPI_TOKEN}`
@@ -27,9 +39,17 @@ async function fetchSingleStock(ticker: string): Promise<TickerItem | null> {
     const s = json.results?.[0]
     if (!s) return null
     return {
-      symbol: s.symbol as string,
+      symbol: s.symbol,
       price: Number(s.regularMarketPrice ?? 0),
-      change: Number(Number(s.regularMarketChangePercent ?? 0).toFixed(2)),
+      change: Number(s.regularMarketChange ?? 0),
+      changePercent: Number(Number(s.regularMarketChangePercent ?? 0).toFixed(2)),
+      previousClose: Number(s.regularMarketPreviousClose ?? 0),
+      open: Number(s.regularMarketOpen ?? 0),
+      high: Number(s.regularMarketDayHigh ?? 0),
+      low: Number(s.regularMarketDayLow ?? 0),
+      volume: Number(s.regularMarketVolume ?? 0),
+      marketCap: Number(s.marketCap ?? 0),
+      logo: (s.logourl as string) ?? '',
     }
   } catch { return null }
 }
@@ -45,7 +65,7 @@ async function fetchMarket(): Promise<MarketResponse> {
     }).catch(() => null),
   ])
 
-  const stocks = stockResults.filter((s): s is TickerItem => s !== null)
+  const stocks = stockResults.filter((s): s is StockItem => s !== null)
 
   const crypto: CryptoItem[] = []
   if (cryptoRes?.ok) {

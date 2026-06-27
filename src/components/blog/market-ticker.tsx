@@ -23,7 +23,7 @@ async function fetchTicker(): Promise<TickerItem[]> {
 
     const items: TickerItem[] = []
     for (const s of (data.stocks ?? [])) {
-      items.push({ symbol: s.symbol, price: fmtPrice(s.symbol, s.price), change: s.change })
+      items.push({ symbol: s.symbol, price: fmtPrice(s.symbol, s.price), change: s.changePercent ?? s.change })
     }
     for (const c of (data.crypto ?? [])) {
       items.push({ symbol: c.name.toUpperCase(), price: fmtPrice(c.name, c.price), change: c.change })
