@@ -130,6 +130,20 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* ─── WHATSAPP ─────────────────────────────────────────────── */}
+      <SectionLabel>WhatsApp</SectionLabel>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="size-4 text-[#25D366]" /> Rookinho no WhatsApp
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <WhatsAppForm currentPhone={user.whatsappPhone ?? null} plan={user.plan} />
+        </CardContent>
+      </Card>
+
       {/* ─── DADOS & PRIVACIDADE ────────────────────────────────────── */}
       <SectionLabel>Dados e privacidade</SectionLabel>
 

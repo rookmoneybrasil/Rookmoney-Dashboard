@@ -63,6 +63,7 @@ const PLANS = [
       { text: 'Análises financeiras ilimitadas', included: true, highlight: true },
       { text: 'Arquivos no chat ilimitados', included: true, highlight: true },
       { text: 'Scanner ilimitado', included: true, highlight: true },
+      { text: 'Rookinho no WhatsApp', included: true, highlight: true },
       { text: 'Suporte prioritário', included: true },
     ],
   },

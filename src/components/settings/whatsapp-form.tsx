@@ -1,17 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageCircle, Smartphone, CheckCircle2, Trash2 } from 'lucide-react'
+import { MessageCircle, Smartphone, CheckCircle2, Trash2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
-interface Props { currentPhone: string | null }
+interface Props { currentPhone: string | null; plan?: string }
 
-const SANDBOX_NUMBER = process.env.NEXT_PUBLIC_TWILIO_SANDBOX_NUMBER ?? '+1 415 523 8886'
+const ROOKINHO_NUMBER = '5513991117381'
 
-export function WhatsAppForm({ currentPhone }: Props) {
+export function WhatsAppForm({ currentPhone, plan }: Props) {
   const [phone] = useState(currentPhone)
 
   const { mutate: save, pending: saving, error } = useMutation(
@@ -19,9 +19,20 @@ export function WhatsAppForm({ currentPhone }: Props) {
     { onSuccess: () => window.location.reload() },
   )
 
+  const isProPlus = plan === 'PRO_PLUS'
+
   const displayPhone = phone
     ? phone.replace(/^\+55/, '').replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3')
     : null
+
+  if (!isProPlus) {
+    return (
+      <div className="rounded-xl bg-amber-500/5 border border-amber-500/20 p-4 text-sm text-slate-400">
+        <p className="font-medium text-amber-400 mb-1">Exclusivo do plano PRO+</p>
+        <p>Faça upgrade para o PRO+ e converse com o Rookinho direto no WhatsApp.</p>
+      </div>
+    )
+  }
 
   if (phone) {
     return (
@@ -33,14 +44,18 @@ export function WhatsAppForm({ currentPhone }: Props) {
             <p className="text-xs text-slate-500 mt-0.5">{displayPhone}</p>
           </div>
         </div>
-        <div className="rounded-xl bg-ink-700/50 border border-white/6 p-4 text-sm text-slate-400 leading-relaxed">
-          <p className="font-medium text-slate-300 mb-2">Como usar:</p>
-          <ol className="flex flex-col gap-1.5 list-decimal list-inside">
-            <li>Abra o WhatsApp e fale com <span className="text-brand-400 font-medium">{SANDBOX_NUMBER}</span></li>
-            <li>Tire uma foto do comprovante e envie</li>
-            <li>O Rook lê e salva automaticamente ✅</li>
-          </ol>
-        </div>
+
+        <a
+          href={`https://wa.me/${ROOKINHO_NUMBER}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm bg-[#25D366] hover:bg-[#20BD5A] text-white transition-colors"
+        >
+          <MessageCircle className="size-4" />
+          Falar com Rookinho no WhatsApp
+          <ExternalLink className="size-3.5" />
+        </a>
+
         <button
           onClick={() => save('')}
           disabled={saving}
@@ -59,9 +74,9 @@ export function WhatsAppForm({ currentPhone }: Props) {
         <p className="text-xs font-semibold text-brand-400 uppercase tracking-wide mb-2">Como funciona</p>
         <ol className="flex flex-col gap-1.5 text-sm text-slate-400 list-decimal list-inside">
           <li>Vincule seu número abaixo</li>
-          <li>Salve o número do Rook no WhatsApp</li>
-          <li>Mande foto de qualquer comprovante</li>
-          <li>O Rook lê e registra automaticamente 🪄</li>
+          <li>Clique no botão para abrir o WhatsApp</li>
+          <li>Converse com o Rookinho — contas, gastos, fotos de boleto</li>
+          <li>Tudo é registrado automaticamente na sua conta</li>
         </ol>
       </div>
       <form
