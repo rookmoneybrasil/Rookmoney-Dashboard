@@ -3,86 +3,39 @@
 import { useEffect, useState } from 'react'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, DollarSign, Bitcoin, BarChart3 } from 'lucide-react'
 
-interface StockQuote {
-  symbol: string
-  price: number
-  change: number
-}
+interface StockQuote { symbol: string; price: number; change: number }
+interface CurrencyItem { name: string; buy: number; sell: number; change: number }
+interface CryptoItem { name: string; price: number; change: number }
 
 interface MarketData {
   ibovespa: { price: number; change: number } | null
   gainers: StockQuote[]
   losers: StockQuote[]
-  currencies: { name: string; buy: string; sell: string }[]
-  crypto: { name: string; price: string; change: number }[]
-}
-
-const STOCKS_BATCH_1 = 'IBOV,PETR4,VALE3,ITUB4,ABEV3,MGLU3,BBDC4,WEGE3'
-const STOCKS_BATCH_2 = 'TOTS3,LREN3,SUZB3,BRKM5,AZZA3,CSNA3,USIM5'
-
-async function fetchStocks(tickers: string): Promise<{ symbol: string; regularMarketPrice: number; regularMarketChangePercent: number }[]> {
-  try {
-    const res = await fetch(`https://brapi.dev/api/quote/${tickers}?token=demo`, { signal: AbortSignal.timeout(8000) })
-    if (!res.ok) return []
-    const json = await res.json()
-    return json.results ?? []
-  } catch { return [] }
+  currencies: CurrencyItem[]
+  crypto: CryptoItem[]
+  updatedAt: string | null
 }
 
 async function fetchMarketOverview(): Promise<MarketData> {
-  const data: MarketData = { ibovespa: null, gainers: [], losers: [], currencies: [], crypto: [] }
+  const data: MarketData = { ibovespa: null, gainers: [], losers: [], currencies: [], crypto: [], updatedAt: null }
 
   try {
-    const [batch1, batch2, cryptoRes, fxRes] = await Promise.all([
-      fetchStocks(STOCKS_BATCH_1),
-      fetchStocks(STOCKS_BATCH_2),
-      fetch('https://brapi.dev/api/v2/crypto?coin=BTC,ETH&currency=BRL', { signal: AbortSignal.timeout(8000) }).catch(() => null),
-      fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL', { signal: AbortSignal.timeout(8000) }).catch(() => null),
-    ])
+    const res = await fetch('/api/market', { signal: AbortSignal.timeout(12000) })
+    if (!res.ok) return data
+    const json = await res.json()
 
-    const results = [...batch1, ...batch2]
+    data.updatedAt = json.updatedAt
+    data.currencies = json.currencies ?? []
+    data.crypto = json.crypto ?? []
 
-    if (results.length > 0) {
-      const quotes = results.map(s => ({
-        symbol: s.symbol,
-        price: s.regularMarketPrice,
-        change: Number(s.regularMarketChangePercent?.toFixed(2) ?? 0),
-      }))
+    const stocks: StockQuote[] = json.stocks ?? []
+    const ibov = stocks.find(q => q.symbol === 'IBOV' || q.symbol === '^BVSP')
+    if (ibov) data.ibovespa = { price: ibov.price, change: ibov.change }
 
-      const ibov = quotes.find(q => q.symbol === 'IBOV' || q.symbol === '^BVSP')
-      if (ibov) data.ibovespa = { price: ibov.price, change: ibov.change }
-
-      const stocks = quotes.filter(q => q.symbol !== 'IBOV' && q.symbol !== '^BVSP')
-      const sorted = [...stocks].sort((a, b) => b.change - a.change)
-      data.gainers = sorted.filter(s => s.change > 0).slice(0, 5)
-      data.losers = sorted.filter(s => s.change < 0).sort((a, b) => a.change - b.change).slice(0, 5)
-    }
-
-    if (cryptoRes?.ok) {
-      const json = await cryptoRes.json()
-      const coins = json.coins ?? []
-      for (const c of coins) {
-        data.crypto.push({
-          name: c.coin === 'BTC' ? 'Bitcoin' : c.coin === 'ETH' ? 'Ethereum' : c.coin,
-          price: `R$ ${Number(c.regularMarketPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          change: Number((c.regularMarketChangePercent ?? 0).toFixed(2)),
-        })
-      }
-    }
-
-    if (fxRes?.ok) {
-      const fx = await fxRes.json()
-      const pairs: [string, string][] = [['USDBRL', 'Dólar'], ['EURBRL', 'Euro'], ['GBPBRL', 'Libra']]
-      for (const [key, name] of pairs) {
-        if (fx[key]) {
-          data.currencies.push({
-            name,
-            buy: `R$ ${Number(fx[key].bid).toFixed(3).replace('.', ',')}`,
-            sell: `R$ ${Number(fx[key].ask).toFixed(3).replace('.', ',')}`,
-          })
-        }
-      }
-    }
+    const rest = stocks.filter(q => q.symbol !== 'IBOV' && q.symbol !== '^BVSP')
+    const sorted = [...rest].sort((a, b) => b.change - a.change)
+    data.gainers = sorted.filter(s => s.change > 0).slice(0, 5)
+    data.losers = sorted.filter(s => s.change < 0).sort((a, b) => a.change - b.change).slice(0, 5)
   } catch {}
 
   return data
@@ -112,10 +65,13 @@ export function MarketOverview() {
     )
   }
 
-  if (!data) return null
+  if (!data || (data.gainers.length === 0 && data.losers.length === 0 && data.currencies.length === 0 && data.crypto.length === 0)) {
+    return null
+  }
 
-  const now = new Date()
-  const timeStr = now.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  const timeStr = data.updatedAt
+    ? new Date(data.updatedAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : ''
 
   return (
     <div className="mb-10">
@@ -124,7 +80,7 @@ export function MarketOverview() {
           <BarChart3 className="size-5 text-brand-600" />
           Mercado Financeiro
         </h2>
-        <span className="text-[11px] text-slate-400">Atualizado {timeStr} · Delay 15 min</span>
+        {timeStr && <span className="text-[11px] text-slate-400">Atualizado {timeStr} · Delay 15 min</span>}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -146,7 +102,6 @@ export function MarketOverview() {
           )}
 
           <div className="grid grid-cols-2 divide-x divide-slate-100">
-            {/* Maiores altas */}
             <div className="p-4">
               <h3 className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 mb-3">
                 <ArrowUpRight className="size-3.5" /> Maiores altas
@@ -165,7 +120,6 @@ export function MarketOverview() {
               </div>
             </div>
 
-            {/* Maiores baixas */}
             <div className="p-4">
               <h3 className="flex items-center gap-1.5 text-xs font-bold text-red-500 mb-3">
                 <ArrowDownRight className="size-3.5" /> Maiores baixas
@@ -188,50 +142,52 @@ export function MarketOverview() {
 
         {/* Moedas + Cripto */}
         <div className="space-y-4">
-          {/* Moedas */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
-            <h3 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-3">
-              <DollarSign className="size-3.5 text-green-600" /> Moedas
-            </h3>
-            <div className="space-y-0">
-              <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 mb-1.5">
-                <span>Moeda</span>
-                <div className="flex gap-6">
-                  <span>Compra</span>
-                  <span>Venda</span>
+          {data.currencies.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-xl p-4">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-3">
+                <DollarSign className="size-3.5 text-green-600" /> Moedas
+              </h3>
+              <div className="space-y-0">
+                <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 mb-1.5">
+                  <span>Moeda</span>
+                  <div className="flex gap-6">
+                    <span>Compra</span>
+                    <span>Venda</span>
+                  </div>
                 </div>
+                {data.currencies.map(c => (
+                  <div key={c.name} className="flex items-center justify-between py-1.5 border-t border-slate-50">
+                    <span className="text-xs font-semibold text-blue-600">{c.name}</span>
+                    <div className="flex gap-4 text-xs text-slate-600">
+                      <span>R$ {c.buy.toFixed(3).replace('.', ',')}</span>
+                      <span>R$ {c.sell.toFixed(3).replace('.', ',')}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              {data.currencies.map(c => (
-                <div key={c.name} className="flex items-center justify-between py-1.5 border-t border-slate-50">
-                  <span className="text-xs font-semibold text-blue-600">{c.name}</span>
-                  <div className="flex gap-4 text-xs text-slate-600">
-                    <span>{c.buy}</span>
-                    <span>{c.sell}</span>
-                  </div>
-                </div>
-              ))}
             </div>
-          </div>
+          )}
 
-          {/* Cripto */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
-            <h3 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-3">
-              <Bitcoin className="size-3.5 text-orange-500" /> Criptoativos
-            </h3>
-            <div className="space-y-0">
-              {data.crypto.map(c => (
-                <div key={c.name} className="flex items-center justify-between py-1.5 border-t border-slate-50 first:border-t-0">
-                  <span className="text-xs font-semibold text-slate-700">{c.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs font-semibold ${c.change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                      {c.change >= 0 ? '+' : ''}{c.change}%
-                    </span>
-                    <span className="text-xs text-slate-600">{c.price}</span>
+          {data.crypto.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-xl p-4">
+              <h3 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-3">
+                <Bitcoin className="size-3.5 text-orange-500" /> Criptoativos
+              </h3>
+              <div className="space-y-0">
+                {data.crypto.map(c => (
+                  <div key={c.name} className="flex items-center justify-between py-1.5 border-t border-slate-50 first:border-t-0">
+                    <span className="text-xs font-semibold text-slate-700">{c.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-semibold ${c.change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {c.change >= 0 ? '+' : ''}{c.change}%
+                      </span>
+                      <span className="text-xs text-slate-600">R$ {c.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
