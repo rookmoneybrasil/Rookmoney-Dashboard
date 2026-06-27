@@ -114,7 +114,7 @@ model Transaction {
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
   @@index([userId])
   @@index([userId, date])
@@ -144,7 +144,7 @@ model RecurringTransaction {
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
   @@index([userId])
 }
@@ -226,7 +226,7 @@ model IncomeSource {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([userId])
 }
@@ -260,7 +260,7 @@ model Bill {
   userId          String
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId      String?
-  category        Category?      @relation(fields: [categoryId], references: [id])
+  category        Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   recurringBill   RecurringBill? @relation(fields: [recurringBillId], references: [id], onDelete: SetNull)
 
   @@index([userId])
@@ -285,7 +285,7 @@ model RecurringBill {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   bills      Bill[]
 
   @@index([userId])
@@ -331,7 +331,7 @@ model PersonEntryRecurring {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([personId])
@@ -358,7 +358,7 @@ model PersonEntry {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([personId])
   @@index([userId])
