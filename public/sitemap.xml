@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://rookmoney.com</loc><priority>1.0</priority></url>
+  <url><loc>https://rookmoney.com/blog</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://rookmoney.com/blog/como-organizar-financas-pessoais</loc><priority>0.7</priority></url>
+  <url><loc>https://rookmoney.com/blog/5-dicas-economizar-dinheiro</loc><priority>0.7</priority></url>
+  <url><loc>https://rookmoney.com/blog/o-que-e-reserva-de-emergencia</loc><priority>0.7</priority></url>
+  <url><loc>https://rookmoney.com/blog/como-comecar-a-investir</loc><priority>0.7</priority></url>
+  <url><loc>https://rookmoney.com/blog/orcamento-mensal-passo-a-passo</loc><priority>0.7</priority></url>
+  <url><loc>https://rookmoney.com/help</loc><priority>0.6</priority></url>
+  <url><loc>https://rookmoney.com/changelog</loc><priority>0.5</priority></url>
+  <url><loc>https://rookmoney.com/privacy</loc><priority>0.3</priority></url>
+  <url><loc>https://rookmoney.com/terms</loc><priority>0.3</priority></url>
+</urlset>
