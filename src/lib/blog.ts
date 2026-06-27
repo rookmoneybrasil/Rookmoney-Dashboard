@@ -3,7 +3,7 @@ import path from 'path'
 import matter from 'gray-matter'
 import readingTime from 'reading-time'
 
-export type BlogCategory = 'dicas' | 'educacao-financeira' | 'investimentos' | 'rook-updates'
+export type BlogCategory = 'dicas' | 'educacao-financeira' | 'investimentos' | 'rook-updates' | 'cripto' | 'curiosidades'
 
 export interface PostFrontmatter {
   title: string
@@ -68,11 +68,15 @@ export const CATEGORY_LABELS: Record<BlogCategory, string> = {
   'educacao-financeira': 'Educação Financeira',
   'investimentos': 'Investimentos',
   'rook-updates': 'Rook Updates',
+  'cripto': 'Cripto',
+  'curiosidades': 'Curiosidades',
 }
 
 export const CATEGORY_COLORS: Record<BlogCategory, { bg: string; text: string; border: string }> = {
-  'dicas': { bg: 'bg-brand-900/60', text: 'text-brand-300', border: 'border-brand-700/40' },
-  'educacao-financeira': { bg: 'bg-success/10', text: 'text-success', border: 'border-success/20' },
-  'investimentos': { bg: 'bg-amber-900/60', text: 'text-amber-300', border: 'border-amber-600/40' },
-  'rook-updates': { bg: 'bg-violet-900/60', text: 'text-violet-300', border: 'border-violet-600/40' },
+  'dicas': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  'educacao-financeira': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'investimentos': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+  'rook-updates': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200' },
+  'cripto': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200' },
+  'curiosidades': { bg: 'bg-pink-50', text: 'text-pink-700', border: 'border-pink-200' },
 }
