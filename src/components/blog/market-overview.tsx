@@ -17,22 +17,32 @@ interface MarketData {
   crypto: { name: string; price: string; change: number }[]
 }
 
-const TRACKED_STOCKS = 'PETR4,VALE3,ITUB4,ABEV3,MGLU3,BBDC4,WEGE3,TOTS3,LREN3,SUZB3,BRKM5,AZZA3,CSNA3,USIM5,DIRR3,CEAB3,MBRF3'
+const STOCKS_BATCH_1 = 'IBOV,PETR4,VALE3,ITUB4,ABEV3,MGLU3,BBDC4,WEGE3'
+const STOCKS_BATCH_2 = 'TOTS3,LREN3,SUZB3,BRKM5,AZZA3,CSNA3,USIM5'
+
+async function fetchStocks(tickers: string): Promise<{ symbol: string; regularMarketPrice: number; regularMarketChangePercent: number }[]> {
+  try {
+    const res = await fetch(`https://brapi.dev/api/quote/${tickers}?token=demo`, { signal: AbortSignal.timeout(8000) })
+    if (!res.ok) return []
+    const json = await res.json()
+    return json.results ?? []
+  } catch { return [] }
+}
 
 async function fetchMarketOverview(): Promise<MarketData> {
   const data: MarketData = { ibovespa: null, gainers: [], losers: [], currencies: [], crypto: [] }
 
   try {
-    const [stocksRes, cryptoRes, fxRes] = await Promise.all([
-      fetch(`https://brapi.dev/api/quote/${TRACKED_STOCKS}?token=demo`, { signal: AbortSignal.timeout(8000) }).catch(() => null),
+    const [batch1, batch2, cryptoRes, fxRes] = await Promise.all([
+      fetchStocks(STOCKS_BATCH_1),
+      fetchStocks(STOCKS_BATCH_2),
       fetch('https://brapi.dev/api/v2/crypto?coin=BTC,ETH&currency=BRL', { signal: AbortSignal.timeout(8000) }).catch(() => null),
       fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL', { signal: AbortSignal.timeout(8000) }).catch(() => null),
     ])
 
-    if (stocksRes?.ok) {
-      const json = await stocksRes.json()
-      const results: { symbol: string; regularMarketPrice: number; regularMarketChangePercent: number }[] = json.results ?? []
+    const results = [...batch1, ...batch2]
 
+    if (results.length > 0) {
       const quotes = results.map(s => ({
         symbol: s.symbol,
         price: s.regularMarketPrice,
