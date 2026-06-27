@@ -12,10 +12,12 @@ interface Props { embedded?: boolean }
 function FormContent() {
   const formRef = useRef<HTMLFormElement>(null)
   const [success, setSuccess] = useState(false)
+  const [mismatch, setMismatch] = useState(false)
   const { mutate, pending, error } = useMutation(
     (data: { currentPassword: string; newPassword: string }) =>
       clientApi.changePassword(data),
     {
+      refresh: false,
       onSuccess: () => {
         setSuccess(true)
         formRef.current?.reset()
@@ -28,16 +30,20 @@ function FormContent() {
       onSubmit={(e) => {
         e.preventDefault()
         setSuccess(false)
+        setMismatch(false)
         const fd = new FormData(e.currentTarget)
+        const newPassword = fd.get('newPassword') as string
+        const confirmPassword = fd.get('confirmPassword') as string
+        if (newPassword !== confirmPassword) { setMismatch(true); return }
         mutate({
           currentPassword: fd.get('currentPassword') as string,
-          newPassword:     fd.get('newPassword') as string,
+          newPassword,
         })
       }}
       className="flex flex-col gap-4"
     >
-      {error && (
-        <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{error}</p>
+      {(error || mismatch) && (
+        <p className="text-sm text-danger bg-danger/10 border border-danger/20 px-3 py-2 rounded-lg">{mismatch ? 'As senhas não coincidem.' : error}</p>
       )}
       {success && (
         <p className="text-sm text-success bg-success/10 border border-success/20 px-3 py-2 rounded-lg">

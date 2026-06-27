@@ -8,8 +8,9 @@ export async function GET(req: NextRequest) {
   const cookie = store.get('rook_session')
 
   const months = req.nextUrl.searchParams.get('months') ?? '6'
+  const params = new URLSearchParams({ months })
 
-  const res = await fetch(`${API}/api/v1/projection?months=${months}`, {
+  const res = await fetch(`${API}/api/v1/projection?${params.toString()}`, {
     cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',

@@ -8,9 +8,11 @@ export async function GET(req: NextRequest) {
   const cookie = store.get('rook_session')
 
   const month = req.nextUrl.searchParams.get('month') ?? ''
-  const qs    = month ? `?month=${month}` : ''
+  const params = new URLSearchParams()
+  if (month) params.set('month', month)
+  const qs = params.toString()
 
-  const res = await fetch(`${API}/api/v1/calendar${qs}`, {
+  const res = await fetch(`${API}/api/v1/calendar${qs ? `?${qs}` : ''}`, {
     cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
