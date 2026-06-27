@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   /* ─── Ink Scale — dark navy backgrounds + light text ──────────── */
