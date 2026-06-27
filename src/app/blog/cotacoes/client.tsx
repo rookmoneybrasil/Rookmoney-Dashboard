@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { TrendingUp, TrendingDown, ArrowLeft, RefreshCw, Search, DollarSign, Bitcoin } from 'lucide-react'
 
 interface StockItem {
-  symbol: string; price: number; change: number; changePercent: number
+  symbol: string; name: string; price: number; change: number; changePercent: number
   previousClose: number; open: number; high: number; low: number
-  volume: number; marketCap: number; logo: string
+  volume: number; marketCap: number; logo: string; sector: string
 }
 interface CurrencyItem { name: string; buy: number; sell: number; change: number }
 interface CryptoItem { name: string; price: number; change: number }
@@ -95,7 +95,7 @@ export function CotacoesClient() {
 
   if (search.trim()) {
     const q = search.toLowerCase()
-    stocks = stocks.filter(s => s.symbol.toLowerCase().includes(q))
+    stocks = stocks.filter(s => s.symbol.toLowerCase().includes(q) || s.name?.toLowerCase().includes(q))
   }
 
   if (filter === 'gainers') stocks = stocks.filter(s => s.changePercent > 0)

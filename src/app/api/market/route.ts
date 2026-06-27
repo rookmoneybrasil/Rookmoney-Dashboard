@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 interface StockItem {
   symbol: string
+  name: string
   price: number
   change: number
   changePercent: number
@@ -12,6 +13,7 @@ interface StockItem {
   volume: number
   marketCap: number
   logo: string
+  sector: string
 }
 interface CurrencyItem { name: string; buy: number; sell: number; change: number }
 interface CryptoItem { name: string; price: number; change: number }
@@ -23,52 +25,70 @@ interface MarketResponse {
   updatedAt: string
 }
 
-const BRAPI_TOKEN = process.env.BRAPI_TOKEN ?? ''
-
-const TICKERS_MAIN = ['PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5', 'DIRR3', 'CEAB3', 'MBRF3']
-
-const TICKERS_FULL = [
-  ...TICKERS_MAIN,
-  'B3SA3', 'RENT3', 'EQTL3', 'RAIL3', 'VBBR3', 'ENEV3', 'ASAI3', 'SBSP3', 'HYPE3',
-  'VAMO3', 'IGTI11', 'BBDC3', 'CURY3', 'FLRY3', 'AXIA3', 'EMBR3', 'RDOR3', 'COGN3',
-  'RADL3', 'CPFE3', 'TIMS3', 'MOTV3', 'BBSE3', 'BPAC11', 'VIVT3', 'SANB11', 'ISAE4',
-  'RECV3', 'CSMG3', 'CMIN3', 'BRAV3', 'GGBR4', 'TAEE11', 'PRIO3', 'CMIG4', 'ENGI11',
-  'MULT3', 'UGPA3', 'POMO4', 'CSAN3', 'EGIE3', 'CPLE3', 'ALOS3', 'PSSA3', 'CXSE3',
-  'AURE3', 'ITSA4', 'HAPV3', 'MRVE3', 'YDUQ3', 'BEEF3', 'NATU3', 'VIVA3',
-]
-
 let cache: { data: MarketResponse; expiresAt: number } | null = null
 let cacheFull: { data: MarketResponse; expiresAt: number } | null = null
 
-async function fetchSingleStock(ticker: string): Promise<StockItem | null> {
+async function fetchStockList(limit: number): Promise<StockItem[]> {
   try {
-    const url = BRAPI_TOKEN
-      ? `https://brapi.dev/api/quote/${ticker}?token=${BRAPI_TOKEN}`
-      : `https://brapi.dev/api/quote/${ticker}`
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) })
-    if (!res.ok) return null
+    const res = await fetch(
+      `https://brapi.dev/api/quote/list?sortBy=volume&sortOrder=desc&limit=${limit}&type=stock`,
+      { signal: AbortSignal.timeout(10000) },
+    )
+    if (!res.ok) return []
     const json = await res.json()
-    const s = json.results?.[0]
-    if (!s) return null
-    return {
-      symbol: s.symbol,
-      price: Number(s.regularMarketPrice ?? 0),
-      change: Number(s.regularMarketChange ?? 0),
-      changePercent: Number(Number(s.regularMarketChangePercent ?? 0).toFixed(2)),
-      previousClose: Number(s.regularMarketPreviousClose ?? 0),
-      open: Number(s.regularMarketOpen ?? 0),
-      high: Number(s.regularMarketDayHigh ?? 0),
-      low: Number(s.regularMarketDayLow ?? 0),
-      volume: Number(s.regularMarketVolume ?? 0),
-      marketCap: Number(s.marketCap ?? 0),
-      logo: (s.logourl as string) ?? '',
-    }
-  } catch { return null }
+    return (json.stocks ?? []).map((s: Record<string, unknown>) => ({
+      symbol: s.stock as string,
+      name: (s.name as string) ?? '',
+      price: Number(s.close ?? 0),
+      change: 0,
+      changePercent: Number(s.change ?? 0),
+      previousClose: 0,
+      open: 0,
+      high: 0,
+      low: 0,
+      volume: Number(s.volume ?? 0),
+      marketCap: Number(s.market_cap ?? 0),
+      logo: (s.logo as string) ?? '',
+      sector: (s.sector as string) ?? '',
+    }))
+  } catch { return [] }
 }
 
-async function fetchMarket(tickers: string[]): Promise<MarketResponse> {
-  const [stockResults, cryptoRes, fxRes] = await Promise.all([
-    Promise.all(tickers.map(fetchSingleStock)),
+async function fetchStockDetails(symbols: string[]): Promise<Map<string, Partial<StockItem>>> {
+  const details = new Map<string, Partial<StockItem>>()
+  const fetchOne = async (sym: string) => {
+    try {
+      const res = await fetch(`https://brapi.dev/api/quote/${sym}`, { signal: AbortSignal.timeout(5000) })
+      if (!res.ok) return
+      const json = await res.json()
+      const s = json.results?.[0]
+      if (!s) return
+      details.set(sym, {
+        price: Number(s.regularMarketPrice ?? 0),
+        change: Number(s.regularMarketChange ?? 0),
+        changePercent: Number(Number(s.regularMarketChangePercent ?? 0).toFixed(2)),
+        previousClose: Number(s.regularMarketPreviousClose ?? 0),
+        open: Number(s.regularMarketOpen ?? 0),
+        high: Number(s.regularMarketDayHigh ?? 0),
+        low: Number(s.regularMarketDayLow ?? 0),
+        volume: Number(s.regularMarketVolume ?? 0),
+      })
+    } catch {}
+  }
+  // Fetch in batches of 8 with 300ms delay to avoid rate limiting
+  for (let i = 0; i < symbols.length; i += 8) {
+    const batch = symbols.slice(i, i + 8)
+    await Promise.all(batch.map(fetchOne))
+    if (i + 8 < symbols.length) await new Promise(r => setTimeout(r, 300))
+  }
+  return details
+}
+
+async function fetchMarket(full: boolean): Promise<MarketResponse> {
+  const limit = full ? 80 : 20
+
+  const [stocks, cryptoRes, fxRes] = await Promise.all([
+    fetchStockList(limit),
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=brl&include_24hr_change=true', {
       signal: AbortSignal.timeout(8000),
     }).catch(() => null),
@@ -77,7 +97,15 @@ async function fetchMarket(tickers: string[]): Promise<MarketResponse> {
     }).catch(() => null),
   ])
 
-  const stocks = stockResults.filter((s): s is StockItem => s !== null)
+  // For the main widget (not full), enrich top stocks with detailed data
+  if (!full && stocks.length > 0) {
+    const topSymbols = stocks.slice(0, 17).map(s => s.symbol)
+    const details = await fetchStockDetails(topSymbols)
+    for (const s of stocks) {
+      const d = details.get(s.symbol)
+      if (d) Object.assign(s, d)
+    }
+  }
 
   const crypto: CryptoItem[] = []
   if (cryptoRes?.ok) {
@@ -125,8 +153,7 @@ export async function GET(req: Request) {
     })
   }
 
-  const tickers = full ? TICKERS_FULL : TICKERS_MAIN
-  const data = await fetchMarket(tickers)
+  const data = await fetchMarket(full)
 
   if (full) cacheFull = { data, expiresAt: now + 5 * 60 * 1000 }
   else cache = { data, expiresAt: now + 5 * 60 * 1000 }
