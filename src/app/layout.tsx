@@ -67,10 +67,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const htmlLang = locale === 'pt' ? 'pt-BR' : locale === 'es' ? 'es' : 'en'
 
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
+  const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID
 
   return (
     <html lang={htmlLang} className={`${poppins.variable} h-full`} suppressHydrationWarning>
       <body className="h-full antialiased">
+        {adsenseId && (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
         {pixelId && (
           <>
             <Script id="meta-pixel" strategy="afterInteractive">
