@@ -7,9 +7,11 @@ const PUBLIC_PATHS = [
   '/register',
   '/forgot-password',
   '/reset-password',
-  '/admin-login',   // admin login page — auth independente
+  '/admin-login',
   '/terms',
   '/privacy',
+  '/changelog',
+  '/blog',
 ]
 
 const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password']
