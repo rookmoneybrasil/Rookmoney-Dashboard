@@ -57,7 +57,7 @@ async function fetchSingleStock(ticker: string): Promise<StockItem | null> {
 async function fetchMarket(): Promise<MarketResponse> {
   const [stockResults, cryptoRes, fxRes] = await Promise.all([
     Promise.all(ALL_TICKERS.map(fetchSingleStock)),
-    fetch('https://brapi.dev/api/v2/crypto?coin=BTC,ETH&currency=BRL', {
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=brl&include_24hr_change=true', {
       signal: AbortSignal.timeout(8000),
     }).catch(() => null),
     fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL', {
@@ -69,13 +69,16 @@ async function fetchMarket(): Promise<MarketResponse> {
 
   const crypto: CryptoItem[] = []
   if (cryptoRes?.ok) {
-    const json = await cryptoRes.json()
-    for (const c of (json.coins ?? [])) {
-      crypto.push({
-        name: c.coin === 'BTC' ? 'Bitcoin' : c.coin === 'ETH' ? 'Ethereum' : c.coin,
-        price: Number(c.regularMarketPrice ?? 0),
-        change: Number(Number(c.regularMarketChangePercent ?? 0).toFixed(2)),
-      })
+    const json = await cryptoRes.json() as Record<string, { brl?: number; brl_24h_change?: number }>
+    const coins: [string, string][] = [['bitcoin', 'Bitcoin'], ['ethereum', 'Ethereum'], ['solana', 'Solana']]
+    for (const [id, name] of coins) {
+      if (json[id]?.brl) {
+        crypto.push({
+          name,
+          price: json[id].brl!,
+          change: Number((json[id].brl_24h_change ?? 0).toFixed(2)),
+        })
+      }
     }
   }
 
