@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 interface TickerItem {
@@ -35,10 +35,25 @@ async function fetchTicker(): Promise<TickerItem[]> {
   } catch { return [] }
 }
 
+function TickerContent({ items }: { items: TickerItem[] }) {
+  return (
+    <>
+      {items.map((item, i) => (
+        <div key={i} className="inline-flex items-center gap-1.5 px-4 h-full border-r border-slate-800/40 shrink-0">
+          <span className="text-[11px] font-semibold text-slate-400">{item.symbol}</span>
+          <span className="text-[11px] font-medium text-white">{item.price}</span>
+          <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${item.change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {item.change >= 0 ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
+            {item.change >= 0 ? '+' : ''}{item.change}%
+          </span>
+        </div>
+      ))}
+    </>
+  )
+}
+
 export function MarketTicker() {
   const [items, setItems] = useState<TickerItem[]>([])
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const animRef = useRef<number>(0)
 
   useEffect(() => {
     fetchTicker().then(setItems)
@@ -46,50 +61,36 @@ export function MarketTicker() {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el || items.length === 0) return
-    let pos = 0
-    const speed = 0.5
-
-    function tick() {
-      pos += speed
-      if (pos >= el!.scrollWidth / 2) pos = 0
-      el!.scrollLeft = pos
-      animRef.current = requestAnimationFrame(tick)
-    }
-    animRef.current = requestAnimationFrame(tick)
-
-    const pause = () => cancelAnimationFrame(animRef.current)
-    const resume = () => { animRef.current = requestAnimationFrame(tick) }
-    el.addEventListener('mouseenter', pause)
-    el.addEventListener('mouseleave', resume)
-
-    return () => {
-      cancelAnimationFrame(animRef.current)
-      el.removeEventListener('mouseenter', pause)
-      el.removeEventListener('mouseleave', resume)
-    }
-  }, [items])
-
   if (items.length === 0) return null
-
-  const doubled = [...items, ...items]
 
   return (
     <div className="bg-slate-950 border-b border-slate-800/50 overflow-hidden">
-      <div ref={scrollRef} className="flex items-center gap-0 overflow-hidden whitespace-nowrap h-8 scrollbar-hide">
-        {doubled.map((item, i) => (
-          <div key={i} className="inline-flex items-center gap-1.5 px-4 h-full border-r border-slate-800/40 shrink-0">
-            <span className="text-[11px] font-semibold text-slate-400">{item.symbol}</span>
-            <span className="text-[11px] font-medium text-white">{item.price}</span>
-            <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${item.change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {item.change >= 0 ? <TrendingUp className="size-2.5" /> : <TrendingDown className="size-2.5" />}
-              {item.change >= 0 ? '+' : ''}{item.change}%
-            </span>
-          </div>
-        ))}
+      <div className="ticker-wrap h-8">
+        <div className="ticker-track flex items-center h-full">
+          <TickerContent items={items} />
+          <TickerContent items={items} />
+          <TickerContent items={items} />
+        </div>
       </div>
+
+      <style jsx>{`
+        .ticker-wrap {
+          overflow: hidden;
+          position: relative;
+        }
+        .ticker-track {
+          display: inline-flex;
+          animation: ticker-scroll 40s linear infinite;
+          width: max-content;
+        }
+        .ticker-track:hover {
+          animation-play-state: paused;
+        }
+        @keyframes ticker-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.333%); }
+        }
+      `}</style>
     </div>
   )
 }
