@@ -767,7 +767,7 @@ export default async function LandingPage() {
             <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
               Blog
             </Link>
-            <Link href="/support" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+            <Link href="/help" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
               {t('nav.support')}
             </Link>
             <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">

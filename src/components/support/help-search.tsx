@@ -12,12 +12,12 @@ export function HelpSearch({ defaultValue = '' }: { defaultValue?: string }) {
     e.preventDefault()
     const params = new URLSearchParams()
     if (query.trim()) params.set('busca', query.trim())
-    router.push(`/support${params.toString() ? `?${params}` : ''}`)
+    router.push(`/help${params.toString() ? `?${params}` : ''}`)
   }
 
   function clear() {
     setQuery('')
-    router.push('/support')
+    router.push('/help')
   }
 
   return (

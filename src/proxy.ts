@@ -12,7 +12,7 @@ const PUBLIC_PATHS = [
   '/privacy',
   '/changelog',
   '/blog',
-  '/support',
+  '/help',
 ]
 
 const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password']

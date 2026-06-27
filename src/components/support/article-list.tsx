@@ -7,7 +7,7 @@ export function ArticleList({ query }: { query: string }) {
 
   return (
     <>
-      <Link href="/support" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
+      <Link href="/help" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
         <ArrowLeft className="size-4" /> Voltar
       </Link>
 
@@ -25,7 +25,7 @@ export function ArticleList({ query }: { query: string }) {
           {results.map(article => {
             const info = CATEGORY_INFO[article.category]
             return (
-              <Link key={article.id} href={`/support?artigo=${article.id}`}
+              <Link key={article.id} href={`/help?artigo=${article.id}`}
                 className="flex items-start gap-3 py-4 hover:bg-slate-50 rounded-lg px-3 -mx-3 transition-colors group">
                 <span className="text-lg mt-0.5">{info.icon}</span>
                 <div>

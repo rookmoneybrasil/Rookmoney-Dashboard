@@ -66,7 +66,7 @@ export default async function SupportPage({
             <a href="mailto:contato@rookmoney.com" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors">
               <Mail className="size-4" /> contato@rookmoney.com
             </a>
-            <Link href="/support?categoria=como-usar" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+            <Link href="/help?categoria=como-usar" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
               <BookOpen className="size-4" /> Ver todos os guias
             </Link>
           </div>
@@ -98,7 +98,7 @@ function DefaultView() {
       <h2 className="text-lg font-semibold text-slate-800 mb-6">Escolha um tema</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
         {categories.map(([key, info]) => (
-          <Link key={key} href={`/support?categoria=${key}`}
+          <Link key={key} href={`/help?categoria=${key}`}
             className="flex items-start gap-4 p-5 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all group">
             <span className="text-2xl">{info.icon}</span>
             <div>
@@ -112,7 +112,7 @@ function DefaultView() {
       <h2 className="text-lg font-semibold text-slate-800 mb-4">Artigos populares</h2>
       <div className="flex flex-col divide-y divide-slate-100">
         {HELP_ARTICLES.slice(0, 6).map(article => (
-          <Link key={article.id} href={`/support?artigo=${article.id}`}
+          <Link key={article.id} href={`/help?artigo=${article.id}`}
             className="flex items-center gap-3 py-4 hover:bg-slate-50 rounded-lg px-3 -mx-3 transition-colors">
             <span className="text-lg">{CATEGORY_INFO[article.category].icon}</span>
             <div>
@@ -136,7 +136,7 @@ function CategoryView({ category }: { category: HelpCategory }) {
 
   return (
     <>
-      <Link href="/support" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
+      <Link href="/help" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
         <ArrowLeft className="size-4" /> Voltar
       </Link>
 
@@ -150,7 +150,7 @@ function CategoryView({ category }: { category: HelpCategory }) {
 
       <div className="flex flex-col divide-y divide-slate-100">
         {articles.map(article => (
-          <Link key={article.id} href={`/support?artigo=${article.id}`}
+          <Link key={article.id} href={`/help?artigo=${article.id}`}
             className="flex items-center justify-between py-4 hover:bg-slate-50 rounded-lg px-3 -mx-3 transition-colors group">
             <p className="text-sm font-medium text-slate-700 group-hover:text-brand-600 transition-colors">{article.title}</p>
             <span className="text-slate-400 text-xs shrink-0">→</span>
@@ -173,7 +173,7 @@ function ArticleDetail({ articleId }: { articleId: string }) {
   if (!article) return (
     <div className="text-center py-20">
       <p className="text-slate-500 mb-2">Artigo não encontrado.</p>
-      <Link href="/support" className="text-sm text-brand-600 hover:underline">Voltar à Central de Ajuda</Link>
+      <Link href="/help" className="text-sm text-brand-600 hover:underline">Voltar à Central de Ajuda</Link>
     </div>
   )
 
@@ -181,7 +181,7 @@ function ArticleDetail({ articleId }: { articleId: string }) {
 
   return (
     <>
-      <Link href={`/support?categoria=${article.category}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
+      <Link href={`/help?categoria=${article.category}`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6">
         <ArrowLeft className="size-4" /> {info.label}
       </Link>
 
@@ -209,7 +209,7 @@ function ArticleDetail({ articleId }: { articleId: string }) {
         <h3 className="text-sm font-semibold text-slate-800 mb-4">Artigos relacionados</h3>
         <div className="flex flex-col gap-2">
           {HELP_ARTICLES.filter(a => a.category === article.category && a.id !== article.id).slice(0, 3).map(related => (
-            <Link key={related.id} href={`/support?artigo=${related.id}`}
+            <Link key={related.id} href={`/help?artigo=${related.id}`}
               className="text-sm text-brand-600 hover:underline">
               {related.title}
             </Link>
