@@ -245,7 +245,7 @@ export function MarketOverview() {
               <span className="text-[10px] text-slate-400 flex items-center gap-1">
                 ⏱ {timeStr} · Delay 15 min
               </span>
-              <a href="https://brapi.dev" target="_blank" rel="noreferrer"
+              <a href="https://www.google.com/finance/?hl=pt-BR" target="_blank" rel="noreferrer"
                 className="text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full transition-colors">
                 Ver mais cotações
               </a>
