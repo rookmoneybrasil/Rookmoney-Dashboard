@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import Link from 'next/link'
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, DollarSign, Bitcoin, Search } from 'lucide-react'
 
 interface StockItem {
@@ -88,7 +89,6 @@ export function MarketOverview() {
   const [data, setData] = useState<MarketData | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [showAll, setShowAll] = useState(false)
 
   useEffect(() => {
     fetchMarketData().then(d => { setData(d); setLoading(false) })
@@ -241,55 +241,15 @@ export function MarketOverview() {
               </div>
             )}
 
-            {/* All stocks expanded */}
-            {showAll && (
-              <div className="border-t border-slate-100">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-slate-50 text-left">
-                      <th className="px-4 py-2.5 font-semibold text-slate-500">Ativo</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right">Preço</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right">Var. dia</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right">Var%</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right hidden sm:table-cell">Abertura</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right hidden sm:table-cell">Máxima</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right hidden sm:table-cell">Mínima</th>
-                      <th className="px-4 py-2.5 font-semibold text-slate-500 text-right hidden md:table-cell">Volume</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sorted.map(s => (
-                      <tr key={s.symbol} className="border-t border-slate-100 hover:bg-slate-50/80 transition-colors">
-                        <td className="px-4 py-2 font-semibold text-blue-600">{s.symbol}</td>
-                        <td className="px-4 py-2 text-right font-medium text-slate-800">{fmtBRL(s.price)}</td>
-                        <td className={`px-4 py-2 text-right font-medium ${s.change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                          {s.change >= 0 ? '+' : ''}{s.change.toFixed(2)}
-                        </td>
-                        <td className={`px-4 py-2 text-right font-semibold ${s.changePercent >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                          {s.changePercent >= 0 ? '+' : ''}{s.changePercent}%
-                        </td>
-                        <td className="px-4 py-2 text-right text-slate-500 hidden sm:table-cell">{fmtBRL(s.open)}</td>
-                        <td className="px-4 py-2 text-right text-slate-500 hidden sm:table-cell">{fmtBRL(s.high)}</td>
-                        <td className="px-4 py-2 text-right text-slate-500 hidden sm:table-cell">{fmtBRL(s.low)}</td>
-                        <td className="px-4 py-2 text-right text-slate-500 hidden md:table-cell">{fmtK(s.volume)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
             {/* Footer */}
             <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 bg-slate-50/50">
               <span className="text-[10px] text-slate-400 flex items-center gap-1">
                 ⏱ {timeStr} · Delay 15 min
               </span>
-              <button
-                onClick={() => setShowAll(!showAll)}
-                className="text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full transition-colors"
-              >
-                {showAll ? 'Ocultar cotações' : 'Ver mais cotações'}
-              </button>
+              <Link href="/blog/cotacoes"
+                className="text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-full transition-colors">
+                Ver mais cotações
+              </Link>
             </div>
           </div>
 

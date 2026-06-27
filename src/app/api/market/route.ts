@@ -24,9 +24,21 @@ interface MarketResponse {
 }
 
 const BRAPI_TOKEN = process.env.BRAPI_TOKEN ?? ''
-const ALL_TICKERS = ['PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5', 'DIRR3', 'CEAB3', 'MBRF3']
+
+const TICKERS_MAIN = ['PETR4', 'VALE3', 'ITUB4', 'ABEV3', 'MGLU3', 'BBDC4', 'WEGE3', 'TOTS3', 'LREN3', 'SUZB3', 'BRKM5', 'AZZA3', 'CSNA3', 'USIM5', 'DIRR3', 'CEAB3', 'MBRF3']
+
+const TICKERS_FULL = [
+  ...TICKERS_MAIN,
+  'B3SA3', 'RENT3', 'EQTL3', 'RAIL3', 'VBBR3', 'ENEV3', 'ASAI3', 'SBSP3', 'HYPE3',
+  'VAMO3', 'IGTI11', 'BBDC3', 'CURY3', 'FLRY3', 'AXIA3', 'EMBR3', 'RDOR3', 'COGN3',
+  'RADL3', 'CPFE3', 'TIMS3', 'MOTV3', 'BBSE3', 'BPAC11', 'VIVT3', 'SANB11', 'ISAE4',
+  'RECV3', 'CSMG3', 'CMIN3', 'BRAV3', 'GGBR4', 'TAEE11', 'PRIO3', 'CMIG4', 'ENGI11',
+  'MULT3', 'UGPA3', 'POMO4', 'CSAN3', 'EGIE3', 'CPLE3', 'ALOS3', 'PSSA3', 'CXSE3',
+  'AURE3', 'ITSA4', 'HAPV3', 'MRVE3', 'YDUQ3', 'BEEF3', 'NATU3', 'VIVA3',
+]
 
 let cache: { data: MarketResponse; expiresAt: number } | null = null
+let cacheFull: { data: MarketResponse; expiresAt: number } | null = null
 
 async function fetchSingleStock(ticker: string): Promise<StockItem | null> {
   try {
@@ -54,9 +66,9 @@ async function fetchSingleStock(ticker: string): Promise<StockItem | null> {
   } catch { return null }
 }
 
-async function fetchMarket(): Promise<MarketResponse> {
+async function fetchMarket(tickers: string[]): Promise<MarketResponse> {
   const [stockResults, cryptoRes, fxRes] = await Promise.all([
-    Promise.all(ALL_TICKERS.map(fetchSingleStock)),
+    Promise.all(tickers.map(fetchSingleStock)),
     fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=brl&include_24hr_change=true', {
       signal: AbortSignal.timeout(8000),
     }).catch(() => null),
@@ -101,17 +113,23 @@ async function fetchMarket(): Promise<MarketResponse> {
   return { stocks, currencies, crypto, updatedAt: new Date().toISOString() }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const now = Date.now()
+  const { searchParams } = new URL(req.url)
+  const full = searchParams.get('full') === '1'
 
-  if (cache && cache.expiresAt > now) {
-    return NextResponse.json(cache.data, {
+  const activeCache = full ? cacheFull : cache
+  if (activeCache && activeCache.expiresAt > now) {
+    return NextResponse.json(activeCache.data, {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
     })
   }
 
-  const data = await fetchMarket()
-  cache = { data, expiresAt: now + 5 * 60 * 1000 }
+  const tickers = full ? TICKERS_FULL : TICKERS_MAIN
+  const data = await fetchMarket(tickers)
+
+  if (full) cacheFull = { data, expiresAt: now + 5 * 60 * 1000 }
+  else cache = { data, expiresAt: now + 5 * 60 * 1000 }
 
   return NextResponse.json(data, {
     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },

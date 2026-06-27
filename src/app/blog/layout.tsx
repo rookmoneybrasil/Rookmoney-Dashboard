@@ -34,6 +34,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <nav className="flex items-center gap-4">
             <Link href="/blog" className="text-sm font-medium text-white">Blog</Link>
+            <Link href="/blog/cotacoes" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Cotações</Link>
             <Link href="/help" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Ajuda</Link>
             <Link href="/register" className="text-sm font-medium px-4 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition-colors">
               Criar conta
