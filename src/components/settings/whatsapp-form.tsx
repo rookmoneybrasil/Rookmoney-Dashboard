@@ -11,11 +11,23 @@ interface Props { currentPhone: string | null; plan?: string }
 
 const ROOKINHO_NUMBER = '5513991117381'
 
+function normalizePhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, '')
+  if (digits.length === 11) return `+55${digits}`
+  if (digits.length === 12 || digits.length === 13) return `+${digits}`
+  return null
+}
+
 export function WhatsAppForm({ currentPhone, plan }: Props) {
   const [phone] = useState(currentPhone)
 
   const { mutate: save, pending: saving, error } = useMutation(
-    (p: string) => clientApi.updateProfile({ whatsappPhone: p || '' }),
+    (p: string) => {
+      if (!p) return clientApi.updateProfile({ whatsappPhone: '' })
+      const normalized = normalizePhone(p)
+      if (!normalized) throw new Error('Número inválido. Use o formato: (11) 99999-9999')
+      return clientApi.updateProfile({ whatsappPhone: normalized })
+    },
     { onSuccess: () => window.location.reload() },
   )
 
