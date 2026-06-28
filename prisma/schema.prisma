@@ -56,6 +56,9 @@ model User {
   utmCampaign         String?
   platform            String?
   lastActiveAt        DateTime?
+  lastDripEmailDay    Int?
+  lastInactivityEmail DateTime?
+  lastPromoEmailDay   Int?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
