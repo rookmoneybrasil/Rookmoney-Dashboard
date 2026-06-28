@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { SignJWT } from 'jose'
 import { db } from '@/lib/db'
 import { createSession } from '@/lib/auth'
+import { sendWelcomeEmail } from '@/lib/email'
 
 const GOOGLE_TOKEN_URL    = 'https://oauth2.googleapis.com/token'
 const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
@@ -108,6 +109,7 @@ export async function GET(req: NextRequest) {
           profileImage: googleUser.picture || null,
         },
       })
+      sendWelcomeEmail(user.email, user.name).catch(() => {})
     }
   }
 

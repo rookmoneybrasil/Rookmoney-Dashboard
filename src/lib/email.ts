@@ -164,3 +164,52 @@ export async function sendBillReminders(
     body: JSON.stringify({ from, to, subject, html }),
   })
 }
+
+export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return
+
+  const firstName = name.split(' ')[0]
+  const from      = process.env.FROM_EMAIL ?? 'Rook Money <noreply@rookmoney.com>'
+  const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<body style="background:#080d1a;color:#cbd5e1;font-family:system-ui,-apple-system,sans-serif;padding:0;margin:0;">
+  <div style="max-width:520px;margin:40px auto;">
+    <div style="background:#0f1629;border-radius:20px;border:1px solid #1e2d4a;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#0d1b3e 0%,#1a1040 100%);padding:40px 32px 24px;text-align:center;">
+        <img src="${appUrl}/rookinho.png" alt="Rookinho" width="120" height="120" style="display:inline-block;object-fit:contain;" />
+        <h1 style="color:#f1f5f9;margin:16px 0 0;font-size:24px;font-weight:700;">Fala, ${firstName}! 👋</h1>
+        <p style="color:#94a3b8;margin:8px 0 0;font-size:15px;">Sua conta no Rook Money foi criada com sucesso.</p>
+      </div>
+      <div style="padding:32px;">
+        <p style="color:#94a3b8;margin:0 0 24px;font-size:15px;line-height:1.6;">
+          Eu sou o <strong style="color:#f1f5f9;">Rookinho</strong>, seu assistente financeiro. Vou te ajudar a organizar suas finanças de um jeito simples e sem dor de cabeça.
+        </p>
+        <p style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 12px;font-weight:600;">O que você pode fazer</p>
+        <div style="margin-bottom:24px;">
+          <div style="margin-bottom:12px;"><span style="color:#3b82f6;font-size:18px;margin-right:12px;">📊</span><strong style="color:#f1f5f9;font-size:14px;">Dashboard completo</strong><br/><span style="color:#64748b;font-size:13px;">Visão geral das suas receitas, despesas e saldo</span></div>
+          <div style="margin-bottom:12px;"><span style="color:#22c55e;font-size:18px;margin-right:12px;">💰</span><strong style="color:#f1f5f9;font-size:14px;">Contas e rendas</strong><br/><span style="color:#64748b;font-size:13px;">Controle contas a pagar, parcelas e fontes de renda</span></div>
+          <div style="margin-bottom:12px;"><span style="color:#a855f7;font-size:18px;margin-right:12px;">🎯</span><strong style="color:#f1f5f9;font-size:14px;">Metas financeiras</strong><br/><span style="color:#64748b;font-size:13px;">Defina objetivos e acompanhe seu progresso</span></div>
+          <div><span style="color:#f59e0b;font-size:18px;margin-right:12px;">🤖</span><strong style="color:#f1f5f9;font-size:14px;">Rookinho IA</strong><br/><span style="color:#64748b;font-size:13px;">Converse com a IA sobre suas finanças (PRO)</span></div>
+        </div>
+        <a href="https://app.rookmoney.com" style="display:block;text-align:center;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;">Acessar meu dashboard →</a>
+      </div>
+      <div style="padding:20px 32px;border-top:1px solid #1e2d4a;background:#060a16;">
+        <p style="margin:0;font-size:12px;color:#334155;text-align:center;">Você recebeu este e-mail porque criou uma conta no <a href="https://rookmoney.com" style="color:#60a5fa;text-decoration:none;">Rook Money</a>.</p>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#1e2d4a;margin-top:24px;">© 2026 Rook Money · rookmoney.com</p>
+  </div>
+</body>
+</html>`
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({ from, to, subject: 'Bem-vindo ao Rook Money! 🎉', html }),
+  })
+}

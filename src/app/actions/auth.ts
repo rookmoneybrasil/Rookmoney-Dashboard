@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
 import { createSession, deleteSession } from '@/lib/auth'
 import { LoginSchema, RegisterSchema } from '@/lib/validations/auth'
-import { sendPasswordResetEmail } from '@/lib/email'
+import { sendPasswordResetEmail, sendWelcomeEmail } from '@/lib/email'
 import type { AuthFormState } from '@/types'
 
 export async function login(state: AuthFormState | undefined, formData: FormData): Promise<AuthFormState> {
@@ -75,6 +75,8 @@ export async function register(state: AuthFormState | undefined, formData: FormD
       password: hashedPassword,
     },
   })
+
+  sendWelcomeEmail(user.email, user.name).catch(() => {})
 
   await createSession(user.id, user.name, user.email)
   redirect('/onboarding')
