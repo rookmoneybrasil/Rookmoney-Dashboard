@@ -432,8 +432,8 @@ export default async function LandingPage() {
 
       {/* ── WhatsApp Rookinho IA ────────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16">
 
             {/* Left: WhatsApp chat simulation */}
             <FadeIn from="left" className="shrink-0">
