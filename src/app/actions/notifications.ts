@@ -13,13 +13,20 @@ export interface AppNotification {
   message: string
   href:    string
   urgency: 'high' | 'medium' | 'low'
+  isNew:   boolean
 }
 
 function hashId(...parts: string[]): string {
   return parts.join('-').replace(/[^a-z0-9-]/gi, '_')
 }
 
-export async function getNotifications(): Promise<AppNotification[]> {
+export async function markNotificationsRead(): Promise<void> {
+  const session = await getSession()
+  if (!session) redirect('/login')
+  await db.user.update({ where: { id: session.userId }, data: { notificationsReadAt: new Date() } })
+}
+
+export async function getNotifications(): Promise<{ notifications: AppNotification[]; newCount: number }> {
   const session = await getSession()
   if (!session) redirect('/login')
 
@@ -42,7 +49,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
   ] = await Promise.all([
     db.user.findUnique({
       where: { id: session.userId },
-      select: { name: true, plan: true, lastActiveAt: true, createdAt: true },
+      select: { name: true, plan: true, lastActiveAt: true, createdAt: true, notificationsReadAt: true },
     }),
     // Contas em ATRASO
     db.bill.findMany({
@@ -95,6 +102,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
     }),
   ])
 
+  const readAt = user?.notificationsReadAt ?? null
   const notifications: AppNotification[] = []
 
   // ── Contas em atraso ────────────────────────────────────────────
@@ -107,6 +115,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: `Atrasada há ${daysLate === 0 ? '1' : daysLate} dia${daysLate > 1 ? 's' : ''} · R$ ${Number(bill.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       href:    '/bills',
       urgency: 'high',
+      isNew:   !readAt || new Date(bill.createdAt) > readAt,
     })
   }
 
@@ -121,6 +130,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: `R$ ${Number(bill.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — ${whenLabel}`,
       href:    '/bills',
       urgency: diffDays <= 1 ? 'high' : 'medium',
+      isNew:   !readAt || new Date(bill.createdAt) > readAt,
     })
   }
 
@@ -136,6 +146,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: `${pct}% concluída — prazo ${diffDays <= 0 ? 'hoje' : diffDays === 1 ? 'amanhã' : `em ${diffDays} dias`}`,
       href:    '/goals',
       urgency: diffDays <= 3 ? 'high' : 'medium',
+      isNew:   !readAt || new Date(goal.createdAt) > readAt,
     })
   }
 
@@ -156,6 +167,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: pct >= 100 ? `Limite ultrapassado (${pct}%)` : `${pct}% do limite atingido`,
       href:    '/budget',
       urgency: pct >= 100 ? 'high' : 'medium',
+      isNew:   !readAt,
     })
   }
 
@@ -169,6 +181,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: `R$ ${Number(p.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — vence ${diffDays <= 0 ? 'hoje' : 'amanhã'}`,
       href:    '/people',
       urgency: 'high',
+      isNew:   !readAt || new Date(p.createdAt) > readAt,
     })
   }
 
@@ -183,6 +196,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: `R$ ${Number(src.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} — renda do dia ${day} ainda não confirmada`,
       href:    '/income',
       urgency: 'low',
+      isNew:   !readAt,
     })
   }
 
@@ -200,6 +214,7 @@ export async function getNotifications(): Promise<AppNotification[]> {
       message: log.body,
       href:    log.screen ? `/${log.screen}` : '/',
       urgency: 'low',
+      isNew:   !readAt || new Date(log.createdAt) > readAt,
     })
   }
 
@@ -217,7 +232,9 @@ export async function getNotifications(): Promise<AppNotification[]> {
       { title: '🐦 Rookinho sincerão', message: `${firstName}, quer organizar de verdade ou só de brincadeira? PRO é pra quem leva a sério.`, href: '/settings' },
       { title: '🐦 Todo mundo tá virando PRO', message: 'Quem assina não volta pro grátis. Será que sabem algo que você não sabe?', href: '/settings' },
     ]
-    notifications.push({ id: 'rookinho-pro', type: 'rookinho', ...proTips[dayOfYear % proTips.length], urgency: 'low' })
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const readToday = readAt && readAt >= todayStart
+    notifications.push({ id: 'rookinho-pro', type: 'rookinho', ...proTips[dayOfYear % proTips.length], urgency: 'low', isNew: !readToday })
   }
 
   const dailyTips = [
@@ -236,10 +253,14 @@ export async function getNotifications(): Promise<AppNotification[]> {
     { title: '🐦 Dica de ouro', message: `${firstName}, paga as contas assim que cair o salário. Futuro-você vai agradecer!`, href: '/bills' },
     { title: `🐦 Opa ${firstName}`, message: 'Importar extrato bancário é rapidinho. Vai em Transações e tenta!', href: '/transactions' },
   ]
-  notifications.push({ id: 'rookinho-tip', type: 'rookinho', ...dailyTips[dayOfYear % dailyTips.length], urgency: 'low' })
+  const todayStart2 = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const readToday2 = readAt && readAt >= todayStart2
+  notifications.push({ id: 'rookinho-tip', type: 'rookinho', ...dailyTips[dayOfYear % dailyTips.length], urgency: 'low', isNew: !readToday2 })
 
-  return notifications.sort((a, b) => {
+  notifications.sort((a, b) => {
     const order = { high: 0, medium: 1, low: 2 }
     return order[a.urgency] - order[b.urgency]
   })
+
+  return { notifications, newCount: notifications.filter(n => n.isNew).length }
 }

@@ -1,12 +1,15 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Bell, Receipt, Target, PieChart, Users, TrendingUp, CheckCheck, Bird } from 'lucide-react'
 import type { AppNotification } from '@/lib/api-client'
+import { markNotificationsRead } from '@/app/actions/notifications'
 
 interface Props {
   notifications: AppNotification[]
+  newCount: number
 }
 
 const TYPE_CONFIG: Record<AppNotification['type'], { icon: React.ReactNode; color: string }> = {
@@ -30,9 +33,11 @@ const GROUP_LABELS: Record<AppNotification['urgency'], string> = {
   low:    '🔵 Informativo',
 }
 
-export function NotificationBell({ notifications }: Props) {
+export function NotificationBell({ notifications, newCount }: Props) {
   const [open, setOpen] = useState(false)
   const ref             = useRef<HTMLDivElement>(null)
+  const router          = useRouter()
+  const [pending, startTransition] = useTransition()
   const count           = notifications.length
   const highCount       = notifications.filter(n => n.urgency === 'high').length
 
@@ -45,7 +50,13 @@ export function NotificationBell({ notifications }: Props) {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  // Group by urgency
+  function handleMarkRead() {
+    startTransition(async () => {
+      await markNotificationsRead()
+      router.refresh()
+    })
+  }
+
   const groups = (['high', 'medium', 'low'] as const)
     .map(u => ({ urgency: u, items: notifications.filter(n => n.urgency === u) }))
     .filter(g => g.items.length > 0)
@@ -54,15 +65,15 @@ export function NotificationBell({ notifications }: Props) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        aria-label={`Notificações${count > 0 ? ` — ${count} nova${count > 1 ? 's' : ''}` : ''}`}
+        aria-label={`Notificações${newCount > 0 ? ` — ${newCount} nova${newCount > 1 ? 's' : ''}` : ''}`}
         className="relative flex items-center justify-center size-9 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-ink-700 transition-colors"
       >
         <Bell className={`size-4 ${open ? 'text-slate-300' : ''}`} />
-        {count > 0 && (
+        {newCount > 0 && (
           <span className={`absolute -top-1 -right-1 size-4 rounded-full text-white text-[10px] flex items-center justify-center font-semibold leading-none ${
             highCount > 0 ? 'bg-danger animate-pulse' : 'bg-warning'
           }`}>
-            {count > 9 ? '9+' : count}
+            {newCount > 9 ? '9+' : newCount}
           </span>
         )}
       </button>
@@ -76,16 +87,17 @@ export function NotificationBell({ notifications }: Props) {
             <div className="flex items-center gap-2">
               <Bell className="size-3.5 text-slate-500" />
               <p className="text-xs font-semibold text-slate-300">Notificações</p>
-              {count > 0 && (
-                <span className="text-[10px] bg-ink-600 text-slate-400 px-1.5 py-0.5 rounded-full">{count}</span>
+              {newCount > 0 && (
+                <span className="text-[10px] bg-brand-600 text-white px-1.5 py-0.5 rounded-full">{newCount}</span>
               )}
             </div>
-            {count > 0 && (
+            {newCount > 0 && (
               <button
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-1 text-[10px] text-slate-600 hover:text-slate-400 transition-colors"
+                onClick={handleMarkRead}
+                disabled={pending}
+                className="flex items-center gap-1 text-[10px] text-brand-400 hover:text-brand-300 transition-colors disabled:opacity-50"
               >
-                <CheckCheck className="size-3" /> marcar como lidas
+                <CheckCheck className="size-3" /> {pending ? '...' : 'marcar como lidas'}
               </button>
             )}
           </div>
@@ -104,7 +116,6 @@ export function NotificationBell({ notifications }: Props) {
               <div className="divide-y divide-white/[0.04]">
                 {groups.map(({ urgency, items }) => (
                   <div key={urgency}>
-                    {/* Group label */}
                     <p className="px-4 py-2 text-[10px] font-semibold text-slate-600 uppercase tracking-wider bg-ink-900/40">
                       {GROUP_LABELS[urgency]}
                     </p>
@@ -115,25 +126,20 @@ export function NotificationBell({ notifications }: Props) {
                           key={n.id}
                           href={n.href}
                           onClick={() => setOpen(false)}
-                          className="flex items-start gap-3 px-4 py-3 hover:bg-ink-700/60 transition-colors group"
+                          className={`flex items-start gap-3 px-4 py-3 hover:bg-ink-700/60 transition-colors group ${!n.isNew ? 'opacity-50' : ''}`}
                         >
-                          {/* Icon */}
                           <div className={`size-7 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${cfg.color}`}>
                             {cfg.icon}
                           </div>
-
-                          {/* Text */}
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-slate-200 truncate group-hover:text-white">
+                            <p className={`text-sm text-slate-200 truncate group-hover:text-white ${n.isNew ? 'font-semibold' : 'font-normal'}`}>
                               {n.title}
                             </p>
                             <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
                               {n.message}
                             </p>
                           </div>
-
-                          {/* Urgency dot */}
-                          <div className={`size-2 rounded-full mt-1.5 shrink-0 ${URGENCY_DOT[n.urgency]}`} />
+                          {n.isNew && <div className={`size-2 rounded-full mt-1.5 shrink-0 ${URGENCY_DOT[n.urgency]}`} />}
                         </Link>
                       )
                     })}
@@ -147,7 +153,7 @@ export function NotificationBell({ notifications }: Props) {
           {count > 0 && (
             <div className="border-t border-white/6 px-4 py-2.5">
               <p className="text-[10px] text-slate-600 text-center">
-                {highCount > 0 && `${highCount} urgente${highCount > 1 ? 's' : ''} · `}
+                {newCount > 0 ? `${newCount} nova${newCount > 1 ? 's' : ''} · ` : ''}
                 {count} notificação{count > 1 ? 'ões' : ''}
               </p>
             </div>

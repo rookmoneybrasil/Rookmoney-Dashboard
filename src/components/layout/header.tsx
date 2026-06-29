@@ -9,10 +9,12 @@ import { isPro, isProPlus } from '@/lib/plans'
 import { getNotifications } from '@/app/actions/notifications'
 
 export async function Header() {
-  const [notifications, user] = await Promise.all([
-    getNotifications().catch(() => []),
+  const [notifData, user] = await Promise.all([
+    getNotifications().catch(() => ({ notifications: [], newCount: 0 })),
     serverApi.me().catch(() => null),
   ])
+  const notifications = notifData.notifications
+  const newCount = notifData.newCount
 
   const userIsPro = isPro(user?.plan)
   const userIsProPlus = isProPlus(user?.plan)
@@ -29,7 +31,7 @@ export async function Header() {
       {/* Right side */}
       <div className="flex items-center gap-2">
         {/* Notification bell */}
-        <NotificationBell notifications={notifications} />
+        <NotificationBell notifications={notifications} newCount={newCount} />
 
         {/* PRO upgrade — only for Free users */}
         {user && !userIsPro && (

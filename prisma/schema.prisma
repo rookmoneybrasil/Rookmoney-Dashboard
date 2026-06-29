@@ -59,6 +59,7 @@ model User {
   lastDripEmailDay    Int?
   lastInactivityEmail DateTime?
   lastPromoEmailDay   Int?
+  notificationsReadAt DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

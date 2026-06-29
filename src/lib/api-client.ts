@@ -126,7 +126,7 @@ export const serverApi = {
   personRecurring: (personId: string) => serverFetch<PersonEntryRecurringItem[]>(`/people/recurring?personId=${personId}`),
 
   // Notifications
-  notifications: () => serverFetch<AppNotification[]>('/notifications'),
+  notifications: () => serverFetch<{ notifications: AppNotification[]; newCount: number }>('/notifications'),
 
   // Achievements
   achievements: () => serverFetch<AchievementsResponse>('/achievements'),
@@ -148,6 +148,8 @@ export const clientApi = {
     clientFetch<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   register: (data: { name: string; email: string; password: string; utmSource?: string; utmMedium?: string; utmCampaign?: string }) =>
     clientFetch<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  phoneAuth: (data: { idToken: string }) =>
+    clientFetch<AuthResponse>('/auth/phone', { method: 'POST', body: JSON.stringify(data) }),
   logout:   () => clientFetch<void>('/auth/logout', { method: 'POST' }),
   me:       () => clientFetch<User>('/auth/me'),
 
@@ -311,7 +313,7 @@ export const clientApi = {
 export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected' | 'received'; href: string; color: string }
 export interface CalendarData { month: string; daysInMonth: number; firstWeekday: number; events: CalendarEvent[]; byDay: Record<string, CalendarEvent[]> }
 
-export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income' | 'rookinho'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low' }
+export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income' | 'rookinho'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low'; isNew: boolean }
 
 // ─── Types for dashboard components ──────────────────────────────────────────
 export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
