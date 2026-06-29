@@ -436,12 +436,12 @@ export default async function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16">
 
             {/* Left: WhatsApp chat simulation */}
-            <FadeIn from="left" className="shrink-0">
+            <FadeIn from="left" className="lg:flex-1 flex justify-center">
               <WhatsAppChat />
             </FadeIn>
 
             {/* Right: explanation */}
-            <div className="flex flex-col gap-5 text-center lg:text-left flex-1 min-w-0">
+            <div className="flex flex-col gap-5 text-center lg:text-left lg:flex-1 min-w-0">
               <FadeIn>
                 <div className="inline-flex items-center gap-2 bg-green-500/15 border border-green-500/25 text-green-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                   <MessageCircle className="size-3" />

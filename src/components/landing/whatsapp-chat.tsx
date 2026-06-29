@@ -52,7 +52,7 @@ export function WhatsAppChat() {
   }, [visibleCount])
 
   return (
-    <div ref={sectionRef} className="w-full max-w-[380px] mx-auto lg:mx-0">
+    <div ref={sectionRef} className="w-full max-w-[380px] mx-auto">
       {/* Phone frame */}
       <div className="rounded-[28px] bg-[#111b21] border border-white/10 shadow-2xl shadow-green-900/20 overflow-hidden">
         {/* WhatsApp header */}
