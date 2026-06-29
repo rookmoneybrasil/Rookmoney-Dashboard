@@ -263,6 +263,13 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink
 .animate-scroll-left  { animation: scroll-left  30s linear infinite; width: max-content; }
 .animate-scroll-right { animation: scroll-right 30s linear infinite; width: max-content; }
 
+/* ─── WhatsApp chat animation ────────────────────────────────────── */
+@keyframes whatsapp-msg-in {
+  0%   { opacity: 0; transform: translateY(12px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.whatsapp-msg-in { animation: whatsapp-msg-in 0.35s ease-out both; }
+
 /* ─── Border Glow (React Bits — exact source port) ────────────────── */
 
 .border-glow-card {
