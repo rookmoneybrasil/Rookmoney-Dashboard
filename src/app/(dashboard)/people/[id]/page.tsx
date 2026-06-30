@@ -164,9 +164,9 @@ export default async function PersonPage({ params }: Props) {
   const openEntries    = allEntries.filter((e) => !e.isSettled)
   const settledEntries = allEntries.filter((e) =>  e.isSettled)
 
-  // Balance: for installment groups, count only ONE installment (monthly value, not total debt)
+  // Balance: for installment groups, count only the installment due in the CURRENT MONTH
+  // (future installments belong in the projection, not in the current-month balance card)
   // For old recurring (>= 24x not migrated): only within 45 days
-  const groupSeen = new Set<string>()
   let theyOweTotal = 0
   let iOweTotal    = 0
 
@@ -175,8 +175,10 @@ export default async function PersonPage({ params }: Props) {
     if (isOldRecurring && new Date(e.date) > cutoff) continue
 
     if (e.installmentGroupId) {
-      if (groupSeen.has(e.installmentGroupId)) continue
-      groupSeen.add(e.installmentGroupId)
+      // Only count installments due in the current month — avoids showing next month's
+      // installment in the balance when this month's is already settled
+      const eDate = new Date(e.date)
+      if (eDate.getFullYear() !== now.getFullYear() || eDate.getMonth() !== now.getMonth()) continue
     }
 
     if (e.type === 'THEY_OWE_ME') theyOweTotal += Number(e.amount)
