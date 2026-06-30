@@ -468,11 +468,12 @@ export default async function PersonPage({ params }: Props) {
                   {i === 0 && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
                   {m.label}
                 </p>
-                {m.theyOwe > 0 && (
-                  <p className="text-xs text-success font-medium">+{formatCurrency(m.theyOwe)}</p>
-                )}
-                {m.iOwe > 0 && (
-                  <p className="text-xs text-danger font-medium">-{formatCurrency(m.iOwe)}</p>
+                {/* Show individual breakdown only when both sides have amounts (mixed month) */}
+                {m.theyOwe > 0 && m.iOwe > 0 && (
+                  <>
+                    <p className="text-xs text-success font-medium">+{formatCurrency(m.theyOwe)}</p>
+                    <p className="text-xs text-danger font-medium">-{formatCurrency(m.iOwe)}</p>
+                  </>
                 )}
                 <p className={`text-sm font-bold mt-1 ${m.balance >= 0 ? 'text-success' : 'text-danger'}`}>
                   {m.balance >= 0 ? '+' : ''}{formatCurrency(m.balance)}
