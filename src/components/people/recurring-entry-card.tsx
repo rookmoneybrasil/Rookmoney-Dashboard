@@ -16,10 +16,13 @@ interface Props {
 }
 
 export function RecurringEntryCard({ item, categories = [], monthEntryId = null, paidThisMonth = false }: Props) {
-  const [confirming, setConfirming] = useState(false)
-  const [stopping,   setStopping]   = useState(false)
-  const [paid,       setPaid]       = useState(paidThisMonth)
-  const [marking,    setMarking]    = useState(false)
+  const [confirming,    setConfirming]    = useState(false)
+  const [stopping,      setStopping]      = useState(false)
+  const [paid,          setPaid]          = useState(paidThisMonth)
+  const [marking,       setMarking]       = useState(false)
+  // Tracks an entry created in this session so retries after settleEntry failure
+  // don't create a second duplicate entry (monthEntryId is a prop, not updated live)
+  const [localEntryId, setLocalEntryId]  = useState<string | null>(null)
 
   // Prevent concurrent/duplicate clicks — blocks any new action until reload
   const processing = useRef(false)
@@ -48,9 +51,11 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
           window.location.reload()
         }
       } else {
-        if (monthEntryId) {
+        // Use localEntryId if a previous attempt created the entry but settleEntry failed
+        const targetId = localEntryId ?? monthEntryId
+        if (targetId) {
           // Entrada já existe — só acerta
-          await clientApi.settleEntry(monthEntryId)
+          await clientApi.settleEntry(targetId)
         } else {
           // Nenhuma entrada gerada ainda — cria e acerta em uma operação
           const entry = await clientApi.createEntry(item.personId, {
@@ -60,6 +65,7 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
             date:        new Date().toISOString().split('T')[0],
             categoryId:  item.categoryId,
           })
+          setLocalEntryId(entry.id)
           await clientApi.settleEntry(entry.id)
         }
         setPaid(true)
