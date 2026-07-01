@@ -36,7 +36,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
 
   const totalBudget = budgets.reduce((s, b) => s + Number(b.amount), 0)
   const totalSpent  = budgets.reduce((s, b) => s + b.spent,  0)
-  const overBudget  = budgets.filter((b) => b.spent > b.amount)
+  const overBudget  = budgets.filter((b) => b.spent > Number(b.amount))
 
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto">
@@ -97,8 +97,8 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
           <CardContent>
             <div className="divide-y divide-white/5">
               {budgets.map((b) => {
-                const pct       = b.amount > 0 ? Math.min(Math.round((b.spent / b.amount) * 100), 100) : 0
-                const isOver    = b.spent > b.amount
+                const pct       = Number(b.amount) > 0 ? Math.min(Math.round((b.spent / Number(b.amount)) * 100), 100) : 0
+                const isOver    = b.spent > Number(b.amount)
                 const isWarning = !isOver && pct >= 80
 
                 return (
