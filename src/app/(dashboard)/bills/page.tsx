@@ -85,20 +85,29 @@ export default async function BillsPage() {
   const activeRecurring = recurringBills.filter(r => r.isActive)
   const pausedRecurring = recurringBills.filter(r => !r.isActive)
   const monthlyFixed    = activeRecurring.reduce((s, r) => s + Number(r.amount), 0)
+  // Overdue = all bills past due date (any month). Includes overdue installments.
   const overdueList = pending.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
+  const overdueInstallments = activeGroups.flatMap(g => g.items)
+    .filter(inst => !inst.isPaid && classifyBillStatus(inst.dueDate, false) === 'overdue')
   const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
+    + overdueInstallments.reduce((s, inst) => s + Number(inst.amount), 0)
 
-  // Bills do mês atual (não atrasados)
+  // Current month: non-overdue bills only (overdue ones are already in overdueTotal)
   const pendingThisMonth = pending.filter(b => {
     const d = new Date(b.dueDate)
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+      && classifyBillStatus(b.dueDate, false) !== 'overdue'
   })
   const totalThisMonth = pendingThisMonth.reduce((s, b) => s + Number(b.amount), 0)
     + activeGroups.flatMap(g => g.items)
-        .filter(inst => !inst.isPaid && (() => { const d = new Date(inst.dueDate); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() })())
+        .filter(inst => !inst.isPaid && (() => {
+          const d = new Date(inst.dueDate)
+          return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+            && classifyBillStatus(inst.dueDate, false) !== 'overdue'
+        })())
         .reduce((s, inst) => s + Number(inst.amount), 0)
 
-  // Grand total = contas do mês + atrasadas + pessoas
+  // Grand total = contas do mês (non-overdue) + todas as atrasadas (any month) + pessoas
   const grandTotal = totalThisMonth + overdueTotal + iOweTotal
 
   // Projection: próximos 3 meses
