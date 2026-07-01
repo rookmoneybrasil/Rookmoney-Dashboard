@@ -45,9 +45,10 @@ model User {
   scannerUsageCount   Int       @default(0)
   stripeCancelAtPeriodEnd Boolean  @default(false)
   stripeCurrentPeriodEnd DateTime?
-  googlePlayToken     String?
-  googlePlayOrderId   String?
-  subscriptionSource  String?
+  googlePlayToken             String?
+  googlePlayOrderId           String?
+  appleOriginalTransactionId  String?
+  subscriptionSource          String?
   proPlanExpiresAt    DateTime?
   proPlanReason       String?
   adminNotes          String?
