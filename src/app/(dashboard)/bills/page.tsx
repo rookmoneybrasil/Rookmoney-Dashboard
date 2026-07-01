@@ -64,13 +64,18 @@ export default async function BillsPage() {
   const now = new Date()
 
   const pending = regular.filter((b) => !b.isPaid)
-  // Only show paid bills from the current month (historical paid bills from past months
-  // don't belong in the current month's "Pagas" card/list)
+  // Current month paid bills (for "Pagas este mês" card)
   const paid = regular.filter((b) => {
     if (!b.isPaid) return false
     const d = new Date(b.dueDate)
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
   })
+  // Past months paid bills (for history section)
+  const paidHistory = regular.filter((b) => {
+    if (!b.isPaid) return false
+    const d = new Date(b.dueDate)
+    return !(d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth())
+  }).sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime())
 
   const totalPending = pending.reduce((s, b) => s + Number(b.amount), 0)
     + activeGroups.reduce((s, g) => s + Number(g.nextDue.amount), 0)
@@ -142,6 +147,25 @@ export default async function BillsPage() {
 
     // Bills para o popup — avulsos + fixas geradas já em pending para este mês
     const billsInMonth: ProjectionBill[] = [
+      // Contas atrasadas de meses anteriores (apenas no mês atual)
+      ...(i === 0
+        ? [
+            ...overdueList.map(b => ({
+              id: b.id, name: b.name, amount: Number(b.amount), dueDate: b.dueDate,
+              isFixed: !!b.recurringBillId, isInstallment: false,
+              categoryIcon: b.category?.icon ?? null, categoryName: b.category?.name ?? null, categoryColor: b.category?.color ?? null,
+            })),
+            ...activeGroups.flatMap(g => g.items
+              .filter(inst => !inst.isPaid && classifyBillStatus(inst.dueDate, false) === 'overdue')
+              .map(inst => ({
+                id: inst.id,
+                name: `${g.name} (${inst.installmentCurrent}/${g.total})`,
+                amount: Number(inst.amount), dueDate: inst.dueDate,
+                isFixed: false, isInstallment: true,
+                categoryIcon: inst.category?.icon ?? null, categoryName: inst.category?.name ?? null, categoryColor: inst.category?.color ?? null,
+              }))),
+          ]
+        : []),
       // Contas já existentes no banco com vencimento neste mês
       ...pending
         .filter(b => inMonth(b.dueDate))
@@ -191,9 +215,9 @@ export default async function BillsPage() {
 
     return {
       label,
-      amount: fixedAmount + avulsoAmount + installmentAmount,
+      amount: fixedAmount + avulsoAmount + installmentAmount + (i === 0 ? overdueTotal : 0),
       isCurrent: i === 0,
-      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount },
+      breakdown: { fixed: fixedAmount, avulso: avulsoAmount, installment: installmentAmount, overdue: i === 0 ? overdueTotal : 0 },
       bills: billsInMonth,
     }
   })
@@ -501,6 +525,46 @@ export default async function BillsPage() {
               <div className="divide-y divide-white/5">
                 {paid.map((bill) => (
                   <div key={bill.id} className="flex items-center gap-4 px-5 py-4 opacity-60 group hover:bg-ink-600/20 transition-colors">
+                    <div className="size-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                      <Check className="size-4 text-success" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-400 truncate">{bill.name}</p>
+                      <p className="text-xs text-slate-600">
+                        {bill.category?.name ?? 'Sem categoria'} · {formatDate(bill.dueDate)}
+                        {bill.recurringBillId && <span className="ml-1 text-brand-600">↻ fixa</span>}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(bill.amount)}</span>
+                      <Badge variant="success" size="sm">Pago</Badge>
+                      <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          </div>
+        </>
+      )}
+
+      {/* ── Histórico de contas pagas ───────────────────────── */}
+      {paidHistory.length > 0 && (
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-slate-600 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-400 flex items-center gap-2">
+                <Archive className="size-4 text-slate-500" /> Histórico de contas pagas
+              </h2>
+            </div>
+          <Card padding="none">
+            <CardContent>
+              <div className="divide-y divide-white/5">
+                {paidHistory.map((bill) => (
+                  <div key={bill.id} className="flex items-center gap-4 px-5 py-4 opacity-50 hover:opacity-80 transition-opacity group">
                     <div className="size-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
                       <Check className="size-4 text-success" />
                     </div>

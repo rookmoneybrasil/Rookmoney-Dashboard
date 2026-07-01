@@ -21,7 +21,7 @@ export interface ProjectionMonth {
   label: string
   amount: number
   isCurrent: boolean
-  breakdown: { fixed: number; avulso: number; installment: number }
+  breakdown: { fixed: number; avulso: number; installment: number; overdue?: number }
   bills: ProjectionBill[]
 }
 
@@ -51,7 +51,7 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
     { label: 'Em atraso',       icon: AlertTriangle, color: 'text-danger',    bg: 'bg-danger/10',    border: 'border-danger/20',    total: sumOf(overdue),     count: overdue.length     },
     { label: 'Parceladas',      icon: Layers,        color: 'text-brand-400', bg: 'bg-brand-500/10', border: 'border-brand-500/20', total: sumOf(installment), count: installment.length },
     { label: 'Fixas + Avulsas', icon: RefreshCw,     color: 'text-slate-300', bg: 'bg-ink-600',      border: 'border-white/8',      total: sumOf(recAvulso),   count: recAvulso.length   },
-    { label: 'Pessoas',         icon: Users,         color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', total: iOweTotal,        count: peopleDue.length   },
+    ...(month.isCurrent && peopleDue.length > 0 ? [{ label: 'Pessoas', icon: Users, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', total: iOweTotal, count: peopleDue.length }] : []),
   ].filter(b => b.count > 0)
 
   const sections: { label: string; icon: React.ElementType; bills: ProjectionBill[]; color: string }[] = [
@@ -134,8 +134,8 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
           ))}
         </div>
 
-          {/* Pessoas section */}
-          {peopleDue.length > 0 && (
+          {/* Pessoas section — only for current month */}
+          {month.isCurrent && peopleDue.length > 0 && (
             <div>
               <div className="flex items-center gap-2 px-5 py-2 sticky top-0 bg-ink-800/95 backdrop-blur-sm border-y border-white/5">
                 <Users className="size-3 text-purple-400" />
@@ -160,8 +160,8 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-white/6 flex items-center justify-between shrink-0 bg-ink-800">
-          <span className="text-xs text-slate-500">{month.bills.length + peopleDue.length} item{month.bills.length + peopleDue.length !== 1 ? 's' : ''} no total</span>
-          <span className="text-sm font-bold text-danger">{`-${formatCurrency(month.amount + iOweTotal)}`}</span>
+          <span className="text-xs text-slate-500">{month.bills.length + (month.isCurrent ? peopleDue.length : 0)} item{month.bills.length + (month.isCurrent ? peopleDue.length : 0) !== 1 ? 's' : ''} no total</span>
+          <span className="text-sm font-bold text-danger">{`-${formatCurrency(month.amount + (month.isCurrent ? iOweTotal : 0))}`}</span>
         </div>
       </div>
     </div>
@@ -197,6 +197,7 @@ export function ProjectionSection({ months, peopleDue = [] }: { months: Projecti
               </p>
               <p className="text-sm font-bold text-danger mb-1.5">{`-${formatCurrency(displayAmount)}`}</p>
               <div className="flex flex-col gap-0.5">
+                {m.isCurrent && (m.breakdown.overdue ?? 0) > 0 && <p className="text-[10px] text-danger/80">⚠️ {formatCurrency(m.breakdown.overdue!)} em atraso</p>}
                 {m.breakdown.fixed       > 0 && <p className="text-[10px] text-slate-600">🔁 {formatCurrency(m.breakdown.fixed)} fixas</p>}
                 {m.breakdown.avulso      > 0 && <p className="text-[10px] text-slate-600">💸 {formatCurrency(m.breakdown.avulso)} avulso</p>}
                 {m.breakdown.installment > 0 && <p className="text-[10px] text-slate-600">📅 {formatCurrency(m.breakdown.installment)} parcelas</p>}
