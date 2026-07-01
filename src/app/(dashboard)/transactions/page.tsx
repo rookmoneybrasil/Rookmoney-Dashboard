@@ -8,7 +8,6 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { type TransactionFilter } from '@/lib/api-client'
 import { DeleteTransactionButton } from '@/components/ui/delete-buttons'
 import { serverApi } from '@/lib/api-client'
-import { TransactionModal } from '@/components/transactions/transaction-modal'
 import { EditTransactionModal } from '@/components/transactions/edit-transaction-modal'
 import { TransactionFilters } from '@/components/transactions/transaction-filters'
 import { PaginationBar } from '@/components/ui/pagination-bar'
@@ -54,9 +53,8 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
         <div>
           <h1 className="text-xl font-semibold text-slate-100 capitalize">Transações</h1>
           <p className="text-sm text-slate-500 mt-0.5 capitalize">{monthLabel}</p>
-          <p className="text-xs text-slate-600 mt-1 max-w-md">Registre todas as entradas e saídas de dinheiro. Use os filtros para buscar por período, tipo ou categoria.</p>
+          <p className="text-xs text-slate-600 mt-1 max-w-md">Visualize todas as entradas e saídas de dinheiro. Use os filtros para buscar por período, tipo ou categoria.</p>
         </div>
-        <TransactionModal categories={categories} />
       </div>
 
       {/* Filters */}
@@ -75,7 +73,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
             <p className="text-slate-600 text-xs mt-1">
               {Object.values(filter).some(Boolean)
                 ? 'Tente ajustar os filtros'
-                : 'Use o botão acima para adicionar a primeira transação'}
+                : 'Suas transações de contas, rendas e pessoas aparecerão aqui'}
             </p>
           </div>
         </div>
