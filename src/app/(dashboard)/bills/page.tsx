@@ -61,6 +61,8 @@ export default async function BillsPage() {
   const completedGroups = allGroups.filter((g) => g.paidCount === g.total)
     .sort((a, b) => b.grandTotal - a.grandTotal)
 
+  const now = new Date()
+
   const pending = regular.filter((b) => !b.isPaid)
   // Only show paid bills from the current month (historical paid bills from past months
   // don't belong in the current month's "Pagas" card/list)
@@ -83,8 +85,6 @@ export default async function BillsPage() {
   const activeRecurring = recurringBills.filter(r => r.isActive)
   const pausedRecurring = recurringBills.filter(r => !r.isActive)
   const monthlyFixed    = activeRecurring.reduce((s, r) => s + Number(r.amount), 0)
-
-  const now = new Date()
   const overdueList = pending.filter(b => classifyBillStatus(b.dueDate, false) === 'overdue')
   const overdueTotal = overdueList.reduce((s, b) => s + Number(b.amount), 0)
 
