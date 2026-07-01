@@ -62,13 +62,23 @@ export default async function BillsPage() {
     .sort((a, b) => b.grandTotal - a.grandTotal)
 
   const pending = regular.filter((b) => !b.isPaid)
-  const paid    = regular.filter((b) =>  b.isPaid)
+  // Only show paid bills from the current month (historical paid bills from past months
+  // don't belong in the current month's "Pagas" card/list)
+  const paid = regular.filter((b) => {
+    if (!b.isPaid) return false
+    const d = new Date(b.dueDate)
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+  })
 
-  // Conta apenas a próxima parcela pendente de cada grupo (não o total futuro)
   const totalPending = pending.reduce((s, b) => s + Number(b.amount), 0)
     + activeGroups.reduce((s, g) => s + Number(g.nextDue.amount), 0)
   const totalPaid = paid.reduce((s, b) => s + Number(b.amount), 0)
-    + allGroups.reduce((s, g) => s + g.paidCount * g.amount, 0)
+    + allGroups.reduce((s, g) => s + g.items
+        .filter(inst => inst.isPaid && (() => {
+          const d = new Date(inst.dueDate)
+          return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
+        })())
+        .reduce((ss, inst) => ss + Number(inst.amount), 0), 0)
 
   const activeRecurring = recurringBills.filter(r => r.isActive)
   const pausedRecurring = recurringBills.filter(r => !r.isActive)
@@ -87,6 +97,9 @@ export default async function BillsPage() {
     + activeGroups.flatMap(g => g.items)
         .filter(inst => !inst.isPaid && (() => { const d = new Date(inst.dueDate); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() })())
         .reduce((s, inst) => s + Number(inst.amount), 0)
+
+  // Grand total = contas do mês + atrasadas + pessoas
+  const grandTotal = totalThisMonth + overdueTotal + iOweTotal
 
   // Projection: próximos 3 meses
   const projection: ProjectionMonth[] = Array.from({ length: 3 }, (_, i) => {
@@ -203,10 +216,16 @@ export default async function BillsPage() {
             <Card variant="outline" padding="sm">
               <div className="flex flex-col gap-1.5">
                 <div className="flex flex-col gap-0">
-                  <span className="text-xs text-slate-500">Este mês</span>
-                  <span className="text-xl font-bold text-slate-100 tabular-nums">{formatCurrency(totalThisMonth)}</span>
-                  <span className="text-xs text-slate-600">{pendingThisMonth.length} conta{pendingThisMonth.length !== 1 ? 's' : ''} pendente{pendingThisMonth.length !== 1 ? 's' : ''}</span>
+                  <span className="text-xs text-slate-500">Total a pagar</span>
+                  <span className="text-xl font-bold text-slate-100 tabular-nums">{formatCurrency(grandTotal)}</span>
                 </div>
+                {totalThisMonth > 0 && (
+                  <div className="border-t border-white/6 pt-1.5 flex flex-col gap-0">
+                    <span className="text-[10px] text-slate-400 font-medium">📅 Contas do mês</span>
+                    <span className="text-sm font-bold text-slate-200 tabular-nums">{formatCurrency(totalThisMonth)}</span>
+                    <span className="text-[10px] text-slate-600">{pendingThisMonth.length} conta{pendingThisMonth.length !== 1 ? 's' : ''}</span>
+                  </div>
+                )}
                 {overdueTotal > 0 && (
                   <div className="border-t border-white/6 pt-1.5 flex flex-col gap-0">
                     <span className="text-[10px] text-danger/80 font-medium">⚠️ Em atraso</span>
@@ -225,7 +244,7 @@ export default async function BillsPage() {
             </Card>
             <Card variant="outline" padding="sm">
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs text-slate-500">Pagas</span>
+                <span className="text-xs text-slate-500">Pagas este mês</span>
                 <span className="text-xl font-bold text-success tabular-nums">{formatCurrency(totalPaid)}</span>
                 <span className="text-xs text-slate-600">{paid.length} conta{paid.length !== 1 ? 's' : ''}</span>
               </div>
