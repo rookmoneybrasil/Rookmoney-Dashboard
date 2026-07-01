@@ -18,8 +18,8 @@ function PersonAvatar({ name, color }: { name: string; color: string | null }) {
     .join('')
   return (
     <div
-      className="size-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-      style={{ backgroundColor: color ?? '#6366f1' }}
+      className="size-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+      style={{ backgroundColor: color ?? '#6366f1', color: '#fff' }}
     >
       {initials}
     </div>

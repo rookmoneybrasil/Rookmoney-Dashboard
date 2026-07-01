@@ -1,24 +1,17 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { Sun, Moon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useDashboardTheme } from './dashboard-shell'
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  // Avoid hydration mismatch
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- canonical hydration-safe mount detection, no render-time equivalent
-  useEffect(() => setMounted(true), [])
-  if (!mounted) return <div className="size-8" />
-
+  const { theme, toggle } = useDashboardTheme()
   const isDark = theme === 'dark'
 
   return (
     <button
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={toggle}
       title={isDark ? 'Modo claro' : 'Modo escuro'}
+      aria-label={isDark ? 'Modo claro' : 'Modo escuro'}
       className="size-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-ink-700 transition-colors"
     >
       {isDark

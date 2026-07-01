@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 
 const AVATAR_COLORS = [
   '#3b82f6', '#8b5cf6', '#ec4899', '#ef4444',
@@ -31,6 +32,7 @@ interface Props {
 export function PersonModal({ person, trigger }: Props) {
   const [open, setOpen]     = useState(false)
   const [color, setColor]   = useState(person?.color ?? AVATAR_COLORS[0])
+  const { theme } = useDashboardTheme()
 
   const { mutate, pending, error } = useMutation(
     (data: { name: string; color: string; notes: string }) =>
@@ -94,8 +96,14 @@ export function PersonModal({ person, trigger }: Props) {
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className="size-7 rounded-full border-2 transition-all"
-                  style={{
+                  className="size-7 rounded-full border-2 transition-all focus:outline-none"
+                  style={theme === 'light' ? {
+                    backgroundColor: c,
+                    outline: color === c ? `2px solid ${c}` : undefined,
+                    outlineOffset: '2px',
+                    borderColor: 'transparent',
+                    transform: color === c ? 'scale(1.1)' : 'scale(1)',
+                  } : {
                     backgroundColor: c,
                     borderColor: color === c ? 'white' : 'transparent',
                     transform: color === c ? 'scale(1.2)' : 'scale(1)',

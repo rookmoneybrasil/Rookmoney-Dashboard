@@ -23,8 +23,8 @@ function PersonAvatar({ name, color, size = 'md' }: { name: string; color: strin
   const sizeClass = size === 'lg' ? 'size-14 text-xl' : size === 'md' ? 'size-10 text-sm' : 'size-7 text-xs'
   return (
     <div
-      className={`${sizeClass} rounded-full flex items-center justify-center font-bold text-white shrink-0`}
-      style={{ backgroundColor: color ?? '#6366f1' }}
+      className={`${sizeClass} rounded-full flex items-center justify-center font-bold shrink-0`}
+      style={{ backgroundColor: color ?? '#6366f1', color: '#fff' }}
     >
       {initials}
     </div>

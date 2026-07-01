@@ -1,8 +1,15 @@
+'use client'
+
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
+
 interface Category { name: string; icon: string; color: string; amount: number; pct: number }
 
 interface Props { categories: Category[]; total: number }
 
 export function CategoryDonut({ categories, total }: Props) {
+  const { theme } = useDashboardTheme()
+  const trackColor = theme === 'light' ? '#E2E8F0' : '#1e293b'
+
   if (categories.length === 0 || total === 0) {
     return (
       <div className="bg-ink-800 border border-white/6 rounded-2xl p-4">
@@ -36,7 +43,7 @@ export function CategoryDonut({ categories, total }: Props) {
         <div className="shrink-0 relative">
           <svg width={88} height={88} viewBox="0 0 88 88">
             {/* Background ring */}
-            <circle cx={cx} cy={cy} r={R} fill="none" stroke="#1e293b" strokeWidth={R - r} />
+            <circle cx={cx} cy={cy} r={R} fill="none" stroke={trackColor} strokeWidth={R - r} />
             {/* Slices */}
             {slices.map((s, i) => (
               <circle

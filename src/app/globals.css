@@ -55,26 +55,33 @@
   --radius-3xl: 2rem;
 }
 
-/* ─── Light mode — redefine ink scale ─────────────────────────────── */
-html[data-theme="light"] {
+/* ─── Light mode (dashboard only) — pastel blue palette ───────────── */
+/* Scoped to [data-dashboard-theme="light"], set on the dashboard shell's
+   own wrapper div (see dashboard-shell.tsx) — never on <html>. Login,
+   landing page and blog are untouched and stay on the dark theme. */
+[data-dashboard-theme="light"] {
   color-scheme: light;
 
+  /* Crisp white cards on a barely-tinted page — Monday-style: color lives
+     in accents (icon chips, badges, borders), not in washed card surfaces. */
   --color-ink-950: #FFFFFF;
-  --color-ink-900: #F8FAFC;
-  --color-ink-800: #F1F5F9;
-  --color-ink-750: #E8EEF4;
-  --color-ink-700: #E2E8F0;
-  --color-ink-600: #CBD5E1;
-  --color-ink-500: #94A3B8;
-  --color-ink-400: #64748B;
-  --color-ink-300: #475569;
-  --color-ink-200: #334155;
-  --color-ink-100: #1E293B;
-  --color-ink-50:  #0F172A;
+  --color-ink-900: #F4F6FB;
+  --color-ink-800: #FFFFFF;
+  --color-ink-750: #F7F9FC;
+  --color-ink-700: #FFFFFF;
+  --color-ink-600: #EEF1F7;
+  --color-ink-500: #B7C0D6;
+  --color-ink-400: #7C879E;
+  --color-ink-300: #55617A;
+  --color-ink-200: #313B54;
+  --color-ink-100: #1C2338;
+  --color-ink-50:  #0B0F1C;
 
   --color-success-subtle: #F0FDF4;
   --color-danger-subtle:  #FFF1F2;
   --color-warning-subtle: #FFF7ED;
+
+  color: #1C2338;
 }
 
 /* ─── Base ────────────────────────────────────────────────────────── */
@@ -93,78 +100,155 @@ body {
   min-height: 100dvh;
 }
 
-/* ─── Light mode adjustments ──────────────────────────────────────── */
-html[data-theme="light"] body { color: #0F172A; }
-
 /* ── Text colors: inverted hierarchy for light bg ── */
-html[data-theme="light"] .text-white     { color: #0F172A !important; }
-html[data-theme="light"] .text-slate-100 { color: #0F172A !important; }
-html[data-theme="light"] .text-slate-200 { color: #1E293B !important; }
-html[data-theme="light"] .text-slate-300 { color: #334155 !important; }
-html[data-theme="light"] .text-slate-400 { color: #475569 !important; }
-html[data-theme="light"] .text-slate-500 { color: #64748B !important; }
-html[data-theme="light"] .text-slate-600 { color: #94A3B8 !important; }
-html[data-theme="light"] .text-slate-700 { color: #94A3B8 !important; }
+[data-dashboard-theme="light"] .text-white     { color: #1C2338 !important; }
+[data-dashboard-theme="light"] .text-slate-100 { color: #1C2338 !important; }
+[data-dashboard-theme="light"] .text-slate-200 { color: #313B54 !important; }
+[data-dashboard-theme="light"] .text-slate-300 { color: #48536E !important; }
+[data-dashboard-theme="light"] .text-slate-400 { color: #64708F !important; }
+[data-dashboard-theme="light"] .text-slate-500 { color: #7D8CAD !important; }
+[data-dashboard-theme="light"] .text-slate-600 { color: #8FA0C4 !important; }
+[data-dashboard-theme="light"] .text-slate-700 { color: #8FA0C4 !important; }
 
-/* ── Backgrounds that need inversion ── */
-html[data-theme="light"] .bg-ink-900\/60  { background-color: rgba(248,250,252,0.8) !important; }
-html[data-theme="light"] .bg-ink-700\/60  { background-color: rgba(226,232,240,0.7) !important; }
-html[data-theme="light"] .bg-ink-700\/40  { background-color: rgba(226,232,240,0.5) !important; }
-html[data-theme="light"] .bg-ink-800\/60  { background-color: rgba(241,245,249,0.8) !important; }
-html[data-theme="light"] .bg-ink-750      { background-color: #E8EEF4 !important; }
+/* SVG `fill-*` utilities are a separate property from `text-*` (color) —
+   charts/gauges using fill-slate-* need the same inversion. */
+[data-dashboard-theme="light"] .fill-slate-100 { fill: #1C2338 !important; }
+[data-dashboard-theme="light"] .fill-slate-200 { fill: #313B54 !important; }
+[data-dashboard-theme="light"] .fill-slate-400 { fill: #64708F !important; }
+[data-dashboard-theme="light"] .fill-slate-500 { fill: #7D8CAD !important; }
+
+/* ── Exceptions: solid/gradient colored surfaces keep white text ──
+   (avatars, chat bubbles, primary buttons, badges, dark overlays —
+   these backgrounds are the same in both themes, so their text must
+   stay white instead of following the inversion rule above)
+   Covers both the text-white being on the SAME element as the colored
+   bg (e.g. a button) and on a DESCENDANT (e.g. an icon nested inside a
+   colored button wrapper) — Tailwind code uses both patterns. ── */
+[data-dashboard-theme="light"] .bg-brand-400.text-white, [data-dashboard-theme="light"] .bg-brand-400 .text-white,
+[data-dashboard-theme="light"] .bg-brand-500.text-white, [data-dashboard-theme="light"] .bg-brand-500 .text-white,
+[data-dashboard-theme="light"] .bg-brand-600.text-white, [data-dashboard-theme="light"] .bg-brand-600 .text-white,
+[data-dashboard-theme="light"] .bg-blue-500.text-white,  [data-dashboard-theme="light"] .bg-blue-500 .text-white,
+[data-dashboard-theme="light"] .bg-blue-600.text-white,  [data-dashboard-theme="light"] .bg-blue-600 .text-white,
+[data-dashboard-theme="light"] .bg-cyan-500.text-white,  [data-dashboard-theme="light"] .bg-cyan-500 .text-white,
+[data-dashboard-theme="light"] .bg-emerald-600.text-white, [data-dashboard-theme="light"] .bg-emerald-600 .text-white,
+[data-dashboard-theme="light"] .bg-danger.text-white,    [data-dashboard-theme="light"] .bg-danger .text-white,
+[data-dashboard-theme="light"] .bg-warning.text-white,   [data-dashboard-theme="light"] .bg-warning .text-white,
+[data-dashboard-theme="light"] .bg-success.text-white,   [data-dashboard-theme="light"] .bg-success .text-white,
+[data-dashboard-theme="light"] .bg-gradient-to-r.text-white,  [data-dashboard-theme="light"] .bg-gradient-to-r .text-white,
+[data-dashboard-theme="light"] .bg-gradient-to-br.text-white, [data-dashboard-theme="light"] .bg-gradient-to-br .text-white,
+[data-dashboard-theme="light"] .bg-black\/40.text-white, [data-dashboard-theme="light"] .bg-black\/40 .text-white,
+[data-dashboard-theme="light"] .bg-black\/60.text-white, [data-dashboard-theme="light"] .bg-black\/60 .text-white,
+[data-dashboard-theme="light"] .bg-black\/70.text-white, [data-dashboard-theme="light"] .bg-black\/70 .text-white,
+[data-dashboard-theme="light"] .bg-black\/80.text-white, [data-dashboard-theme="light"] .bg-black\/80 .text-white {
+  color: #fff !important;
+}
+[data-dashboard-theme="light"] .bg-black\/40.text-white\/60,
+[data-dashboard-theme="light"] .bg-black\/40 .text-white\/60 { color: rgba(255,255,255,0.6) !important; }
+
+/* ── Bright accent text — darken for legibility on light surfaces ── */
+[data-dashboard-theme="light"] .text-cyan-300   { color: #0E7490 !important; }
+[data-dashboard-theme="light"] .text-cyan-400   { color: #0E7490 !important; }
+[data-dashboard-theme="light"] .text-purple-300 { color: #7E22CE !important; }
+[data-dashboard-theme="light"] .text-purple-400 { color: #7E22CE !important; }
+
+/* ── Backgrounds that need inversion — solid, not translucent ──
+   These utilities carry alpha in dark mode because they sit over a dark
+   page; on the light page that same alpha reads as "washed out". Render
+   them as solid, fully-opaque fills instead. Substring selectors catch
+   every opacity fraction (/10, /20, /30...) at once — ink-700/800 are
+   both pure white now, so any fraction of either would otherwise vanish
+   depending on which one someone happened to use. ── */
+[data-dashboard-theme="light"] [class*="bg-ink-900/"]  { background-color: #F4F6FB !important; }
+[data-dashboard-theme="light"] [class*="bg-ink-700/"]  { background-color: #EEF1F7 !important; }
+[data-dashboard-theme="light"] [class*="bg-ink-800/"]  { background-color: #FFFFFF !important; }
+[data-dashboard-theme="light"] .bg-ink-750      { background-color: #F7F9FC !important; }
+
+/* ── Bespoke progress-bar tracks (bg-ink-700 + rounded-full + overflow-hidden) ──
+   Several pages hand-roll a progress bar instead of the shared <Progress>
+   component, using bg-ink-700 for the empty track. Now that ink-700 is
+   white (card bg), the track vanishes into the card. Badges/chips share
+   bg-ink-700 + rounded-full too, but never combine it with overflow-hidden,
+   so this compound selector only catches real progress tracks. ── */
+[data-dashboard-theme="light"] .bg-ink-700.rounded-full.overflow-hidden { background-color: #EEF1F7 !important; }
+
+/* ── Loading skeletons (bg-ink-700/800 + animate-pulse) ──
+   The dashboard's route-level loading.tsx and a couple of Suspense
+   fallbacks pulse a bg-ink-700/800 block as a placeholder — invisible
+   now that those tokens are white, so every page transition briefly
+   showed a blank page in light mode. ── */
+[data-dashboard-theme="light"] .bg-ink-700.animate-pulse { background-color: #EEF1F7 !important; }
+[data-dashboard-theme="light"] .bg-ink-800.animate-pulse { background-color: #EEF1F7 !important; }
+
+/* ── 1px filled-div "dividers" (bg-white/5 or /6 + h-px) ──
+   Dropdown/select separators and a couple of settings-page section
+   dividers are built as a hairline div rather than a border-* utility.
+   Same white-on-white vanishing act as everything else here. ── */
+[data-dashboard-theme="light"] .bg-white\/5.h-px { background-color: #E2E8F0 !important; }
+[data-dashboard-theme="light"] .bg-white\/6.h-px { background-color: #E2E8F0 !important; }
+
+/* ── Selected-swatch rings (category/goal color pickers) ──
+   Same "white ring to show the selected color" idea as the person
+   modal, but built with the ring-* utility instead of an inline style —
+   ring-white/N and the ring-offset color both vanish on white cards. ── */
+[data-dashboard-theme="light"] .ring-white\/40 { --tw-ring-color: rgba(30,58,138,0.35) !important; }
+[data-dashboard-theme="light"] .ring-white\/30 { --tw-ring-color: rgba(30,58,138,0.30) !important; }
 
 /* ── Border opacity adapts ── */
-html[data-theme="light"] .border-white\/6  { border-color: rgba(0,0,0,0.08) !important; }
-html[data-theme="light"] .border-white\/8  { border-color: rgba(0,0,0,0.10) !important; }
-html[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
-html[data-theme="light"] .border-white\/4  { border-color: rgba(0,0,0,0.06) !important; }
-html[data-theme="light"] .border-white\/5  { border-color: rgba(0,0,0,0.07) !important; }
-html[data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.15) !important; }
+[data-dashboard-theme="light"] .border-white\/6  { border-color: rgba(30,58,138,0.10) !important; }
+[data-dashboard-theme="light"] .border-white\/8  { border-color: rgba(30,58,138,0.12) !important; }
+[data-dashboard-theme="light"] .border-white\/10 { border-color: rgba(30,58,138,0.14) !important; }
+[data-dashboard-theme="light"] .border-white\/4  { border-color: rgba(30,58,138,0.07) !important; }
+[data-dashboard-theme="light"] .border-white\/5  { border-color: rgba(30,58,138,0.08) !important; }
+[data-dashboard-theme="light"] .border-white\/20 { border-color: rgba(30,58,138,0.18) !important; }
+
+/* ── border-ink-* and divide-ink-* as a BORDER, not a background ──
+   ink-700/800 are now solid white (card bg) in light mode, so any
+   border/divide using those same tokens as a divider line disappears
+   (white line on white card). Keep those specific tokens visible when
+   used for borders — background usage elsewhere is unaffected. ── */
+[data-dashboard-theme="light"] .border-ink-800 { border-color: #E2E8F0 !important; }
+[data-dashboard-theme="light"] .border-ink-700 { border-color: #E2E8F0 !important; }
+[data-dashboard-theme="light"] .border-ink-600 { border-color: #D8E0EC !important; }
+[data-dashboard-theme="light"] .hover\:border-ink-600:hover { border-color: #C7D2E1 !important; }
+[data-dashboard-theme="light"] .hover\:border-ink-500:hover { border-color: #9FACC4 !important; }
+[data-dashboard-theme="light"] .hover\:border-ink-400:hover { border-color: #7C879E !important; }
+[data-dashboard-theme="light"] .divide-ink-700 > :not(:last-child) { border-color: #E2E8F0 !important; }
 
 /* ── Hover backgrounds ── */
-html[data-theme="light"] .hover\:bg-ink-700\/60:hover { background-color: rgba(203,213,225,0.5) !important; }
-html[data-theme="light"] .hover\:bg-ink-700:hover     { background-color: #CBD5E1 !important; }
-html[data-theme="light"] .hover\:bg-ink-600:hover     { background-color: #B8C5D4 !important; }
-html[data-theme="light"] .hover\:bg-ink-750:hover     { background-color: #D8E4EF !important; }
+[data-dashboard-theme="light"] .hover\:bg-ink-700\/60:hover { background-color: #EEF1F7 !important; }
+[data-dashboard-theme="light"] .hover\:bg-ink-700:hover     { background-color: #EEF1F7 !important; }
+[data-dashboard-theme="light"] .hover\:bg-ink-600:hover     { background-color: #E4E9F3 !important; }
+[data-dashboard-theme="light"] .hover\:bg-ink-750:hover     { background-color: #EEF1F7 !important; }
 
-/* ── Brand colors in light ── */
-html[data-theme="light"] .bg-brand-800\/60  { background-color: rgba(37,99,235,0.12) !important; }
-html[data-theme="light"] .bg-brand-900\/60  { background-color: rgba(37,99,235,0.08) !important; }
-html[data-theme="light"] .bg-brand-900\/30  { background-color: rgba(37,99,235,0.06) !important; }
-html[data-theme="light"] .text-brand-300    { color: #1D4ED8 !important; }
-html[data-theme="light"] .text-brand-400    { color: #2563EB !important; }
-html[data-theme="light"] .border-brand-700\/40 { border-color: rgba(37,99,235,0.25) !important; }
+/* ── Brand colors in light — solid pastel chip, not a translucent wash ──
+   Substring selectors (not exact classes) so every opacity fraction used
+   anywhere in the app (/10, /20, /30, /40, /60...) is caught at once —
+   otherwise each one only gets fixed when someone happens to spot it. ── */
+[data-dashboard-theme="light"] [class*="bg-brand-800/"]  { background-color: #DCE9FE !important; }
+[data-dashboard-theme="light"] [class*="bg-brand-900/"]  { background-color: #F0F6FF !important; }
+[data-dashboard-theme="light"] [class*="bg-brand-600/"]  { background-color: #DCE9FE !important; }
+[data-dashboard-theme="light"] .text-brand-300     { color: #1D4ED8 !important; }
+[data-dashboard-theme="light"] .text-brand-400     { color: #2563EB !important; }
+[data-dashboard-theme="light"] [class*="border-brand-700/"] { border-color: rgba(37,99,235,0.20) !important; }
+[data-dashboard-theme="light"] [class*="border-brand-600/"] { border-color: rgba(37,99,235,0.20) !important; }
+[data-dashboard-theme="light"] [class*="border-brand-500/"] { border-color: rgba(37,99,235,0.25) !important; }
 
-/* ── Opacity backgrounds ── */
-html[data-theme="light"] .bg-ink-800\/20   { background-color: rgba(241,245,249,0.6) !important; }
-html[data-theme="light"] .bg-ink-800\/50   { background-color: rgba(241,245,249,0.9) !important; }
-html[data-theme="light"] .bg-ink-800\/30   { background-color: rgba(241,245,249,0.6) !important; }
-html[data-theme="light"] .bg-ink-700\/80   { background-color: rgba(226,232,240,0.9) !important; }
-html[data-theme="light"] .bg-ink-700\/50   { background-color: rgba(226,232,240,0.7) !important; }
-html[data-theme="light"] .bg-ink-900\/20   { background-color: rgba(248,250,252,0.5) !important; }
-html[data-theme="light"] .bg-ink-900\/60   { background-color: rgba(248,250,252,0.85) !important; }
 
 /* ── Dividers ── */
-html[data-theme="light"] .divide-white\/5 > * + *  { border-color: rgba(0,0,0,0.07) !important; }
-html[data-theme="light"] .divide-white\/6 > * + *  { border-color: rgba(0,0,0,0.08) !important; }
+[data-dashboard-theme="light"] .divide-white\/5 > :not(:last-child)  { border-color: rgba(30,58,138,0.08) !important; }
+[data-dashboard-theme="light"] .divide-white\/6 > :not(:last-child)  { border-color: rgba(30,58,138,0.10) !important; }
 
 /* ── Section labels ── */
-html[data-theme="light"] .uppercase.tracking-widest { color: #94A3B8 !important; }
-
-/* ── CardSwap ── */
-html[data-theme="light"] .card-swap-card { background: #F1F5F9 !important; border-color: rgba(0,0,0,0.08) !important; }
+[data-dashboard-theme="light"] .uppercase.tracking-widest { color: #8FA0C4 !important; }
 
 /* ── Scrollbar light ── */
-html[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink-500); }
+[data-dashboard-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
+[data-dashboard-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink-500); }
 
-html[data-theme="light"] ::selection {
-  background-color: rgba(37, 99, 235, 0.2);
-  color: #0F172A;
+[data-dashboard-theme="light"] ::selection {
+  background-color: rgba(37, 99, 235, 0.15);
+  color: #1C2338;
 }
-
-html[data-theme="light"] ::-webkit-scrollbar-track { background: var(--color-ink-700); }
-html[data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--color-ink-500); }
 
 /* ─── Scrollbar ───────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }

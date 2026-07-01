@@ -1,7 +1,8 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { serverApi } from '@/lib/api-client'
 import { NotificationBell } from './notification-bell'
+import { ThemeToggle } from './theme-toggle'
+import { BrandLogo } from './brand-logo'
 import { Avatar } from '@/components/ui/avatar'
 import { Settings, Crown, Sparkles } from 'lucide-react'
 import { LogoutButton } from './logout-button'
@@ -23,13 +24,16 @@ export async function Header() {
     <header className="relative z-40 flex items-center gap-3 h-14 px-4 lg:px-6 border-b border-white/6 bg-ink-800/50 backdrop-blur-sm shrink-0 print:hidden">
       {/* Mobile: brand logo */}
       <div className="lg:hidden relative h-7 shrink-0" style={{ width: 108 }}>
-        <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain object-left" />
+        <BrandLogo />
       </div>
 
       <div className="flex-1" />
 
       {/* Right side */}
       <div className="flex items-center gap-2">
+        {/* Theme toggle */}
+        <ThemeToggle />
+
         {/* Notification bell */}
         <NotificationBell notifications={notifications} newCount={newCount} />
 
@@ -62,8 +66,8 @@ export async function Header() {
                 <Avatar src={user.profileImage ?? undefined} name={user.name} size="sm" />
                 <div className={`absolute -bottom-1 -right-1 size-4 rounded-full border-2 border-ink-800 flex items-center justify-center ${userIsProPlus ? 'bg-gradient-to-br from-amber-400 to-orange-500' : 'bg-amber-400'}`}>
                   {userIsProPlus
-                    ? <Sparkles className="size-2.5 text-ink-900" />
-                    : <Crown className="size-2.5 text-ink-900 fill-ink-900" />}
+                    ? <Sparkles className="size-2.5 text-slate-900" />
+                    : <Crown className="size-2.5 text-slate-900 fill-slate-900" />}
                 </div>
               </Link>
             ) : (

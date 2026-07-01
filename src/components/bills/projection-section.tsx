@@ -144,8 +144,8 @@ function BillsPopup({ month, peopleDue, onClose }: { month: ProjectionMonth; peo
               <div className="divide-y divide-white/5">
                 {peopleDue.map(p => (
                   <div key={p.id} className="flex items-center gap-3 px-5 py-3">
-                    <div className="size-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 text-white"
-                      style={{ backgroundColor: p.color ?? '#8B5CF6' }}>
+                    <div className="size-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                      style={{ backgroundColor: p.color ?? '#8B5CF6', color: '#fff' }}>
                       {p.name[0].toUpperCase()}
                     </div>
                     <p className="flex-1 text-sm font-medium text-slate-200 truncate">{p.name}</p>

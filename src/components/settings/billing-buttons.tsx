@@ -16,7 +16,7 @@ export function UpgradeButton() {
   return (
     <button
       onClick={handleUpgrade}
-      className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-ink-900 text-sm font-semibold transition-colors"
+      className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 text-sm font-semibold transition-colors"
     >
       <Zap className="size-4" />
       Fazer upgrade para PRO

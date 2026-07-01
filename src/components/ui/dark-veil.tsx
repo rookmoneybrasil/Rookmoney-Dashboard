@@ -136,8 +136,13 @@ export default function DarkVeil({
 
     const start = performance.now()
     let frame = 0
+    let disposed = false
 
     const loop = () => {
+      // Dev Fast Refresh / effect remounts can leave a rAF callback in
+      // flight after cleanup starts tearing down the GL context — bail
+      // out instead of rendering into a disposed context.
+      if (disposed || gl.isContextLost()) return
       program.uniforms.uTime.value        = ((performance.now() - start) / 1000) * speed
       program.uniforms.uHueShift.value    = hueShift
       program.uniforms.uNoise.value       = noiseIntensity
@@ -150,6 +155,7 @@ export default function DarkVeil({
     loop()
 
     return () => {
+      disposed = true
       cancelAnimationFrame(frame)
       window.removeEventListener('resize', resize)
       gl.getExtension('WEBGL_lose_context')?.loseContext()

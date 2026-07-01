@@ -3,6 +3,7 @@
 import * as React from 'react'
 import * as ProgressPrimitive from '@radix-ui/react-progress'
 import { cn } from '@/lib/utils'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 
 /* ─── Progress ──────────────────────────────────────────────────── */
 export interface ProgressProps
@@ -80,10 +81,12 @@ export function CircularProgress({
   children,
   className,
 }: CircularProgressProps) {
+  const { theme } = useDashboardTheme()
   const pct = Math.min((value / max) * 100, 100)
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (pct / 100) * circumference
+  const trackColor = theme === 'light' ? 'rgba(30,58,138,0.10)' : 'rgba(255,255,255,0.06)'
 
   const strokeColors = {
     brand:   '#3B82F6',
@@ -100,7 +103,7 @@ export function CircularProgress({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="rgba(255,255,255,0.06)"
+          stroke={trackColor}
           strokeWidth={strokeWidth}
         />
         <circle

@@ -4,6 +4,7 @@ import { BorderGlow } from '@/components/ui/border-glow'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ArrowUpFromLine } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 import Link from 'next/link'
 
 interface Props {
@@ -15,9 +16,11 @@ interface Props {
 
 export function ThemedBillCard({ pendingBillsCount, pendingBillsAmount, personPayablesAmount, overdueCount }: Props) {
   const total = (pendingBillsAmount ?? 0) + (personPayablesAmount ?? 0)
+  const { theme } = useDashboardTheme()
+  const bg = theme === 'light' ? '#FFE7EC' : '#1A0505'
 
   return (
-    <BorderGlow backgroundColor="#1A0505" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']}
+    <BorderGlow backgroundColor={bg} glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']}
       borderRadius={12} glowRadius={24} glowIntensity={1.2} coneSpread={30} fillOpacity={0.6}>
       <Card className="bg-transparent border-transparent h-full">
         <CardHeader>

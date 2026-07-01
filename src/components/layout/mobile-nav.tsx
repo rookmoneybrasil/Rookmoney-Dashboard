@@ -20,7 +20,7 @@ interface MobileNavProps {
 function BadgeCount({ count }: { count: number }) {
   if (count === 0) return null
   return (
-    <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-ink-900 flex items-center justify-center px-0.5 leading-none">
+    <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-slate-900 flex items-center justify-center px-0.5 leading-none">
       {count > 99 ? '99+' : count}
     </span>
   )
@@ -133,7 +133,7 @@ export function MobileNav({ badges = {} }: MobileNavProps) {
                     <span className="relative">
                       <Icon className="size-5" />
                       {count > 0 && (
-                        <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-ink-900 flex items-center justify-center px-0.5 leading-none">
+                        <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] rounded-full bg-amber-500 text-[9px] font-bold text-slate-900 flex items-center justify-center px-0.5 leading-none">
                           {count > 99 ? '99+' : count}
                         </span>
                       )}

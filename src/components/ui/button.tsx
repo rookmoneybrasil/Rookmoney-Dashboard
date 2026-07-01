@@ -21,7 +21,7 @@ const buttonVariants = cva(
         destructive:
           'bg-danger-subtle text-danger border border-danger/30 hover:bg-danger/15',
         gold:
-          'bg-gold-500 text-ink-900 hover:bg-gold-400 active:bg-gold-600 font-semibold shadow-sm',
+          'bg-gold-500 text-slate-900 hover:bg-gold-400 active:bg-gold-600 font-semibold shadow-sm',
         link:
           'text-brand-400 underline-offset-4 hover:underline p-0 h-auto',
       },

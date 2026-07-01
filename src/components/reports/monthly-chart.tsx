@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 
 type MonthlyDataPoint = {
   month?:       string
@@ -66,6 +67,9 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export function MonthlyChart({ data }: MonthlyChartProps) {
+  const { theme } = useDashboardTheme()
+  const gridColor = theme === 'light' ? '#E2E8F0' : '#1e293b'
+
   if (!data.length) {
     return <p className="text-sm text-slate-600 py-4 text-center">Sem dados ainda.</p>
   }
@@ -73,7 +77,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <ComposedChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
         <XAxis
           dataKey="monthFull"
           tick={{ fill: '#64748b', fontSize: 11 }}

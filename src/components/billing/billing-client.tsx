@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Crown, Zap, Star, Shield, BarChart3, Bot, Upload, Infinity, CreditCard, Receipt, XCircle, ChevronRight, AlertTriangle, Check, Sparkles } from 'lucide-react'
 import { clientApi, type User } from '@/lib/api-client'
 import { UsageBar } from '@/components/ui/limit-banner'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 
 interface Props {
   user: User
@@ -73,6 +74,7 @@ export function BillingClient({ user, hasStripeSubscription = false, cancelAtPer
   const [annual,      setAnnual]      = useState(false)
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [loadingPort, setLoadingPort] = useState(false)
+  const { theme } = useDashboardTheme()
 
   const currentPlan = user.plan as 'FREE' | 'PRO' | 'PRO_PLUS'
   const isPro       = currentPlan === 'PRO' || currentPlan === 'PRO_PLUS'
@@ -171,9 +173,13 @@ export function BillingClient({ user, hasStripeSubscription = false, cancelAtPer
               key={plan.id}
               className={`relative flex flex-col rounded-2xl border p-5 transition-all ${
                 isCurrent
-                  ? 'border-brand-500/40 bg-brand-600/5 ring-1 ring-brand-500/20'
+                  ? theme === 'light'
+                    ? 'border-indigo-300 bg-gradient-to-br from-indigo-50 to-blue-100 ring-1 ring-indigo-200'
+                    : 'border-brand-500/40 bg-brand-600/5 ring-1 ring-brand-500/20'
                   : 'popular' in plan && plan.popular
-                    ? 'border-brand-700/30 bg-gradient-to-b from-ink-800 to-[#0d1f50]/50'
+                    ? theme === 'light'
+                      ? 'border-blue-300 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100'
+                      : 'border-brand-700/30 bg-gradient-to-b from-ink-800 to-[#0d1f50]/50'
                     : 'border-white/6 bg-ink-800'
               }`}
             >

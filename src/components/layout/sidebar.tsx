@@ -27,6 +27,8 @@ import {
 import { cn } from '@/lib/utils'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { ProBadge } from '@/components/ui/pro-badge'
+import { BrandLogo } from './brand-logo'
+import { useDashboardTheme } from './dashboard-shell'
 
 // ─── Glass nav icon — inline styles, zero CSS-class dependency ───────────────
 
@@ -42,8 +44,15 @@ const GLASS_GRADIENTS: Record<string, string> = {
   slate:  'linear-gradient(hsl(215,20%,30%),hsl(215,20%,22%))',
 }
 
+// Inactive icons default to 'slate' everywhere they're called — on the light
+// dashboard theme that reads as a dull dark-gray blob, so swap it for a
+// dusty pastel blue-lavender chip (still saturated enough for a white icon).
+const LIGHT_SLATE_GRADIENT = 'linear-gradient(hsl(226,55%,80%),hsl(226,45%,70%))'
+
 function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { icon: React.ReactNode; color?: string; active?: boolean; size?: number }) {
-  const bg = GLASS_GRADIENTS[active ? 'blue' : color] ?? GLASS_GRADIENTS.slate
+  const { theme } = useDashboardTheme()
+  const isLightSlate = theme === 'light' && !active && color === 'slate'
+  const bg = isLightSlate ? LIGHT_SLATE_GRADIENT : (GLASS_GRADIENTS[active ? 'blue' : color] ?? GLASS_GRADIENTS.slate)
   const SZ = size
   const R  = Math.round(SZ * 0.25)
 
@@ -69,7 +78,7 @@ function GlassNavIcon({ icon, color = 'slate', active = false, size = 40 }: { ic
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: active ? '#fff' : 'hsla(0,0%,100%,0.65)',
+        color: active || isLightSlate ? '#fff' : 'hsla(0,0%,100%,0.65)',
         transition: 'transform 0.3s cubic-bezier(0.83,0,0.17,1)',
       }} className="gi-front">
         {icon}
@@ -168,7 +177,7 @@ export function Sidebar({ collapsed = false, onToggle, badges = {}, plan }: Side
           </div>
         ) : (
           <div className="h-8 relative" style={{ width: 120 }}>
-            <Image src="/SVG/logo branco.svg" alt="Rook Money" fill className="object-contain object-left" />
+            <BrandLogo />
           </div>
         )}
       </div>

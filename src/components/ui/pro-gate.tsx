@@ -72,9 +72,9 @@ export function ProGate({ feature, children, locked = true, perks }: Props) {
 
             <Link
               href="/billing"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-ink-900 font-bold text-sm px-5 py-2.5 rounded-xl transition-all self-start shadow-lg shadow-amber-500/20"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-900 font-bold text-sm px-5 py-2.5 rounded-xl transition-all self-start shadow-lg shadow-amber-500/20"
             >
-              <Crown className="size-4 fill-ink-900/20" />
+              <Crown className="size-4 fill-slate-900/20" />
               {t('subscribe')}
             </Link>
           </div>

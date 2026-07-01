@@ -5,10 +5,13 @@ import { useState } from 'react'
 import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { FinancialHealth, HealthComponent } from '@/lib/api-client'
 import { useTranslations } from 'next-intl'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 
 // ─── Arc SVG ──────────────────────────────────────────────────────────────────
 
 function ScoreArc({ score }: { score: number }) {
+  const { theme } = useDashboardTheme()
+  const trackColor = theme === 'light' ? '#E2E8F0' : '#1e293b'
   // Arc from -210° to 30° (240° sweep) centered at bottom
   const R = 52
   const cx = 64
@@ -37,7 +40,7 @@ function ScoreArc({ score }: { score: number }) {
       <path
         d={arc(startAngle, startAngle + sweepTotal)}
         fill="none"
-        stroke="#1e293b"
+        stroke={trackColor}
         strokeWidth="10"
         strokeLinecap="round"
       />

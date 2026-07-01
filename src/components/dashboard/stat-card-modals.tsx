@@ -7,7 +7,18 @@ import { BorderGlow } from '@/components/ui/border-glow'
 import { StatCard } from '@/components/ui/card'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { Sparkline } from './sparkline'
+import { useDashboardTheme } from '@/components/layout/dashboard-shell'
 import type { Bill, Transaction, MonthIncomeTransaction, UpcomingPersonPayable } from '@/lib/api-client'
+
+// KPI card backgrounds — dark navy in dark mode, soft pastel tints in light
+// mode (solid matching-hue backgrounds made the sparkline lines unreadable
+// and read as too "flat" — pastel won out after review).
+const KPI_BG = {
+  receber:  { dark: '#062828', light: '#E7F3FE' },
+  receitas: { dark: '#052E16', light: '#E3F9EA' },
+  pagar:    { dark: '#450A0A', light: '#FFE7EC' },
+  saldo:    { dark: '#111E32', light: '#EDE9FE' },
+}
 
 // ─── Modal shell ──────────────────────────────────────────────────────────────
 
@@ -65,6 +76,8 @@ interface Props {
 
 export function DashboardKPIs(p: Props) {
   const [modal, setModal] = useState<ModalType>(null)
+  const { theme } = useDashboardTheme()
+  const bg = (key: keyof typeof KPI_BG) => theme === 'light' ? KPI_BG[key].light : KPI_BG[key].dark
   const cardHover = 'cursor-pointer group/card relative transition-all duration-150'
   const overlay   = 'absolute inset-0 rounded-xl pointer-events-none ring-1 ring-white/0 group-hover/card:ring-white/20 transition-all duration-150'
 
@@ -74,7 +87,7 @@ export function DashboardKPIs(p: Props) {
         {/* A Receber */}
         <WithTooltip content="Clique para ver detalhes" side="bottom">
           <div className={cardHover} onClick={() => setModal('receber')}>
-            <BorderGlow backgroundColor="#062828" glowColor="187 80 50" colors={['#22d3ee', '#67e8f9', '#0891b2']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+            <BorderGlow backgroundColor={bg('receber')} glowColor="187 80 50" colors={['#22d3ee', '#67e8f9', '#0891b2']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
               <StatCard label="A Receber" value={formatCurrency(p.totalReceivable)} variant="info" icon={<ArrowDownToLine className="size-4" />}
                 sub={p.totalReceivable === 0 ? 'Nada pendente' : [p.totalPeopleReceivable > 0 && `${formatCurrency(p.totalPeopleReceivable, true)} de pessoas`, p.totalIncomeReceivable > 0 && `${formatCurrency(p.totalIncomeReceivable, true)} de rendas`].filter(Boolean).join(' · ')}
                 className="bg-transparent border-transparent" />
@@ -86,7 +99,7 @@ export function DashboardKPIs(p: Props) {
         {/* Receitas */}
         <WithTooltip content="Clique para ver detalhes" side="bottom">
           <div className={cardHover} onClick={() => setModal('receitas')}>
-            <BorderGlow backgroundColor="#052E16" glowColor="142 71 45" colors={['#22c55e', '#4ade80', '#16a34a']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+            <BorderGlow backgroundColor={bg('receitas')} glowColor="142 71 45" colors={['#22c55e', '#4ade80', '#16a34a']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
               <div className="relative">
                 <StatCard label="Receitas" value={formatCurrency(p.monthIncome)} variant="income" icon={<TrendingUp className="size-4" />}
                   trend={p.incomeChange !== 0 ? { value: p.incomeChange, label: 'vs mês ant.' } : undefined}
@@ -103,7 +116,7 @@ export function DashboardKPIs(p: Props) {
         {/* A Pagar */}
         <WithTooltip content="Clique para ver detalhes" side="bottom">
           <div className={cardHover} onClick={() => setModal('pagar')}>
-            <BorderGlow backgroundColor="#450A0A" glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+            <BorderGlow backgroundColor={bg('pagar')} glowColor="0 84 60" colors={['#ef4444', '#f87171', '#dc2626']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
               <div className="relative">
                 <StatCard label="A Pagar" value={formatCurrency(p.pendingBillsAmount + p.personPayablesAmount)} variant="expense" icon={<TrendingDown className="size-4" />}
                   sub={p.overdueCount > 0 ? `${p.overdueCount} em atraso · ${p.pendingBillsCount} conta${p.pendingBillsCount !== 1 ? 's' : ''}` : `${p.pendingBillsCount} conta${p.pendingBillsCount !== 1 ? 's' : ''} pendente${p.pendingBillsCount !== 1 ? 's' : ''}`}
@@ -120,7 +133,7 @@ export function DashboardKPIs(p: Props) {
         {/* Saldo */}
         <WithTooltip content="Clique para ver detalhes" side="bottom">
           <div className={cardHover} onClick={() => setModal('saldo')}>
-            <BorderGlow backgroundColor="#111E32" glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
+            <BorderGlow backgroundColor={bg('saldo')} glowColor="221 83 53" colors={['#2563EB', '#6366f1', '#3B82F6']} borderRadius={12} glowRadius={20} glowIntensity={1.0} coneSpread={25} fillOpacity={0.5}>
               <div className="relative">
                 <StatCard label="Saldo do mês" value={formatCurrency(p.monthBalance)} variant="default" icon={<Wallet className="size-4" />}
                   sub={`Já pago: ${formatCurrency(p.monthExpense)}`} className="bg-transparent border-transparent" />
