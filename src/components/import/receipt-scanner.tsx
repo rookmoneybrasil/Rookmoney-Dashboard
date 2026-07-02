@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react'
 import { ScanLine, CheckCircle2, AlertCircle, X, ImageIcon, Loader2 } from 'lucide-react'
 import { clientApi } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
+import { DateInput } from '@/components/ui/date-input'
 
 interface Category { id: string; name: string; color: string; icon: string }
 
@@ -243,11 +244,10 @@ export function ReceiptScanner({ categories }: Props) {
 
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-slate-500">Data</label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={editForm.date ?? ''}
-                      onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))}
-                      className="bg-ink-700 border border-white/8 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-600/60"
+                      onValueChange={date => setEditForm(f => ({ ...f, date }))}
+                      className="bg-ink-700 border-white/8"
                     />
                   </div>
 

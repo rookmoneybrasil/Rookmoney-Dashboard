@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { clientApi } from '@/lib/api-client'
 import { Input, FormField } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/date-input'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
-import { Camera, User, MapPin, Briefcase, Calendar } from 'lucide-react'
+import { Camera, User, MapPin, Briefcase } from 'lucide-react'
 
 interface Props {
   name:         string
@@ -103,9 +104,8 @@ export function ProfileForm({ name, email, profileImage, bio, city, occupation, 
         </FormField>
 
         <FormField label="Data de nascimento" htmlFor="birthdate">
-          <Input id="birthdate" type="date" value={form.birthdate}
-            onChange={e => set('birthdate', e.target.value)}
-            leftIcon={<Calendar className="size-4" />} />
+          <DateInput id="birthdate" value={form.birthdate}
+            onValueChange={v => set('birthdate', v)} />
         </FormField>
       </div>
 

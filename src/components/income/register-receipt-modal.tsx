@@ -6,6 +6,7 @@ import { ArrowDownToLine } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
+import { DateInput } from '@/components/ui/date-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { registerReceipt } from '@/app/actions/income-sources'
 import { triggerMascot } from '@/lib/mascot'
@@ -116,11 +117,10 @@ export function RegisterReceiptModal({ source, categories, label = 'Recebi' }: P
                 </label>
               ))}
               {dateOpt === 'custom' && (
-                <Input
+                <DateInput
                   id="date"
-                  type="date"
                   value={customDate}
-                  onChange={(e) => setCustom(e.target.value)}
+                  onValueChange={setCustom}
                   className="mt-1"
                   required
                 />

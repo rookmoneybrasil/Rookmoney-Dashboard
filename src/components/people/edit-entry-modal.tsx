@@ -6,6 +6,7 @@ import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -109,7 +110,7 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
               <CurrencyInput id="amount" name="amount" defaultValue={Number(entry.amount)} required />
             </FormField>
             <FormField label={isGroup ? 'Data da próxima' : 'Data'} htmlFor="date">
-              <Input id="date" name="date" type="date" defaultValue={dateStr} />
+              <DateInput id="date" name="date" defaultValue={dateStr} />
             </FormField>
           </div>
 

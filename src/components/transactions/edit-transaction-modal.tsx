@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -141,7 +142,7 @@ export function EditTransactionModal({ transaction, categories }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Data" htmlFor="date" required>
-              <Input id="date" name="date" type="date" defaultValue={dateStr} required />
+              <DateInput id="date" name="date" defaultValue={dateStr} required />
             </FormField>
             <FormField label="Categoria" htmlFor="categoryId" required>
               <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />

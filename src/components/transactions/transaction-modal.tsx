@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -195,10 +196,9 @@ export function TransactionModal({ categories }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label={c('date')} htmlFor="date" required>
-              <Input
+              <DateInput
                 id="date"
                 name="date"
-                type="date"
                 defaultValue={today}
                 required
               />
