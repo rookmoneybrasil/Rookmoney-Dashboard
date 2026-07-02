@@ -52,15 +52,16 @@ export function PendingBillsList({ bills, categories }: Props) {
   }
 
   async function markPaid(id: string) {
-    const prev = items
-    setItems(items.filter(b => b.id !== id)) // optimistic: leaves "pending" once paid
+    if (busyIds.has(id)) return
+    let rollback: Bill[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(b => b.id !== id) }) // optimistic: leaves "pending" once paid
     setBusy(id, true)
     try {
       await clientApi.markBillPaid(id, true)
       playBillPaid()
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao marcar como paga. Tente novamente.')
     } finally {
       setBusy(id, false)
@@ -68,14 +69,15 @@ export function PendingBillsList({ bills, categories }: Props) {
   }
 
   async function deleteBill(id: string) {
-    const prev = items
-    setItems(items.filter(b => b.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: Bill[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(b => b.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteBill(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir a conta. Tente novamente.')
     } finally {
       setBusy(id, false)

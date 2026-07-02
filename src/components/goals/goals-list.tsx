@@ -73,14 +73,15 @@ export function GoalsList({ goals, categories }: Props) {
   }
 
   async function deleteGoal(id: string) {
-    const prev = items
-    setItems(items.filter(g => g.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: Goal[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(g => g.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteGoal(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir a meta. Tente novamente.')
     } finally {
       setBusy(id, false)

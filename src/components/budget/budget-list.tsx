@@ -34,14 +34,15 @@ export function BudgetList({ budgets, categories, month }: Props) {
   }
 
   async function deleteBudget(id: string) {
-    const prev = items
-    setItems(items.filter(b => b.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: BudgetItem[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(b => b.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteBudget(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir o orçamento. Tente novamente.')
     } finally {
       setBusy(id, false)

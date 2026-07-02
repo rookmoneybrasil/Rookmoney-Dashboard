@@ -27,14 +27,15 @@ export function CustomCategoriesList({ categories }: Props) {
   }
 
   async function deleteCategory(id: string) {
-    const prev = items
-    setItems(items.filter(c => c.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: Category[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(c => c.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteCategory(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir a categoria. Tente novamente.')
     } finally {
       setBusy(id, false)

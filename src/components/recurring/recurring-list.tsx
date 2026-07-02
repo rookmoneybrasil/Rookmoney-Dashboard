@@ -66,14 +66,15 @@ export function RecurringList({ items, categories }: Props) {
   }
 
   async function toggle(id: string) {
-    const prev = list
-    setList(list.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r))
+    if (busyIds.has(id)) return
+    let rollback: RecurringTransaction[] | null = null
+    setList(prev => { rollback = prev; return prev.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r) })
     setBusy(id, true)
     try {
       await clientApi.toggleRecurring(id)
       router.refresh()
     } catch {
-      setList(prev)
+      if (rollback) setList(rollback)
       alert('Erro ao atualizar. Tente novamente.')
     } finally {
       setBusy(id, false)
@@ -81,14 +82,15 @@ export function RecurringList({ items, categories }: Props) {
   }
 
   async function remove(id: string) {
-    const prev = list
-    setList(list.filter(r => r.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: RecurringTransaction[] | null = null
+    setList(prev => { rollback = prev; return prev.filter(r => r.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteRecurring(id)
       router.refresh()
     } catch {
-      setList(prev)
+      if (rollback) setList(rollback)
       alert('Erro ao excluir. Tente novamente.')
     } finally {
       setBusy(id, false)

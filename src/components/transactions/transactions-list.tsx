@@ -37,14 +37,15 @@ export function TransactionsList({ transactions, categories }: Props) {
   }
 
   async function deleteTx(id: string) {
-    const prev = items
-    setItems(items.filter(t => t.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: Transaction[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(t => t.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteTransaction(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir a transação. Tente novamente.')
     } finally {
       setBusy(id, false)

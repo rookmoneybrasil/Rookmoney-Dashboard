@@ -85,14 +85,15 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
   }
 
   async function deleteSource(id: string) {
-    const prev = items
-    setItems(items.filter(s => s.id !== id))
+    if (busyIds.has(id)) return
+    let rollback: IncomeSource[] | null = null
+    setItems(prev => { rollback = prev; return prev.filter(s => s.id !== id) })
     setBusy(id, true)
     try {
       await clientApi.deleteIncomeSource(id)
       router.refresh()
     } catch {
-      setItems(prev)
+      if (rollback) setItems(rollback)
       alert('Erro ao excluir a renda. Tente novamente.')
     } finally {
       setBusy(id, false)
