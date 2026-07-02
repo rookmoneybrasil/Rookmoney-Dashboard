@@ -58,6 +58,12 @@ async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({})) as { error?: string; code?: string }
+    // Session expired / token revoked → send to login (serverFetch already does
+    // this; without it, client-side actions just error out on every screen).
+    if (res.status === 401) {
+      window.location.href = '/login'
+      throw new Error(err.error ?? 'Sessão expirada.')
+    }
     // Plan limit hit → redirect to billing page automatically
     if (err.code === 'PLAN_LIMIT' || err.code === 'PRO_REQUIRED') {
       window.location.href = '/billing'

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle2, RotateCcw, Trash2, AlertTriangle } from 'lucide-react'
 import { clientApi } from '@/lib/api-client'
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function EntryActions({ entryId, isSettled }: Props) {
+  const router = useRouter()
   const [settling,    setSettling]    = useState(false)
   const [delConfirm,  setDelConfirm]  = useState(false)
   const [delPending,  setDelPending]  = useState(false)
@@ -20,7 +22,7 @@ export function EntryActions({ entryId, isSettled }: Props) {
     try {
       if (isSettled) await clientApi.unsettleEntry(entryId)
       else           await clientApi.settleEntry(entryId)
-      window.location.reload()
+      router.refresh()  // re-render server components instead of a full page reload
     } finally { setSettling(false) }
   }
 
@@ -28,7 +30,7 @@ export function EntryActions({ entryId, isSettled }: Props) {
     setDelPending(true)
     try {
       await clientApi.deleteEntry(entryId)
-      window.location.reload()
+      router.refresh()
     } finally { setDelPending(false) }
   }
 

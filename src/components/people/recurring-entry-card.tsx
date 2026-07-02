@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { RefreshCw, X, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function RecurringEntryCard({ item, categories = [], monthEntryId = null, paidThisMonth = false }: Props) {
+  const router = useRouter()
   const [confirming,    setConfirming]    = useState(false)
   const [stopping,      setStopping]      = useState(false)
   const [paid,          setPaid]          = useState(paidThisMonth)
@@ -33,8 +35,13 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
     if (processing.current) return
     processing.current = true
     setStopping(true)
-    await clientApi.stopPersonRecurring(item.id)
-    window.location.reload()
+    try {
+      await clientApi.stopPersonRecurring(item.id)
+      router.refresh()  // card is dropped by the parent re-render; no full reload
+    } catch {
+      processing.current = false
+      setStopping(false)
+    }
   }
 
   async function handleTogglePaid() {
@@ -48,7 +55,6 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         if (monthEntryId) {
           await clientApi.unsettleEntry(monthEntryId)
           setPaid(false)
-          window.location.reload()
         }
       } else {
         // Use localEntryId if a previous attempt created the entry but settleEntry failed
@@ -69,8 +75,13 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
           await clientApi.settleEntry(entry.id)
         }
         setPaid(true)
-        window.location.reload()
       }
+      // Reconcile server data in the background (no full reload). The component
+      // isn't remounted, so release the guards manually — the optimistic setPaid
+      // above already updated the UI.
+      router.refresh()
+      processing.current = false
+      setMarking(false)
     } catch {
       // Em caso de erro, libera o guard para tentar novamente
       processing.current = false
