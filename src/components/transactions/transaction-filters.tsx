@@ -35,6 +35,11 @@ export function TransactionFilters({ categories, totalCount }: Props) {
         if (!v) params.delete(k)
         else params.set(k, v)
       }
+      // Any filter change resets pagination — otherwise a stale page=N
+      // (from before the filter narrowed the results) leaves the user on an
+      // out-of-range page showing the empty "Nenhuma transação encontrada"
+      // state with no pagination bar to escape it.
+      params.delete('page')
       return params.toString()
     },
     [searchParams],

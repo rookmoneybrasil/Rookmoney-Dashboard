@@ -259,8 +259,8 @@ export const clientApi = {
     clientFetch<void>('/settings?action=preferences', { method: 'PATCH', body: JSON.stringify(data) }),
   disconnectGoogle: () =>
     clientFetch<void>('/settings?action=disconnect-google', { method: 'PATCH' }),
-  deleteAccount: () =>
-    clientFetch<void>('/settings', { method: 'DELETE' }),
+  deleteAccount: (data?: { reason?: string; feedback?: string }) =>
+    clientFetch<void>('/settings', { method: 'DELETE', body: JSON.stringify(data ?? {}) }),
 
   // Recurring Bills (templates)
   createRecurringBill: (data: RecurringBillInput) =>
@@ -334,7 +334,7 @@ function toQs(params?: Record<string, string>): string {
 
 export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number; recurring: number }
 export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; recurring: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
-export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits; hasGoogle?: boolean; notifBillReminder?: boolean; notifCategoryLimit?: boolean; notifMonthlyEmail?: boolean; currency?: string; dateFormat?: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; stripeCancelAtPeriodEnd?: boolean; stripeCurrentPeriodEnd?: string | null }
+export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits; hasGoogle?: boolean; notifBillReminder?: boolean; notifCategoryLimit?: boolean; notifMonthlyEmail?: boolean; currency?: string; dateFormat?: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; stripeCancelAtPeriodEnd?: boolean; stripeCurrentPeriodEnd?: string | null; subscriptionSource?: string | null }
 export interface AuthResponse { token: string; user: User; eventId?: string }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }

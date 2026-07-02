@@ -192,8 +192,13 @@ export function DeleteAccountClientButton() {
     <button
       onClick={async () => {
         if (!confirm('Tem certeza? Esta ação é IRREVERSÍVEL. Todos os seus dados serão excluídos permanentemente.')) return
-        await clientApi.deleteAccount()
-        window.location.href = '/login'
+        try {
+          await clientApi.deleteAccount()
+          window.location.href = '/login'
+        } catch (err) {
+          // e.g. Stripe subscription cancellation failed — account was NOT deleted
+          alert(err instanceof Error ? err.message : 'Não foi possível excluir a conta. Tente novamente.')
+        }
       }}
       className="flex items-center gap-2 bg-danger/10 hover:bg-danger/20 border border-danger/20 text-danger font-medium px-4 py-2 rounded-xl text-sm transition-colors"
     >

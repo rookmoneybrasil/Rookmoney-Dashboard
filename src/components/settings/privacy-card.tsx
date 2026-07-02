@@ -3,9 +3,9 @@ import { ExportDataButton } from './export-data-button'
 import { DeleteAccountButton } from './delete-account-button'
 import type { UserUsage } from '@/lib/api-client'
 
-interface Props { usage: UserUsage; createdAt: string }
+interface Props { usage: UserUsage; createdAt: string; plan?: string | null; subscriptionSource?: string | null }
 
-export function PrivacyCard({ usage, createdAt }: Props) {
+export function PrivacyCard({ usage, createdAt, plan, subscriptionSource }: Props) {
   const since = new Date(createdAt).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
   const totalRecords =
     usage.transactionsThisMonth + usage.bills + usage.goals + usage.people
@@ -66,7 +66,7 @@ export function PrivacyCard({ usage, createdAt }: Props) {
               <p className="text-xs text-slate-600">Remove permanentemente todos os {totalRecords > 0 ? `${totalRecords}+ ` : ''}registros</p>
             </div>
           </div>
-          <DeleteAccountButton />
+          <DeleteAccountButton plan={plan} subscriptionSource={subscriptionSource} />
         </div>
       </div>
     </div>

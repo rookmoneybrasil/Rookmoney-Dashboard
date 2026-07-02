@@ -155,7 +155,7 @@ export default async function SettingsPage() {
         </CardHeader>
         <CardContent>
           {usage
-            ? <PrivacyCard usage={usage} createdAt={user.createdAt ?? new Date().toISOString()} />
+            ? <PrivacyCard usage={usage} createdAt={user.createdAt ?? new Date().toISOString()} plan={user.plan} subscriptionSource={user.subscriptionSource} />
             : null
           }
         </CardContent>
