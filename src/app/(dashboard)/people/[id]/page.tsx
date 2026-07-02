@@ -170,16 +170,17 @@ export default async function PersonPage({ params }: Props) {
   let theyOweTotal = 0
   let iOweTotal    = 0
 
+  const balMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
   for (const e of openEntries) {
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     if (isOldRecurring && new Date(e.date) > cutoff) continue
 
-    if (e.installmentGroupId) {
-      // Only count installments due in the current month — avoids showing next month's
-      // installment in the balance when this month's is already settled
-      const eDate = new Date(e.date)
-      if (eDate.getFullYear() !== now.getFullYear() || eDate.getMonth() !== now.getMonth()) continue
-    }
+    // Count everything owed up to the end of the current month (overdue + this
+    // month), for both single entries AND installments. Future installments
+    // belong to the projection, not the current "Você deve". This keeps
+    // "Você deve", the current-month projection and the share total consistent
+    // (before, overdue installments were dropped here → 3 different totals).
+    if (new Date(e.date) > balMonthEnd) continue
 
     if (e.type === 'THEY_OWE_ME') theyOweTotal += Number(e.amount)
     else                           iOweTotal    += Number(e.amount)
@@ -311,19 +312,21 @@ export default async function PersonPage({ params }: Props) {
   const shareIOwe: ShareItem[] = []
   const shareTheyOwe: ShareItem[] = []
 
-  // Recurring templates
+  // Recurring templates — only the ones still owed this month (skip if already paid)
   for (const r of recurring) {
     const entry = recurringEntryMap.get(r.id)
-    const settled = entry?.isSettled ?? false
+    if (entry?.isSettled) continue
     const bucket = r.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
-    bucket.push({ desc: `${r.description} (recorrente, dia ${r.dayOfMonth})`, amount: Number(r.amount), settled })
+    bucket.push({ desc: `${r.description} (recorrente, dia ${r.dayOfMonth})`, amount: Number(r.amount), settled: false })
   }
 
-  // All single entries this month (open + settled), skip those already covered by recurring
+  // Unsettled single entries owed up to the end of this month (overdue + current),
+  // skip those already covered by recurring. Overdue included so the share total
+  // matches "Você deve" and the projection instead of hiding past-due amounts.
   const recurringDescs = new Set(recurring.map(r => `${r.description}|${r.type}`))
   const allSingles = allEntries.filter(e => {
     const d = new Date(e.date)
-    return !e.installmentGroupId && d >= monthStart && d <= monthEnd
+    return !e.installmentGroupId && !e.isSettled && d <= monthEnd
   })
   for (const e of allSingles) {
     if (recurringDescs.has(`${e.description}|${e.type}`)) continue
@@ -331,12 +334,9 @@ export default async function PersonPage({ params }: Props) {
     bucket.push({ desc: e.description, amount: Number(e.amount), settled: e.isSettled })
   }
 
-  // Installment entries due this month (from ALL groups, not just active)
+  // Unsettled installment parcelas owed up to end of this month (overdue + current)
   for (const [, grp] of allGroupMap.entries()) {
-    const due = grp.find(e => {
-      const d = new Date(e.date)
-      return d >= monthStart && d <= monthEnd
-    })
+    const due = grp.find(e => !e.isSettled && new Date(e.date) <= monthEnd)
     if (!due) continue
     const total = due.installmentTotal ?? grp.length
     const current = due.installmentCurrent ?? 1
