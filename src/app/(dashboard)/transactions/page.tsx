@@ -1,18 +1,12 @@
 import { Suspense } from 'react'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { formatCurrency, formatDate } from '@/lib/utils'
 import { type TransactionFilter } from '@/lib/api-client'
-import { DeleteTransactionButton } from '@/components/ui/delete-buttons'
 import { serverApi } from '@/lib/api-client'
-import { EditTransactionModal } from '@/components/transactions/edit-transaction-modal'
+import { TransactionsList } from '@/components/transactions/transactions-list'
 import { TransactionFilters } from '@/components/transactions/transaction-filters'
 import { PaginationBar } from '@/components/ui/pagination-bar'
-import { getServiceBrand } from '@/lib/service-brands'
-import { WithTooltip } from '@/components/ui/tooltip'
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -78,88 +72,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
           </div>
         </div>
       ) : (
-        <Card padding="none">
-          <CardContent>
-            <div className="divide-y divide-white/5">
-              {transactions.map((tx) => {
-                const brand = getServiceBrand(tx.description, tx.category.name)
-
-                return (
-                  <div
-                    key={tx.id}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-ink-600/30 transition-colors group"
-                  >
-                    {/* Icon — brand or category */}
-                    <WithTooltip
-                      content={brand ? brand.name : tx.category.name}
-                      side="right"
-                    >
-                      <div
-                        className="size-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-sm select-none"
-                        style={
-                          brand
-                            ? { backgroundColor: brand.color, color: brand.text }
-                            : { backgroundColor: tx.category.color + '20', color: tx.category.color }
-                        }
-                      >
-                        {brand ? brand.short : (
-                          tx.type === 'INCOME'
-                            ? <ArrowUpRight className="size-5" />
-                            : <ArrowDownRight className="size-5" />
-                        )}
-                      </div>
-                    </WithTooltip>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-200 truncate">
-                        {tx.description ?? tx.category.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span
-                          className="text-xs px-1.5 py-0.5 rounded-md font-medium"
-                          style={{
-                            backgroundColor: tx.category.color + '18',
-                            color: tx.category.color,
-                          }}
-                        >
-                          {tx.category.icon} {tx.category.name}
-                        </span>
-                        <span className="text-xs text-slate-600">{formatDate(tx.date)}</span>
-                      </div>
-                    </div>
-
-                    {/* Amount + badge + delete */}
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="flex flex-col items-end">
-                        <span
-                          className={`text-sm font-semibold tabular-nums ${
-                            tx.type === 'INCOME' ? 'text-success' : 'text-slate-300'
-                          }`}
-                        >
-                          {tx.type === 'INCOME' ? '+' : '-'}
-                          {formatCurrency(Number(tx.amount))}
-                        </span>
-                        <WithTooltip
-                          content={tx.type === 'INCOME' ? 'Entrada de dinheiro' : 'Saída de dinheiro'}
-                          side="left"
-                        >
-                          <Badge variant={tx.type === 'INCOME' ? 'income' : 'expense'} size="sm">
-                            {tx.type === 'INCOME' ? 'Receita' : 'Despesa'}
-                          </Badge>
-                        </WithTooltip>
-                      </div>
-
-                      <EditTransactionModal transaction={{ ...tx, amount: Number(tx.amount) }} categories={categories} />
-
-                      <DeleteTransactionButton id={tx.id} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <TransactionsList transactions={transactions} categories={categories} />
       )}
 
       {/* Pagination */}

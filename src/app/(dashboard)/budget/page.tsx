@@ -1,13 +1,11 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { PiggyBank, TrendingUp } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
-import { DeleteBudgetButton } from '@/components/ui/delete-buttons'
 import { serverApi } from '@/lib/api-client'
 import { BudgetModal } from '@/components/budget/budget-modal'
+import { BudgetList } from '@/components/budget/budget-list'
 import { BudgetMonthPicker } from '@/components/budget/budget-month-picker'
 import { ProGate } from '@/components/ui/pro-gate'
 import { isPro } from '@/lib/plans'
@@ -93,51 +91,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Searc
           </div>
         </div>
       ) : (
-        <Card padding="none">
-          <CardContent>
-            <div className="divide-y divide-white/5">
-              {budgets.map((b) => {
-                const pct       = Number(b.amount) > 0 ? Math.min(Math.round((b.spent / Number(b.amount)) * 100), 100) : 0
-                const isOver    = b.spent > Number(b.amount)
-                const isWarning = !isOver && pct >= 80
-
-                return (
-                  <div key={b.id} className="flex items-center gap-4 px-5 py-4 group hover:bg-ink-600/20 transition-colors">
-                    <div className="size-9 rounded-xl flex items-center justify-center text-lg shrink-0"
-                      style={{ backgroundColor: b.category.color + '22', color: b.category.color }}>
-                      {b.category.icon}
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium text-slate-200 truncate">{b.category.name}</span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {isOver && <Badge variant="danger" size="sm" dot>Acima do limite</Badge>}
-                          {isWarning && <Badge variant="warning" size="sm" dot>Atenção {pct}%</Badge>}
-                          {!isOver && !isWarning && (
-                            <span className="text-xs text-slate-600 tabular-nums">{pct}%</span>
-                          )}
-                          <span className="text-xs text-slate-500 tabular-nums">
-                            {formatCurrency(b.spent, true)} / {formatCurrency(Number(b.amount), true)}
-                          </span>
-                        </div>
-                      </div>
-                      <Progress
-                        value={b.spent}
-                        max={Number(b.amount)}
-                        variant={isOver ? 'danger' : isWarning ? 'warning' : 'brand'}
-                        size="sm"
-                      />
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                      <BudgetModal categories={categories} month={month} budget={b} />
-                      <DeleteBudgetButton id={b.id} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <BudgetList budgets={budgets} categories={categories} month={month} />
       )}
 
       {overBudget.length > 0 && (
