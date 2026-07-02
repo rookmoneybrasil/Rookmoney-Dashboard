@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { serverApi } from '@/lib/api-client'
 import { getSession } from '@/lib/auth'
 import { DashboardShell } from '@/components/layout/dashboard-shell'
@@ -20,6 +21,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getSession()
   const isImpersonating = session?.impersonating === true
 
+  const cookieStore = await cookies()
+  const themeCookie = cookieStore.get('rook-dashboard-theme')?.value
+  const initialTheme = themeCookie === 'dark' ? 'dark' : 'light'
+
   const badges: Record<string, number> = {}
   if (user.badges) {
     Object.entries(user.badges).forEach(([path, count]) => {
@@ -34,6 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       user={{ name: user.name, email: user.email, image: user.profileImage ?? undefined }}
       badges={badges}
       plan={user.plan}
+      initialTheme={initialTheme}
       header={<Header />}
       banner={isImpersonating
         ? <ImpersonationBanner name={user.name} />

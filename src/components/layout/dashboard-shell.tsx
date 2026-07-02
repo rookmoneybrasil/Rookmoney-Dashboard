@@ -13,9 +13,10 @@ interface Props {
   banner?:  React.ReactNode
   badges?:  Record<string, number>
   plan?:    string
+  initialTheme?: DashboardTheme
 }
 
-type DashboardTheme = 'light' | 'dark'
+export type DashboardTheme = 'light' | 'dark'
 const THEME_STORAGE_KEY = 'rook-dashboard-theme'
 
 const DashboardThemeContext = createContext<{ theme: DashboardTheme; toggle: () => void }>({
@@ -30,14 +31,13 @@ export function useDashboardTheme() {
   return useContext(DashboardThemeContext)
 }
 
-export function DashboardShell({ user, header, children, banner, badges, plan }: Props) {
+export function DashboardShell({ user, header, children, banner, badges, plan, initialTheme = 'light' }: Props) {
   const [collapsed, setCollapsed] = useState(false)
-  const [theme, setTheme] = useState<DashboardTheme>('light')
-
-  useEffect(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark') setTheme(stored)
-  }, [])
+  // Seeded from a cookie read server-side (see (dashboard)/layout.tsx) so the
+  // very first paint — including loading.tsx's Suspense fallback — already
+  // matches the user's preference. No client-only localStorage read here:
+  // that used to run after first paint and caused a dark<->light flicker.
+  const [theme, setTheme] = useState<DashboardTheme>(initialTheme)
 
   // Modals/dropdowns render via Radix portals straight into <body>, outside
   // this div's DOM subtree — mirror the attribute onto <body> too so the
@@ -51,6 +51,7 @@ export function DashboardShell({ user, header, children, banner, badges, plan }:
     setTheme(prev => {
       const next = prev === 'light' ? 'dark' : 'light'
       localStorage.setItem(THEME_STORAGE_KEY, next)
+      document.cookie = `${THEME_STORAGE_KEY}=${next}; path=/; max-age=31536000; samesite=lax`
       return next
     })
   }
