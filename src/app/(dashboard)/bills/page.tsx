@@ -6,20 +6,14 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
 import { serverApi } from '@/lib/api-client'
-import { DeleteBillButton, DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
+import { DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
 import { EditInstallmentGroupModal } from '@/components/bills/edit-installment-group-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
+import { PendingBillsList } from '@/components/bills/pending-bills-list'
 // import { BillsTabs } from '@/components/bills/bills-tabs' // Open Finance — reativar quando Pluggy pago
 import { ProjectionSection, type ProjectionBill, type ProjectionMonth } from '@/components/bills/projection-section'
-
-const statusConfig = {
-  paid:    { label: 'Pago',     variant: 'success' as const, icon: Check       },
-  pending: { label: 'Pendente', variant: 'default' as const, icon: Clock       },
-  urgent:  { label: 'Urgente',  variant: 'warning' as const, icon: AlertCircle },
-  overdue: { label: 'Atrasado', variant: 'danger'  as const, icon: AlertCircle },
-}
 
 export default async function BillsPage() {
   const [bills, categories, recurringBills, people] = await Promise.all([
@@ -367,57 +361,7 @@ export default async function BillsPage() {
             <div className="bg-ink-800 border border-ink-600 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
               💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e as parcelas geradas pelas contas fixas — marque como pago quando quitar.
             </div>
-            {pending.length === 0 ? (
-              <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
-                <p className="text-xs text-success">Nenhuma conta pendente 🎉</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {pending.map((bill) => {
-                  const status = classifyBillStatus(bill.dueDate, bill.isPaid)
-                  const cfg    = statusConfig[status]
-                  const Icon   = cfg.icon
-                  return (
-                    <div key={bill.id} className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors group ${
-                      status === 'overdue' ? 'bg-danger/8 border-danger/25 hover:bg-danger/12'
-                      : status === 'urgent' ? 'bg-warning/5 border-warning/20 hover:bg-warning/8'
-                      : 'bg-ink-800 border-ink-700 hover:bg-ink-700/80'
-                    }`}>
-                      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 text-sm ${
-                        status === 'overdue' ? 'bg-danger/15' : status === 'urgent' ? 'bg-warning/15' : 'bg-ink-600'
-                      }`}>
-                        {bill.category?.icon
-                          ? <span>{bill.category.icon}</span>
-                          : bill.recurringBillId
-                          ? <RefreshCw className="size-3.5 text-brand-400" />
-                          : <Icon className={`size-3.5 ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-500'}`} />
-                        }
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <p className="text-sm font-medium text-slate-200 truncate">{bill.name}</p>
-                          {bill.recurringBillId && <span className="text-[10px] text-brand-500">↻ fixa</span>}
-                          <Badge variant={cfg.variant} size="sm" dot>{cfg.label}</Badge>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
-                        {/* Botão de pagar sempre visível com texto */}
-                        <MarkBillPaidButton id={bill.id} isPaid={bill.isPaid} showLabel />
-                        {/* Editar e excluir só no hover */}
-                        <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <EditBillModal bill={bill} categories={categories} />
-                          <DeleteBillButton id={bill.id} />
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+            <PendingBillsList bills={pending} categories={categories} />
           </div>
 
           </div>
