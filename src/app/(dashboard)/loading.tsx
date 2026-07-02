@@ -1,22 +1,25 @@
-import { cookies } from 'next/headers'
-
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse rounded-xl bg-ink-700 ${className}`} />
 }
 
-export default async function DashboardLoading() {
-  // This Suspense fallback renders before DashboardShell mounts, so it can't
-  // read the theme from React context or localStorage — without this, it
-  // always painted dark, causing a dark->light flash on every navigation
-  // for users on the (now-default) light theme. Same cookie DashboardShell
-  // seeds its initial state from (see (dashboard)/layout.tsx).
-  const cookieStore = await cookies()
-  const theme = cookieStore.get('rook-dashboard-theme')?.value === 'dark' ? 'dark' : 'light'
-
+// This is the Suspense fallback for every route under (dashboard) — both
+// the very first load (before DashboardShell exists) AND every later
+// sibling-page navigation (Contas -> Pessoas etc, where DashboardShell is
+// already mounted and this renders *nested inside* its themed div).
+//
+// It must NOT set its own data-dashboard-theme here. An earlier version
+// read the theme cookie itself and stamped its own attribute — during
+// client-side navigation that read came back stale/mismatched with
+// DashboardShell's live state, so this fallback would flash the *wrong*
+// theme (e.g. a light skeleton inside an already-dark shell) on every
+// single navigation. Left attribute-less, it just inherits whatever
+// DashboardShell already applied — correct in the common (already
+// mounted) case. The only remaining gap is the one-time cold load before
+// DashboardShell mounts at all, where this briefly shows in dark (the
+// CSS default) — a single acceptable flash, not a recurring one.
+export default function DashboardLoading() {
   return (
-    // Full-bleed bg so <body>'s own (always-dark) background can't peek
-    // through around this centered block while the theme is light.
-    <div className="min-h-screen bg-ink-900 p-4 lg:p-6" data-dashboard-theme={theme}>
+    <div className="min-h-screen bg-ink-900 p-4 lg:p-6">
       <div className="flex flex-col gap-5 max-w-5xl mx-auto">
         {/* Page header */}
         <div className="flex items-center justify-between gap-4">

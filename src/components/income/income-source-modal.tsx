@@ -6,6 +6,7 @@ import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { CategorySelect } from '@/components/ui/category-select'
 import { clientApi } from '@/lib/api-client'
@@ -141,10 +142,9 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
                 htmlFor="startDate"
                 hint="Deixe vazio para começar este mês"
               >
-                <Input
+                <DateInput
                   id="startDate"
                   name="startDate"
-                  type="date"
                   defaultValue={source?.startDate
                     ? new Date(source.startDate).toISOString().slice(0, 10)
                     : undefined}

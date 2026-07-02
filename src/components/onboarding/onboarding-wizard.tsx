@@ -7,6 +7,7 @@ import { ArrowRight, ArrowLeft, CheckCircle2, Banknote, FileText, Target, Sparkl
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { MASCOT_SRCS } from '@/lib/mascot'
 import { getServiceBrand, QUICK_BILL_SERVICES } from '@/lib/service-brands'
@@ -192,7 +193,7 @@ export function OnboardingWizard({ firstName }: Props) {
                       </FormField>
                       <FormField label="Primeiro pagamento" htmlFor="startDate"
                         hint="Deixe vazio para começar este mês">
-                        <Input id="startDate" name="startDate" type="date"
+                        <DateInput id="startDate" name="startDate"
                           defaultValue={new Date().toISOString().split('T')[0]} />
                       </FormField>
                     </div>
@@ -314,7 +315,7 @@ export function OnboardingWizard({ firstName }: Props) {
                       </FormField>
                     ) : (
                       <FormField label="1º vencimento" htmlFor="dueDate" required>
-                        <Input id="dueDate" name="dueDate" type="date" defaultValue={new Date().toISOString().split('T')[0]} required />
+                        <DateInput id="dueDate" name="dueDate" defaultValue={new Date().toISOString().split('T')[0]} required />
                       </FormField>
                     )}
                   </div>

@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { triggerMascot } from '@/lib/mascot'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
@@ -122,10 +123,9 @@ export function GoalModal() {
             </FormField>
 
             <FormField label={t('deadline')} htmlFor="deadline">
-              <Input
+              <DateInput
                 id="deadline"
                 name="deadline"
-                type="date"
               />
             </FormField>
           </div>

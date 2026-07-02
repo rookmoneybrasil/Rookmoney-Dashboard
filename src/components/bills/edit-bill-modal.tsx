@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -85,7 +86,7 @@ export function EditBillModal({ bill, categories }: Props) {
               <CurrencyInput id="amount" name="amount" defaultValue={bill.amount} required />
             </FormField>
             <FormField label="Vencimento" htmlFor="dueDate" required>
-              <Input id="dueDate" name="dueDate" type="date" defaultValue={dateStr} required />
+              <DateInput id="dueDate" name="dueDate" defaultValue={dateStr} required />
             </FormField>
           </div>
 

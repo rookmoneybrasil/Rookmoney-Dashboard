@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
+import { DateInput } from '@/components/ui/date-input'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -88,7 +89,7 @@ export function EditGoalModal({ goal }: Props) {
               <CurrencyInput id="targetAmount" name="targetAmount" defaultValue={Number(goal.targetAmount)} required />
             </FormField>
             <FormField label="Prazo" htmlFor="deadline">
-              <Input id="deadline" name="deadline" type="date" defaultValue={deadlineStr} />
+              <DateInput id="deadline" name="deadline" defaultValue={deadlineStr} />
             </FormField>
           </div>
 
