@@ -49,6 +49,66 @@ function DeleteInline({ id, busy, onDelete }: { id: string; busy: boolean; onDel
   )
 }
 
+// Defined at module level (not inside RecurringList) on purpose: a component
+// declared inside another component's body gets a new function identity on
+// every render, so React unmounts + remounts the whole subtree each time the
+// parent re-renders (every toggle/delete/resync) — that would reset the
+// DeleteInline confirm state and restart the row's animations. Keeping it here
+// means rows reconcile in place.
+function Row({ rec, busy, categories, onToggle, onRemove }: {
+  rec: RecurringTransaction
+  busy: boolean
+  categories: Category[]
+  onToggle: (id: string) => void
+  onRemove: (id: string) => void
+}) {
+  const isIncome = rec.type === 'INCOME'
+  return (
+    <div className={`flex items-center gap-4 px-5 py-4 hover:bg-ink-600/30 transition-all group ${busy ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className="size-9 rounded-xl flex items-center justify-center shrink-0 text-sm"
+        style={{ backgroundColor: rec.category.color + '22', color: rec.category.color }}>
+        {rec.category.icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-medium text-slate-200 truncate">{rec.name}</p>
+          <Badge variant={isIncome ? 'success' : 'default'} size="sm">
+            {isIncome ? <TrendingUp className="size-3 inline mr-1" /> : <TrendingDown className="size-3 inline mr-1" />}
+            {isIncome ? 'Receita' : 'Despesa'}
+          </Badge>
+          <Badge variant="outline" size="sm">{freqLabel[rec.frequency] ?? rec.frequency}</Badge>
+          {rec.frequency === 'MONTHLY' && rec.dayOfMonth && (
+            <span className="text-xs text-slate-600">dia {rec.dayOfMonth}</span>
+          )}
+        </div>
+        <p className="text-xs text-slate-500 mt-0.5">
+          {rec.category.icon} {rec.category.name}
+          {rec.description ? ` · ${rec.description}` : ''}
+        </p>
+      </div>
+      <span className={`text-sm font-semibold tabular-nums shrink-0 ${isIncome ? 'text-success' : 'text-slate-300'}`}>
+        {isIncome ? '+' : '-'}{formatCurrency(rec.amount)}
+      </span>
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={() => onToggle(rec.id)}
+          disabled={busy}
+          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors disabled:opacity-40 ${
+            rec.isActive
+              ? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
+              : 'bg-ink-600 text-slate-500 border border-white/6 hover:bg-ink-500'
+          }`}
+          title={rec.isActive ? 'Desativar' : 'Ativar'}
+        >
+          {rec.isActive ? 'Ativa' : 'Inativa'}
+        </button>
+        <RecurringModal categories={categories} item={rec} />
+        <DeleteInline id={rec.id} busy={busy} onDelete={onRemove} />
+      </div>
+    </div>
+  )
+}
+
 // Optimistic toggle (active/inactive) + delete for recurring transactions.
 export function RecurringList({ items, categories }: Props) {
   const router = useRouter()
@@ -100,55 +160,6 @@ export function RecurringList({ items, categories }: Props) {
   const active   = list.filter((r) => r.isActive)
   const inactive = list.filter((r) => !r.isActive)
 
-  function Row({ rec }: { rec: RecurringTransaction }) {
-    const isIncome = rec.type === 'INCOME'
-    const busy = busyIds.has(rec.id)
-    return (
-      <div className={`flex items-center gap-4 px-5 py-4 hover:bg-ink-600/30 transition-all group ${busy ? 'opacity-50 pointer-events-none' : ''}`}>
-        <div className="size-9 rounded-xl flex items-center justify-center shrink-0 text-sm"
-          style={{ backgroundColor: rec.category.color + '22', color: rec.category.color }}>
-          {rec.category.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-medium text-slate-200 truncate">{rec.name}</p>
-            <Badge variant={isIncome ? 'success' : 'default'} size="sm">
-              {isIncome ? <TrendingUp className="size-3 inline mr-1" /> : <TrendingDown className="size-3 inline mr-1" />}
-              {isIncome ? 'Receita' : 'Despesa'}
-            </Badge>
-            <Badge variant="outline" size="sm">{freqLabel[rec.frequency] ?? rec.frequency}</Badge>
-            {rec.frequency === 'MONTHLY' && rec.dayOfMonth && (
-              <span className="text-xs text-slate-600">dia {rec.dayOfMonth}</span>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {rec.category.icon} {rec.category.name}
-            {rec.description ? ` · ${rec.description}` : ''}
-          </p>
-        </div>
-        <span className={`text-sm font-semibold tabular-nums shrink-0 ${isIncome ? 'text-success' : 'text-slate-300'}`}>
-          {isIncome ? '+' : '-'}{formatCurrency(rec.amount)}
-        </span>
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            onClick={() => toggle(rec.id)}
-            disabled={busy}
-            className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors disabled:opacity-40 ${
-              rec.isActive
-                ? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
-                : 'bg-ink-600 text-slate-500 border border-white/6 hover:bg-ink-500'
-            }`}
-            title={rec.isActive ? 'Desativar' : 'Ativar'}
-          >
-            {rec.isActive ? 'Ativa' : 'Inativa'}
-          </button>
-          <RecurringModal categories={categories} item={rec} />
-          <DeleteInline id={rec.id} busy={busy} onDelete={remove} />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <>
       {active.length > 0 && (
@@ -157,7 +168,9 @@ export function RecurringList({ items, categories }: Props) {
           <Card padding="none">
             <CardContent>
               <div className="divide-y divide-white/5">
-                {active.map((rec) => <Row key={rec.id} rec={rec} />)}
+                {active.map((rec) => (
+                  <Row key={rec.id} rec={rec} busy={busyIds.has(rec.id)} categories={categories} onToggle={toggle} onRemove={remove} />
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -170,7 +183,9 @@ export function RecurringList({ items, categories }: Props) {
           <Card padding="none">
             <CardContent>
               <div className="divide-y divide-white/5 opacity-60">
-                {inactive.map((rec) => <Row key={rec.id} rec={rec} />)}
+                {inactive.map((rec) => (
+                  <Row key={rec.id} rec={rec} busy={busyIds.has(rec.id)} categories={categories} onToggle={toggle} onRemove={remove} />
+                ))}
               </div>
             </CardContent>
           </Card>
