@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { playBillPaid } from '@/lib/sounds'
 
 /**
@@ -39,19 +40,27 @@ export function DeleteGoalButton({ id }: { id: string }) {
 
 // ─── Bills ────────────────────────────────────────────────────────────────────
 
+// Bills use router.refresh() instead of a full reload() — pay/delete here
+// happen constantly and a full page reload for each one felt sluggish.
+// Safe here specifically because: the bills list is keyed by bill.id (a
+// deleted row's own component subtree, including any button state, just
+// unmounts cleanly on refresh) and MarkBillPaidButton below resets its own
+// loading state on success instead of relying on the page being destroyed.
 export function DeleteBillButton({ id }: { id: string }) {
+  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteBill(id); reload() }}
+      action={async () => { await clientApi.deleteBill(id); router.refresh() }}
       icon="trash" label="Excluir conta?"
     />
   )
 }
 
 export function DeleteBillGroupButton({ groupId }: { groupId: string }) {
+  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteBillGroup(groupId); reload() }}
+      action={async () => { await clientApi.deleteBillGroup(groupId); router.refresh() }}
       label="Cancelar parcelamento? Todas as parcelas serão excluídas."
       className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-danger transition-colors py-1 px-2 rounded-lg hover:bg-danger/10 mt-1"
     >
@@ -62,15 +71,17 @@ export function DeleteBillGroupButton({ groupId }: { groupId: string }) {
 }
 
 export function DeleteInstallmentGroupButton({ groupId }: { groupId: string }) {
+  const router = useRouter()
   return (
     <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteInstallmentGroup(groupId); reload() }}
+      action={async () => { await clientApi.deleteInstallmentGroup(groupId); router.refresh() }}
       icon="trash" label="Excluir parcelamento?"
     />
   )
 }
 
 export function MarkBillPaidButton({ id, isPaid, showLabel }: { id: string; isPaid: boolean; showLabel?: boolean }) {
+  const router = useRouter()
   const [loading, setLoading] = React.useState(false)
   return (
     <button
@@ -81,9 +92,10 @@ export function MarkBillPaidButton({ id, isPaid, showLabel }: { id: string; isPa
         try {
           await clientApi.markBillPaid(id, !isPaid)
           if (!isPaid) playBillPaid()
-          reload()
+          router.refresh()
         }
-        catch  { setLoading(false); alert('Erro ao atualizar a conta. Tente novamente.') }
+        catch  { alert('Erro ao atualizar a conta. Tente novamente.') }
+        finally { setLoading(false) }
       }}
       className={showLabel
         ? `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isPaid ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700 border border-ink-600' : 'text-success bg-success/10 hover:bg-success/20 border border-success/30'}`
