@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Clock, AlertCircle, Check, RefreshCw } from 'lucide-react'
+import { Clock, AlertCircle, AlertTriangle, Check, Trash2, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button'
 import { EditBillModal } from './edit-bill-modal'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
 import { clientApi, type Bill, type Category } from '@/lib/api-client'
@@ -33,6 +32,12 @@ export function PendingBillsList({ bills, categories }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(bills)
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set())
+  // Plain state, no useTransition: ConfirmDeleteButton wraps its action in
+  // startTransition, and in React 19 an async transition's isPending stays
+  // true for the *whole* awaited call — the confirm button sat on "..."
+  // for the entire round-trip, feeling much slower than the Pagar button
+  // right next to it (which never used a transition to begin with).
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
 
   // Resync whenever the server sends fresh data (after the background
   // refresh completes, or on navigation back to this page).
@@ -129,13 +134,38 @@ export function PendingBillsList({ bills, categories }: Props) {
                 <Check className="size-3.5" />
                 Pagar
               </button>
-              <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                <EditBillModal bill={bill} categories={categories} />
-                <ConfirmDeleteButton
-                  action={() => deleteBill(bill.id)}
-                  icon="trash" label="Excluir conta?"
-                />
-              </div>
+              {confirmingId === bill.id ? (
+                <div className="flex items-center gap-1 animate-in fade-in duration-150">
+                  <span className="text-xs text-slate-500 flex items-center gap-1 mr-0.5">
+                    <AlertTriangle className="size-3 text-warning shrink-0" />
+                    Excluir conta?
+                  </span>
+                  <button
+                    onClick={() => { setConfirmingId(null); deleteBill(bill.id) }}
+                    className="h-6 px-2 rounded text-xs font-medium bg-danger/15 text-danger hover:bg-danger/25 transition-colors border border-danger/20"
+                  >
+                    Sim
+                  </button>
+                  <button
+                    onClick={() => setConfirmingId(null)}
+                    className="h-6 px-2 rounded text-xs font-medium bg-ink-600 text-slate-400 hover:text-slate-200 transition-colors"
+                  >
+                    Não
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <EditBillModal bill={bill} categories={categories} />
+                  <button
+                    onClick={() => setConfirmingId(bill.id)}
+                    disabled={busy}
+                    className="size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-40"
+                    title="Excluir"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )

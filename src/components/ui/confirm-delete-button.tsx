@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { X, AlertTriangle, Trash2 } from 'lucide-react'
 
 interface Props {
@@ -20,8 +20,23 @@ export function ConfirmDeleteButton({
   className,
   children,
 }: Props) {
-  const [confirming, setConfirming]   = useState(false)
-  const [isPending, startTransition]  = useTransition()
+  const [confirming, setConfirming] = useState(false)
+  // Plain state, not useTransition: in React 19, wrapping an *async*
+  // action in startTransition keeps isPending true for the whole awaited
+  // call (mutation + whatever the caller does after, e.g. a refresh) —
+  // this button sat on "..." for the entire round-trip, which read as
+  // much slower than it needed to once callers started doing optimistic
+  // updates that resolve instantly on their own.
+  const [isPending, setIsPending] = useState(false)
+
+  async function handleConfirm() {
+    setIsPending(true)
+    try {
+      await action()
+    } finally {
+      setIsPending(false)
+    }
+  }
 
   const triggerClass = className ?? `size-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10 transition-colors`
 
@@ -33,7 +48,7 @@ export function ConfirmDeleteButton({
           {label}
         </span>
         <button
-          onClick={() => startTransition(() => action())}
+          onClick={handleConfirm}
           disabled={isPending}
           className="h-6 px-2 rounded text-xs font-medium bg-danger/15 text-danger hover:bg-danger/25 transition-colors border border-danger/20 disabled:opacity-50"
         >
