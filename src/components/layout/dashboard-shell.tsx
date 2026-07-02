@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext } from 'react'
+import { useState, useEffect, useMemo, useCallback, createContext, useContext } from 'react'
 import { Sidebar } from './sidebar'
 import { MobileNav } from './mobile-nav'
 import { Mascot } from '@/components/mascot/mascot'
@@ -47,17 +47,25 @@ export function DashboardShell({ user, header, children, banner, badges, plan, i
     return () => { document.body.removeAttribute('data-dashboard-theme') }
   }, [theme])
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     setTheme(prev => {
       const next = prev === 'light' ? 'dark' : 'light'
       localStorage.setItem(THEME_STORAGE_KEY, next)
       document.cookie = `${THEME_STORAGE_KEY}=${next}; path=/; max-age=31536000; samesite=lax`
       return next
     })
-  }
+  }, [])
+
+  // Every consumer of useDashboardTheme() (StatCard, sidebar icons, chart
+  // tracks, etc) re-renders whenever this context value's identity changes.
+  // Without memoizing it, a plain `{ theme, toggle }` object literal is a
+  // *new* reference on every DashboardShell render — including ones with
+  // nothing to do with theme, like collapsing the sidebar — so it was
+  // re-rendering the whole themed subtree on unrelated state changes.
+  const themeContextValue = useMemo(() => ({ theme, toggle }), [theme, toggle])
 
   return (
-    <DashboardThemeContext.Provider value={{ theme, toggle }}>
+    <DashboardThemeContext.Provider value={themeContextValue}>
     <div className="flex h-screen overflow-hidden bg-ink-900" data-dashboard-theme={theme}>
       {/* Sidebar — desktop only */}
       <div className="hidden lg:flex">
