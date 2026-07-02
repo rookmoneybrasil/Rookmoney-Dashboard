@@ -212,9 +212,13 @@ export default async function PersonPage({ params }: Props) {
     const d = addMonths(now, i)
     const label = format(d, "MMM/yy", { locale: ptBR })
 
-    // Installment groups: which entries are due in this month?
+    // Which entries are due in this month? The CURRENT month (i === 0) also
+    // absorbs everything overdue (past-due unpaid), so the projection matches
+    // "Você deve" instead of hiding money owed from earlier months.
+    const dMonthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
     const dueEntries = openEntries.filter(e => {
       const eDate = new Date(e.date)
+      if (i === 0) return eDate <= dMonthEnd  // overdue + current month
       return eDate.getFullYear() === d.getFullYear() && eDate.getMonth() === d.getMonth()
     })
 
@@ -223,7 +227,9 @@ export default async function PersonPage({ params }: Props) {
     const seenGroups = new Set<string>()
 
     for (const e of dueEntries) {
-      if (e.installmentGroupId) {
+      // Dedup installments only for future months (one parcela per month). In the
+      // current month each overdue parcela is genuinely still owed → count them all.
+      if (e.installmentGroupId && i > 0) {
         if (seenGroups.has(e.installmentGroupId)) continue
         seenGroups.add(e.installmentGroupId)
       }
