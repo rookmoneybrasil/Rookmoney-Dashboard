@@ -351,7 +351,11 @@ export default async function PersonPage({ params }: Props) {
     shareLines.push('')
   }
 
-  shareLines.push('— Enviado pelo Rook Money — https://rookmoney.com')
+  // ?utm_source=whatsapp isn't just tracking — it also busts WhatsApp's
+  // aggressive per-URL link-preview cache, which had already cached a
+  // no-image result for the bare domain from earlier shares made before
+  // app.rookmoney.com's DNS/og:image issue was fixed.
+  shareLines.push('— Enviado pelo Rook Money — https://rookmoney.com/?utm_source=whatsapp')
   const shareText = shareLines.join('\n')
 
   return (
