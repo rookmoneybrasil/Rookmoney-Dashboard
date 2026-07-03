@@ -499,20 +499,11 @@ export default async function PersonPage({ params }: Props) {
             </h2>
           </div>
           <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
-            🔁 <strong className="text-slate-300">Como funciona:</strong> cada recorrente gera automaticamente uma conta pendente no dia configurado, todo mês. Clique em <strong className="text-slate-300">Pago</strong> para quitar o mês atual, ou acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> abaixo. Meses não pagos acumulam em Pendentes.
+            🔁 <strong className="text-slate-300">Como funciona:</strong> cada recorrente gera automaticamente uma conta pendente no dia configurado, todo mês. Acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> abaixo. Meses não pagos acumulam em Pendentes.
           </div>
-          {recurring.map(item => {
-            const monthEntry = recurringEntryMap.get(item.id)
-            return (
-              <RecurringEntryCard
-                key={item.id}
-                item={item}
-                categories={categories}
-                monthEntryId={monthEntry?.id ?? null}
-                paidThisMonth={monthEntry?.isSettled ?? false}
-              />
-            )
-          })}
+          {recurring.map(item => (
+            <RecurringEntryCard key={item.id} item={item} categories={categories} />
+          ))}
         </div>
       )}
 

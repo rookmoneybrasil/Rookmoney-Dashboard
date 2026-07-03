@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { RefreshCw, X, AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
+import { RefreshCw, X, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 import { EditRecurringModal } from './edit-recurring-modal'
@@ -10,88 +10,61 @@ import { EditRecurringModal } from './edit-recurring-modal'
 interface Category { id: string; name: string; icon: string; color: string }
 
 interface Props {
-  item:           PersonEntryRecurringItem
-  categories?:    Category[]
-  monthEntryId?:  string | null
-  paidThisMonth?: boolean
+  item:        PersonEntryRecurringItem
+  categories?: Category[]
 }
 
-export function RecurringEntryCard({ item, categories = [], monthEntryId = null, paidThisMonth = false }: Props) {
+// Standardized to match RecurringBillRow (Contas Fixas): the template only
+// toggles active/paused, edits, or deletes — it does NOT have a "Pago"
+// action. The month's actual generated entry (with its own pay button)
+// already appears in the regular entries list further down the page, so a
+// pay button here would just be a redundant second way to do the same thing.
+export function RecurringEntryCard({ item, categories = [] }: Props) {
   const router = useRouter()
-  const [confirming,    setConfirming]    = useState(false)
-  const [stopping,      setStopping]      = useState(false)
-  const [paid,          setPaid]          = useState(paidThisMonth)
-  const [marking,       setMarking]       = useState(false)
-
-  // Prevent concurrent/duplicate clicks — blocks any new action until reload
-  const processing = useRef(false)
+  const [confirming, setConfirming] = useState(false)
+  const [stopping,   setStopping]   = useState(false)
+  const [toggling,   setToggling]   = useState(false)
 
   const isTheyOwe = item.type === 'THEY_OWE_ME'
 
-  async function handleStop() {
-    if (processing.current) return
-    processing.current = true
-    setStopping(true)
+  async function handleToggle() {
+    setToggling(true)
     try {
-      await clientApi.stopPersonRecurring(item.id)
-      router.refresh()  // card is dropped by the parent re-render; no full reload
-    } catch {
-      processing.current = false
-      setStopping(false)
+      await clientApi.updatePersonRecurring(item.id, { isActive: !item.isActive })
+      router.refresh()
+    } finally {
+      setToggling(false)
     }
   }
 
-  async function handleTogglePaid() {
-    if (processing.current) return // already handling a click
-    processing.current = true
-    setMarking(true)
-
+  async function handleStop() {
+    setStopping(true)
     try {
-      if (paid) {
-        // Desfazer: reabrir a entrada quitada
-        if (monthEntryId) {
-          await clientApi.unsettleEntry(monthEntryId)
-          setPaid(false)
-        }
-      } else {
-        // Garante que o lançamento do mês existe (via FK, sem duplicar) e acerta —
-        // tudo numa única chamada no servidor, em vez de criar um lançamento avulso
-        // aqui (isso causava duplicidade com o gerado pelo cron, ver CLAUDE.md).
-        await clientApi.payPersonRecurring(item.id)
-        setPaid(true)
-      }
-      // Reconcile server data in the background (no full reload). The component
-      // isn't remounted, so release the guards manually — the optimistic setPaid
-      // above already updated the UI.
+      await clientApi.stopPersonRecurring(item.id)
       router.refresh()
-      processing.current = false
-      setMarking(false)
     } catch {
-      // Em caso de erro, libera o guard para tentar novamente
-      processing.current = false
-      setMarking(false)
+      setStopping(false)
     }
   }
 
   return (
     <div className={`flex items-center gap-3 p-3.5 rounded-xl border transition-colors ${
-      paid ? 'bg-success/5 border-success/20' : 'bg-brand-900/20 border-brand-700/30'
+      item.isActive
+        ? 'bg-brand-900/20 border-brand-700/30'
+        : 'bg-ink-800/50 border-ink-700/50 opacity-50'
     }`}>
-      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${paid ? 'bg-success/15' : 'bg-brand-800/60'}`}>
-        {paid
-          ? <CheckCircle2 className="size-3.5 text-success" />
-          : <RefreshCw    className="size-3.5 text-brand-400" />}
+      <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${item.isActive ? 'bg-brand-800/60' : 'bg-ink-700'}`}>
+        <RefreshCw className={`size-3.5 ${item.isActive ? 'text-brand-400' : 'text-slate-500'}`} />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className={`text-sm font-medium truncate ${paid ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+          <p className={`text-sm font-medium truncate ${item.isActive ? 'text-slate-200' : 'text-slate-500'}`}>
             {item.description}
           </p>
-          {paid
-            ? <span className="text-[10px] bg-success/15 text-success border border-success/20 px-1.5 py-0.5 rounded-full font-medium shrink-0">Pago</span>
-            : <span className="text-[10px] bg-warning/15 text-warning border border-warning/20 px-1.5 py-0.5 rounded-full font-medium shrink-0">Pendente</span>
-          }
+          {!item.isActive && (
+            <span className="text-[10px] bg-ink-700 text-slate-600 border border-ink-600 px-1.5 py-0.5 rounded-full font-medium shrink-0">Pausada</span>
+          )}
         </div>
         <p className="text-xs text-slate-500 mt-0.5">
           <span className={isTheyOwe ? 'text-success' : 'text-danger'}>
@@ -103,22 +76,19 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
-        {!confirming && <EditRecurringModal item={item} categories={categories} />}
-
         {!confirming && (
           <button
-            onClick={handleTogglePaid}
-            disabled={marking}
-            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              paid
-                ? 'text-slate-500 hover:text-slate-300 hover:bg-ink-700'
-                : 'text-success hover:bg-success/10'
-            }`}
+            type="button"
+            onClick={handleToggle}
+            disabled={toggling}
+            title={item.isActive ? 'Pausar recorrência' : 'Ativar recorrência'}
+            className="size-7 rounded-lg flex items-center justify-center transition-colors text-slate-500 hover:text-slate-300 hover:bg-ink-700 disabled:opacity-50"
           >
-            <Circle className="size-3.5" />
-            {marking ? '...' : paid ? 'Desfazer' : 'Pago'}
+            {item.isActive ? <ToggleRight className="size-4 text-success" /> : <ToggleLeft className="size-4" />}
           </button>
         )}
+
+        {!confirming && <EditRecurringModal item={item} categories={categories} />}
 
         {!confirming ? (
           <button
@@ -130,7 +100,7 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
         ) : (
           <div className="flex items-center gap-1">
             <span className="text-xs text-slate-500 flex items-center gap-0.5">
-              <AlertTriangle className="size-3 text-warning" /> Parar?</span>
+              <AlertTriangle className="size-3 text-warning" /> Remover?</span>
             <button onClick={handleStop} disabled={stopping}
               className="text-xs text-danger hover:text-danger/80 px-1.5 py-1 rounded hover:bg-danger/10 transition-colors disabled:opacity-50">
               {stopping ? '...' : 'Sim'}

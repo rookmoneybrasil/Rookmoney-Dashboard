@@ -250,8 +250,6 @@ export const clientApi = {
     clientFetch<PersonEntryRecurringItem>(`/people/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   stopPersonRecurring: (id: string) =>
     clientFetch<void>(`/people/recurring/${id}`, { method: 'DELETE' }),
-  payPersonRecurring: (id: string) =>
-    clientFetch<PersonEntry>(`/people/recurring/${id}?action=pay`, { method: 'POST' }),
   migratePersonRecurring: () =>
     clientFetch<{ converted: number; message: string }>('/people/migrate-recurring', { method: 'POST' }),
 
