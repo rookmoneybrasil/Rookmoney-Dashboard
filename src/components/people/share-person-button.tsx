@@ -9,10 +9,12 @@ export function SharePersonButton({ text }: { text: string }) {
   async function handleShare() {
     if (navigator.share) {
       try {
-        // Passing url separately (not just embedded in the text) lets apps
-        // that support it (WhatsApp included) render a rich link preview
-        // using the site's Open Graph image/title instead of a plain link.
-        await navigator.share({ text, url: 'https://rookmoney.com' })
+        // text already ends with a "https://rookmoney.com" line (see
+        // page.tsx) — WhatsApp auto-links a bare URL found in the message
+        // body and generates its own preview card from it. Passing url as
+        // a SEPARATE field here as well made WhatsApp show it a second
+        // time as a duplicate link.
+        await navigator.share({ text })
         return
       } catch {
         // user cancelled or share failed — fall through to clipboard
