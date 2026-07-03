@@ -214,11 +214,15 @@ export default async function PersonPage({ params }: Props) {
     const dEnd   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
 
     for (const r of recurring) {
+      // Match ANY entry (settled or not) — settled means paid (nothing to
+      // add), unsettled means it's already counted via dueEntries above.
+      // Filtering to unsettled-only here made a paid recurring entry look
+      // like it was never generated, so its amount got added a second time.
       const alreadyHasEntry = allEntries.some(e =>
-        !e.isSettled && e.recurringEntryId === r.id &&
+        e.recurringEntryId === r.id &&
         new Date(e.date) >= dStart && new Date(e.date) <= dEnd
       )
-      if (alreadyHasEntry) continue // already counted in dueEntries
+      if (alreadyHasEntry) continue // already counted in dueEntries (or already settled)
 
       const amount = Number(r.amount)
       const desc = `${r.description} (recorrente)`
