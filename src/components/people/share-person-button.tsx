@@ -9,7 +9,10 @@ export function SharePersonButton({ text }: { text: string }) {
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ text })
+        // Passing url separately (not just embedded in the text) lets apps
+        // that support it (WhatsApp included) render a rich link preview
+        // using the site's Open Graph image/title instead of a plain link.
+        await navigator.share({ text, url: 'https://rookmoney.com' })
         return
       } catch {
         // user cancelled or share failed — fall through to clipboard

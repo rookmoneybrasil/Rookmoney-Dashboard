@@ -23,6 +23,8 @@ export function EntryActions({ entryId, isSettled }: Props) {
       if (isSettled) await clientApi.unsettleEntry(entryId)
       else           await clientApi.settleEntry(entryId)
       router.refresh()  // re-render server components instead of a full page reload
+    } catch {
+      alert('Não foi possível atualizar. Tente novamente.')
     } finally { setSettling(false) }
   }
 
@@ -31,6 +33,8 @@ export function EntryActions({ entryId, isSettled }: Props) {
     try {
       await clientApi.deleteEntry(entryId)
       router.refresh()
+    } catch {
+      alert('Não foi possível excluir. Tente novamente.')
     } finally { setDelPending(false) }
   }
 

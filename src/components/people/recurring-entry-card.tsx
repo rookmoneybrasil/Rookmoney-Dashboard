@@ -45,6 +45,7 @@ export function RecurringEntryCard({ item, categories = [] }: Props) {
       await clientApi.stopPersonRecurring(item.id)
       router.refresh()
     } catch {
+      alert('Não foi possível remover. Tente novamente.')
       setStopping(false)
     }
   }

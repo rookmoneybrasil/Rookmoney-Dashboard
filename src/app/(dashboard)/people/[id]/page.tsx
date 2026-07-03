@@ -351,7 +351,7 @@ export default async function PersonPage({ params }: Props) {
     shareLines.push('')
   }
 
-  shareLines.push('— Enviado pelo Rook Money 🐂')
+  shareLines.push('— Enviado pelo Rook Money — https://rookmoney.com')
   const shareText = shareLines.join('\n')
 
   return (
