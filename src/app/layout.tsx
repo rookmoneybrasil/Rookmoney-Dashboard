@@ -28,17 +28,17 @@ export const metadata: Metadata = {
     type:        'website',
     locale:      'pt_BR',
     images: [{
-      url:    '/og-image.png',
-      width:  1200,
-      height: 630,
+      url:    '/icon-512.png',
+      width:  512,
+      height: 512,
       alt:    'Rook Money — Controle financeiro inteligente',
     }],
   },
   twitter: {
-    card:        'summary_large_image',
+    card:        'summary',
     title:       'Rook Money — Controle financeiro inteligente',
     description: 'Dashboard, metas, orçamento e relatórios. Organize suas finanças em minutos.',
-    images:      ['/og-image.png'],
+    images:      ['/icon-512.png'],
   },
   icons: {
     icon: [
