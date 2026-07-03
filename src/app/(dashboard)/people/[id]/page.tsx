@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, CalendarDays } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, RefreshCw } from 'lucide-react'
 import { addMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { serverApi } from '@/lib/api-client'
@@ -15,6 +15,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import type { PersonEntryRow } from '@/lib/api-client'
 import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
 import { MigrateRecurringButton } from '@/components/people/migrate-recurring-button'
+import { PersonProjectionSection } from '@/components/people/person-projection-section'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -205,6 +206,7 @@ export default async function PersonPage({ params }: Props) {
 
   // ── Mini projeção: próximos 3 meses ───────────────────────────────────────
   const monthLabel = format(now, 'MMMM', { locale: ptBR })
+  type ProjectionItem = { id: string; desc: string; amount: number; category: Category | null }
   const projection = Array.from({ length: 3 }, (_, i) => {
     const d = addMonths(now, i)
     const label = format(d, "MMM/yy", { locale: ptBR })
@@ -221,6 +223,8 @@ export default async function PersonPage({ params }: Props) {
 
     let projTheyOwe = 0
     let projIOwe    = 0
+    const theyOweItems: ProjectionItem[] = []
+    const iOweItems: ProjectionItem[]    = []
     const seenGroups = new Set<string>()
 
     for (const e of dueEntries) {
@@ -230,33 +234,34 @@ export default async function PersonPage({ params }: Props) {
         if (seenGroups.has(e.installmentGroupId)) continue
         seenGroups.add(e.installmentGroupId)
       }
-      if (e.type === 'THEY_OWE_ME') projTheyOwe += Number(e.amount)
-      else                           projIOwe    += Number(e.amount)
+      const amount = Number(e.amount)
+      const desc = e.installmentGroupId
+        ? `${e.description} (parcela ${e.installmentCurrent ?? 1}/${e.installmentTotal ?? 1})`
+        : e.description
+      if (e.type === 'THEY_OWE_ME') { projTheyOwe += amount; theyOweItems.push({ id: e.id, desc, amount, category: e.category }) }
+      else                           { projIOwe    += amount; iOweItems.push({ id: e.id, desc, amount, category: e.category }) }
     }
 
     // Add recurring monthly amounts — but only if there's no PersonEntry already
-    // generated for this month for that recurring template (avoid double-counting).
-    // A recurring template that generated an entry is already counted in dueEntries above.
+    // generated for this month for that recurring template (avoid double-counting,
+    // matched via the recurringEntryId FK, not a description/type/date heuristic).
     const dStart = new Date(d.getFullYear(), d.getMonth(), 1)
     const dEnd   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
 
     for (const r of recurring) {
-      // Check if a PersonEntry already exists for this recurring template this month
       const alreadyHasEntry = allEntries.some(e =>
-        !e.isSettled &&
-        e.description === r.description &&
-        e.type        === r.type &&
-        !e.installmentGroupId &&
-        new Date(e.date) >= dStart &&
-        new Date(e.date) <= dEnd
+        !e.isSettled && e.recurringEntryId === r.id &&
+        new Date(e.date) >= dStart && new Date(e.date) <= dEnd
       )
       if (alreadyHasEntry) continue // already counted in dueEntries
 
-      if (r.type === 'THEY_OWE_ME') projTheyOwe += Number(r.amount)
-      else                           projIOwe    += Number(r.amount)
+      const amount = Number(r.amount)
+      const desc = `${r.description} (recorrente)`
+      if (r.type === 'THEY_OWE_ME') { projTheyOwe += amount; theyOweItems.push({ id: `r-${r.id}`, desc, amount, category: r.category }) }
+      else                           { projIOwe    += amount; iOweItems.push({ id: `r-${r.id}`, desc, amount, category: r.category }) }
     }
 
-    return { label, theyOwe: projTheyOwe, iOwe: projIOwe, balance: projTheyOwe - projIOwe }
+    return { label, isCurrent: i === 0, theyOwe: projTheyOwe, iOwe: projIOwe, balance: projTheyOwe - projIOwe, theyOweItems, iOweItems }
   })
 
   // Show the projection card whenever there's something projected (recurring
@@ -373,7 +378,7 @@ export default async function PersonPage({ params }: Props) {
   const shareText = shareLines.join('\n')
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       {/* Back */}
       <Link
         href="/people"
@@ -457,85 +462,71 @@ export default async function PersonPage({ params }: Props) {
       </div>
 
       {/* ── Mini projeção ────────────────────────────────── */}
-      {hasProjectionData && (
-        <div className="bg-ink-800 rounded-xl border border-ink-700 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <CalendarDays className="size-4 text-brand-400" />
-            <h2 className="text-sm font-semibold text-slate-300">Projeção dos próximos meses</h2>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {projection.map((m, i) => (
-              <div key={m.label} className={`rounded-lg p-3 border ${i === 0 ? 'border-brand-600/40 bg-brand-900/20' : 'border-ink-600 bg-ink-700/50'}`}>
-                <p className="text-[11px] text-slate-500 capitalize mb-2 flex items-center gap-1">
-                  {i === 0 && <span className="size-1.5 rounded-full bg-brand-400 inline-block" />}
-                  {m.label}
-                </p>
-                {/* Show individual breakdown only when both sides have amounts (mixed month) */}
-                {m.theyOwe > 0 && m.iOwe > 0 && (
-                  <>
-                    <p className="text-xs text-success font-medium">+{formatCurrency(m.theyOwe)}</p>
-                    <p className="text-xs text-danger font-medium">-{formatCurrency(m.iOwe)}</p>
-                  </>
-                )}
-                <p className={`text-sm font-bold mt-1 ${m.balance >= 0 ? 'text-success' : 'text-danger'}`}>
-                  {m.balance >= 0 ? '+' : ''}{formatCurrency(m.balance)}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-slate-600 mt-2">Baseado nos recorrentes ativos + lançamentos pendentes</p>
-        </div>
-      )}
+      {hasProjectionData && <PersonProjectionSection months={projection} />}
 
       {/* ── Auto-migração silenciosa de recorrentes antigos ── */}
       {hasOldRecurring && <MigrateRecurringButton />}
 
-      {/* ── Recorrentes ativos ──────────────────────── */}
-      {recurring.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="text-xs font-semibold text-slate-600 uppercase tracking-widest">
-              Recorrentes ativos
+      {/* ── Blocos horizontais: Recorrentes | Pendentes ─────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+        {/* Recorrentes ativos */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-5 rounded-full bg-brand-400 shrink-0" />
+            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <RefreshCw className="size-4 text-brand-400" /> Recorrentes ativos
             </h2>
           </div>
-          <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-4 py-3 text-xs text-slate-400 leading-relaxed">
-            🔁 <strong className="text-slate-300">Como funciona:</strong> cada recorrente gera automaticamente uma conta pendente no dia configurado, todo mês. Acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> abaixo. Meses não pagos acumulam em Pendentes.
+          <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
+            🔁 <strong className="text-slate-300">Recorrentes</strong> geram automaticamente um lançamento pendente no dia configurado, todo mês — acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> ao lado.
           </div>
-          {recurring.map(item => (
-            <RecurringEntryCard key={item.id} item={item} categories={categories} />
-          ))}
+          {recurring.length === 0 ? (
+            <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+              <p className="text-xs text-slate-600">Nenhum recorrente ativo</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {recurring.map(item => (
+                <RecurringEntryCard key={item.id} item={item} categories={categories} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
 
-      {/* ── Pending ─────────────────────────────────── */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Clock className="size-4 text-slate-500" />
-          <h2 className="text-base font-semibold text-white">Pendentes ({pendingCount})</h2>
+        {/* Pendentes */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-5 rounded-full bg-slate-500 shrink-0" />
+            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <Clock className="size-4 text-slate-400" /> Pendentes ({pendingCount})
+            </h2>
+          </div>
+
+          {pendingCount === 0 ? (
+            <div className="py-10 flex flex-col items-center gap-3 text-sm text-slate-600 bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
+              Nenhum lançamento pendente
+              <EntryModal personId={person.id} personName={person.name} categories={categories} label="Criar primeiro lançamento" variant="secondary" />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {/* Installment groups */}
+              {activeGroups.map((grp) => (
+                <InstallmentGroup
+                  key={grp[0].installmentGroupId}
+                  personId={person.id}
+                  entries={grp}
+                  categories={categories}
+                />
+              ))}
+              {/* Single entries */}
+              {singleOpen.map((entry) => (
+                <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} />
+              ))}
+            </div>
+          )}
         </div>
 
-        {pendingCount === 0 ? (
-          <div className="py-10 flex flex-col items-center gap-3 text-sm text-slate-600 bg-ink-800 rounded-xl border border-ink-700 border-dashed">
-            Nenhum lançamento pendente
-            <EntryModal personId={person.id} personName={person.name} categories={categories} label="Criar primeiro lançamento" variant="secondary" />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {/* Installment groups */}
-            {activeGroups.map((grp) => (
-              <InstallmentGroup
-                key={grp[0].installmentGroupId}
-                personId={person.id}
-                entries={grp}
-                categories={categories}
-              />
-            ))}
-            {/* Single entries */}
-            {singleOpen.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* ── Settled ─────────────────────────────────── */}
