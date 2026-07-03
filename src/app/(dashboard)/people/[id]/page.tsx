@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, RefreshCw } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, RefreshCw, Archive, Check } from 'lucide-react'
 import { addMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { serverApi } from '@/lib/api-client'
@@ -12,10 +12,13 @@ import { EditPersonButton } from '@/components/people/person-modal'
 import { DeletePersonButton } from '@/components/people/delete-person-button'
 import { SharePersonButton } from '@/components/people/share-person-button'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import type { PersonEntryRow } from '@/lib/api-client'
 import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
 import { MigrateRecurringButton } from '@/components/people/migrate-recurring-button'
 import { PersonProjectionSection } from '@/components/people/person-projection-section'
+import { PendingEntryRow } from '@/components/people/pending-entry-row'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -59,65 +62,27 @@ function groupEntries(entries: PersonEntryRow[]) {
 
 type Category = { id: string; name: string; icon: string; color: string }
 
-function EntryCard({ entry, personId, categories, settled = false }: { entry: PersonEntryRow; personId: string; categories: Category[]; settled?: boolean }) {
-  const isTheyOwe = entry.type === 'THEY_OWE_ME'
-
-  if (settled) {
-    return (
-      <div className="group flex items-center gap-3 p-4 bg-ink-800/50 rounded-xl border border-ink-700/50 opacity-60 hover:opacity-80 transition-opacity">
-        <div className="size-9 rounded-lg bg-ink-700 flex items-center justify-center shrink-0">
-          <CheckCircle2 className="size-4 text-slate-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-slate-400 text-sm truncate line-through">{entry.description}</p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-xs text-slate-600">Acertado em {formatDate(entry.settledAt ?? entry.createdAt)}</p>
-            {entry.category && (
-              <span className="text-xs text-slate-600">{entry.category.icon} {entry.category.name}</span>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <span className="font-semibold text-sm text-slate-500">{formatCurrency(entry.amount)}</span>
-          <EditEntryModal entry={entry} categories={categories} />
-          <EntryActions entryId={entry.id} personId={personId} isSettled={true} />
-        </div>
-      </div>
-    )
-  }
-
+// Mirrors Bills' paid-history row (components/bills/page.tsx) — used only
+// for settled entries. Pending entries use PendingEntryRow instead, which
+// mirrors PendingBillsList.
+function SettledEntryRow({ entry, personId, categories }: { entry: PersonEntryRow; personId: string; categories: Category[] }) {
   return (
-    <div className="group flex items-center gap-3 p-4 bg-ink-800 rounded-xl border border-ink-700 hover:border-ink-600 transition-colors">
-      <div className={`size-9 rounded-lg shrink-0 flex items-center justify-center ${
-        isTheyOwe ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
-      }`}>
-        {isTheyOwe ? <TrendingUp className="size-4" /> : <TrendingDown className="size-4" />}
+    <div className="flex items-center gap-4 px-5 py-4 opacity-50 hover:opacity-80 transition-opacity group">
+      <div className="size-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+        <Check className="size-4 text-success" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-white text-sm truncate">{entry.description}</p>
-        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          <p className="text-xs text-slate-500">{formatDate(entry.date)}</p>
-          {entry.category && (
-            <span
-              className="text-xs px-1.5 py-0.5 rounded-full border"
-              style={{
-                backgroundColor: entry.category.color + '18',
-                color: entry.category.color,
-                borderColor: entry.category.color + '40',
-              }}
-            >
-              {entry.category.icon} {entry.category.name}
-            </span>
-          )}
-          {entry.notes && <span className="text-xs text-slate-600 truncate max-w-[120px]">{entry.notes}</span>}
-        </div>
+        <p className="text-sm text-slate-400 truncate">{entry.description}</p>
+        <p className="text-xs text-slate-600">
+          {entry.category?.name ?? 'Sem categoria'} · {formatDate(entry.settledAt ?? entry.createdAt)}
+          {entry.recurringEntryId && <span className="ml-1 text-brand-600">↻ recorrente</span>}
+        </p>
       </div>
-      <div className="flex items-center gap-3 shrink-0">
-        <span className={`font-bold text-sm ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
-          {isTheyOwe ? '+' : '-'}{formatCurrency(entry.amount)}
-        </span>
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(entry.amount)}</span>
+        <Badge variant="success" size="sm">Pago</Badge>
         <EditEntryModal entry={entry} categories={categories} />
-        <EntryActions entryId={entry.id} personId={personId} isSettled={false} />
+        <EntryActions entryId={entry.id} personId={personId} isSettled={true} />
       </div>
     </div>
   )
@@ -521,7 +486,7 @@ export default async function PersonPage({ params }: Props) {
               ))}
               {/* Single entries */}
               {singleOpen.map((entry) => (
-                <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} />
+                <PendingEntryRow key={entry.id} entry={entry} personId={person.id} categories={categories} />
               ))}
             </div>
           )}
@@ -529,27 +494,44 @@ export default async function PersonPage({ params }: Props) {
 
       </div>
 
-      {/* ── Settled ─────────────────────────────────── */}
+      {/* ── Acertados (histórico) ───────────────────── */}
       {settledCount > 0 && (
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="size-4 text-slate-500" />
-            <h2 className="text-base font-semibold text-slate-500">Acertados ({settledCount})</h2>
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-slate-600 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-400 flex items-center gap-2">
+                <Archive className="size-4 text-slate-500" /> Histórico de acertados ({settledCount})
+              </h2>
+            </div>
+
+            {doneGroups.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {doneGroups.map((grp) => (
+                  <InstallmentGroup
+                    key={grp[0].installmentGroupId}
+                    personId={person.id}
+                    entries={grp}
+                    categories={categories}
+                  />
+                ))}
+              </div>
+            )}
+
+            {singleSettled.length > 0 && (
+              <Card padding="none">
+                <CardContent>
+                  <div className="divide-y divide-white/5">
+                    {singleSettled.map((entry) => (
+                      <SettledEntryRow key={entry.id} entry={entry} personId={person.id} categories={categories} />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
-          <div className="flex flex-col gap-2">
-            {doneGroups.map((grp) => (
-              <InstallmentGroup
-                key={grp[0].installmentGroupId}
-                personId={person.id}
-                entries={grp}
-                categories={categories}
-              />
-            ))}
-            {singleSettled.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} personId={person.id} categories={categories} settled />
-            ))}
-          </div>
-        </div>
+        </>
       )}
     </div>
   )
