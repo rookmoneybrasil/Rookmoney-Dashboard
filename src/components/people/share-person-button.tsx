@@ -7,21 +7,25 @@ export function SharePersonButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
   async function handleShare() {
+    // Generated fresh on every click (not baked into the server-rendered
+    // text) so WhatsApp never reuses a cached preview from a previous share
+    // — reusing the exact same URL across shares is what caused it to show
+    // a stale (or, once, no) preview earlier today. WhatsApp auto-links a
+    // bare URL found in the message body and builds its own preview card
+    // from it, so this doesn't need to be passed as a separate `url` field.
+    const shareUrl = `https://rookmoney.com/?ref=${Date.now()}`
+    const fullText = `${text} — ${shareUrl}`
+
     if (navigator.share) {
       try {
-        // text already ends with a "https://rookmoney.com" line (see
-        // page.tsx) — WhatsApp auto-links a bare URL found in the message
-        // body and generates its own preview card from it. Passing url as
-        // a SEPARATE field here as well made WhatsApp show it a second
-        // time as a duplicate link.
-        await navigator.share({ text })
+        await navigator.share({ text: fullText })
         return
       } catch {
         // user cancelled or share failed — fall through to clipboard
       }
     }
 
-    await navigator.clipboard.writeText(text)
+    await navigator.clipboard.writeText(fullText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
