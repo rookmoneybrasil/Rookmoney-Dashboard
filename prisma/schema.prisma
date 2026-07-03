@@ -359,6 +359,7 @@ model PersonEntry {
   installmentGroupId   String?
   settledTransactionId String?   // ID da Transaction criada ao acertar
   recurringEntryId     String?   // FK to PersonEntryRecurring template that generated this
+  recurringMonth       String?   // "YYYY-MM" this entry covers, set alongside recurringEntryId — enables the unique constraint below so two concurrent requests can never both create an entry for the same template+month
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
@@ -374,6 +375,7 @@ model PersonEntry {
   @@index([userId])
   @@index([installmentGroupId])
   @@index([recurringEntryId])
+  @@unique([recurringEntryId, recurringMonth])
 }
 
 // ─── Feedback ────────────────────────────────────────────────────────

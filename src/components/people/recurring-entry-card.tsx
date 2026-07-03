@@ -22,9 +22,6 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
   const [stopping,      setStopping]      = useState(false)
   const [paid,          setPaid]          = useState(paidThisMonth)
   const [marking,       setMarking]       = useState(false)
-  // Tracks an entry created in this session so retries after settleEntry failure
-  // don't create a second duplicate entry (monthEntryId is a prop, not updated live)
-  const [localEntryId, setLocalEntryId]  = useState<string | null>(null)
 
   // Prevent concurrent/duplicate clicks — blocks any new action until reload
   const processing = useRef(false)
@@ -57,23 +54,10 @@ export function RecurringEntryCard({ item, categories = [], monthEntryId = null,
           setPaid(false)
         }
       } else {
-        // Use localEntryId if a previous attempt created the entry but settleEntry failed
-        const targetId = localEntryId ?? monthEntryId
-        if (targetId) {
-          // Entrada já existe — só acerta
-          await clientApi.settleEntry(targetId)
-        } else {
-          // Nenhuma entrada gerada ainda — cria e acerta em uma operação
-          const entry = await clientApi.createEntry(item.personId, {
-            type:        item.type,
-            description: item.description,
-            amount:      item.amount,
-            date:        new Date().toISOString().split('T')[0],
-            categoryId:  item.categoryId,
-          })
-          setLocalEntryId(entry.id)
-          await clientApi.settleEntry(entry.id)
-        }
+        // Garante que o lançamento do mês existe (via FK, sem duplicar) e acerta —
+        // tudo numa única chamada no servidor, em vez de criar um lançamento avulso
+        // aqui (isso causava duplicidade com o gerado pelo cron, ver CLAUDE.md).
+        await clientApi.payPersonRecurring(item.id)
         setPaid(true)
       }
       // Reconcile server data in the background (no full reload). The component

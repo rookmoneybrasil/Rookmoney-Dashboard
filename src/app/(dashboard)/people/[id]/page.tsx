@@ -146,15 +146,11 @@ export default async function PersonPage({ params }: Props) {
 
   // Map: recurringId → ANY entry this month (settled or not)
   // Used for: monthEntryId (card tracking) + balance (if settled → payment done, don't add again)
+  // Matched via the recurringEntryId FK (set by processRecurringPersonEntries /
+  // the "pay recurring" endpoint) instead of a description/type/date heuristic.
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
-    const match = allEntries.find(e =>
-      e.description === r.description &&
-      e.type        === r.type &&
-      !e.installmentGroupId &&
-      new Date(e.date) >= monthStart &&
-      new Date(e.date) <= monthEnd
-    )
+    const match = allEntries.find(e => e.recurringEntryId === r.id)
     if (match) recurringEntryMap.set(r.id, match)
   }
   const today        = new Date()
