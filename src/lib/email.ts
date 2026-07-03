@@ -193,7 +193,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
           <div style="margin-bottom:12px;"><span style="color:#a855f7;font-size:18px;margin-right:12px;">🎯</span><strong style="color:#f1f5f9;font-size:14px;">Metas financeiras</strong><br/><span style="color:#64748b;font-size:13px;">Defina objetivos e acompanhe seu progresso</span></div>
           <div><span style="color:#f59e0b;font-size:18px;margin-right:12px;">🤖</span><strong style="color:#f1f5f9;font-size:14px;">Rookinho IA</strong><br/><span style="color:#64748b;font-size:13px;">Converse com a IA sobre suas finanças (PRO)</span></div>
         </div>
-        <a href="https://app.rookmoney.com" style="display:block;text-align:center;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;">Acessar meu dashboard →</a>
+        <a href="https://rookmoney.com" style="display:block;text-align:center;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;">Acessar meu dashboard →</a>
       </div>
       <div style="padding:20px 32px;border-top:1px solid #1e2d4a;background:#060a16;">
         <p style="margin:0;font-size:12px;color:#334155;text-align:center;">Você recebeu este e-mail porque criou uma conta no <a href="https://rookmoney.com" style="color:#60a5fa;text-decoration:none;">Rook Money</a>.</p>
