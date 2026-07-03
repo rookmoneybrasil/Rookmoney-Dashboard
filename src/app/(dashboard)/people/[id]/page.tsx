@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, RefreshCw, Archive, Check } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, CheckCircle2, Clock, RefreshCw, Archive, Check, Layers } from 'lucide-react'
 import { addMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { serverApi } from '@/lib/api-client'
@@ -277,7 +277,6 @@ export default async function PersonPage({ params }: Props) {
     .filter(([gid]) => doneGroupIds.has(gid))
     .map(([, g]) => g.sort((a, b) => (a.installmentCurrent ?? 0) - (b.installmentCurrent ?? 0)))
 
-  const pendingCount = singleOpen.length + activeGroups.length
   const settledCount = singleSettled.length + doneGroups.length
 
   // ── Share text ────────────────────────────────────────────────────────────
@@ -472,32 +471,22 @@ export default async function PersonPage({ params }: Props) {
           )}
         </div>
 
-        {/* Pendentes */}
+        {/* Pendentes — avulsos e recorrentes gerados (parceladas ficam numa seção própria abaixo, igual Contas) */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <div className="w-1 h-5 rounded-full bg-slate-500 shrink-0" />
             <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <Clock className="size-4 text-slate-400" /> Pendentes ({pendingCount})
+              <Clock className="size-4 text-slate-400" /> Pendentes ({singleOpen.length})
             </h2>
           </div>
 
-          {pendingCount === 0 ? (
+          {singleOpen.length === 0 ? (
             <div className="py-10 flex flex-col items-center gap-3 text-sm text-slate-600 bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
               Nenhum lançamento pendente
               <EntryModal personId={person.id} personName={person.name} categories={categories} label="Criar primeiro lançamento" variant="secondary" />
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {/* Installment groups */}
-              {activeGroups.map((grp) => (
-                <InstallmentGroup
-                  key={grp[0].installmentGroupId}
-                  personId={person.id}
-                  entries={grp}
-                  categories={categories}
-                />
-              ))}
-              {/* Single entries */}
               {singleOpen.map((entry) => (
                 <PendingEntryRow key={entry.id} entry={entry} personId={person.id} categories={categories} />
               ))}
@@ -506,6 +495,31 @@ export default async function PersonPage({ params }: Props) {
         </div>
 
       </div>
+
+      {/* ── Parceladas ────────────────────────────────── */}
+      {activeGroups.length > 0 && (
+        <>
+          <div className="border-t border-white/6" />
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-5 rounded-full bg-brand-500 shrink-0" />
+              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <Layers className="size-4 text-brand-400" /> Parceladas
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeGroups.map((grp) => (
+                <InstallmentGroup
+                  key={grp[0].installmentGroupId}
+                  personId={person.id}
+                  entries={grp}
+                  categories={categories}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── Acertados (histórico) ───────────────────── */}
       {settledCount > 0 && (
