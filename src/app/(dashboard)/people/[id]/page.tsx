@@ -116,7 +116,14 @@ export default async function PersonPage({ params }: Props) {
   // the "pay recurring" endpoint) instead of a description/type/date heuristic.
   const recurringEntryMap = new Map<string, typeof allEntries[number]>()
   for (const r of recurring) {
-    const match = allEntries.find(e => e.recurringEntryId === r.id)
+    // Scoped to the current month — recurringEntryId alone isn't enough since
+    // a template accumulates one entry per month it's been active; matching
+    // without a date range would find last month's (already-settled) entry
+    // and wrongly skip adding this month's not-yet-generated amount below.
+    const match = allEntries.find(e =>
+      e.recurringEntryId === r.id &&
+      new Date(e.date) >= monthStart && new Date(e.date) <= monthEnd
+    )
     if (match) recurringEntryMap.set(r.id, match)
   }
   const today        = new Date()
@@ -291,15 +298,17 @@ export default async function PersonPage({ params }: Props) {
   }
 
   // Unsettled single entries owed up to the end of this month (overdue + current),
-  // skip those already covered by recurring. Overdue included so the share total
-  // matches "Você deve" and the projection instead of hiding past-due amounts.
-  const recurringDescs = new Set(recurring.map(r => `${r.description}|${r.type}`))
+  // skip only the current month's recurring-generated entry (already covered by
+  // the "recorrente" line above) — matched by entry id via the FK-scoped
+  // recurringEntryMap, not by description+type, which would also swallow
+  // genuinely separate overdue months for the same template.
+  const currentMonthRecurringEntryIds = new Set(Array.from(recurringEntryMap.values()).map(e => e.id))
   const allSingles = allEntries.filter(e => {
     const d = new Date(e.date)
     return !e.installmentGroupId && !e.isSettled && d <= monthEnd
   })
   for (const e of allSingles) {
-    if (recurringDescs.has(`${e.description}|${e.type}`)) continue
+    if (currentMonthRecurringEntryIds.has(e.id)) continue
     const bucket = e.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
     bucket.push({ desc: e.description, amount: Number(e.amount), settled: e.isSettled })
   }

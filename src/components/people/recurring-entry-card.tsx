@@ -32,6 +32,8 @@ export function RecurringEntryCard({ item, categories = [] }: Props) {
     try {
       await clientApi.updatePersonRecurring(item.id, { isActive: !item.isActive })
       router.refresh()
+    } catch {
+      alert('Não foi possível atualizar. Tente novamente.')
     } finally {
       setToggling(false)
     }
