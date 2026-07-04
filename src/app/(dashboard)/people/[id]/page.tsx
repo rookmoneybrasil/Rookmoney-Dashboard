@@ -113,8 +113,12 @@ export default async function PersonPage({ params }: Props) {
 
   // For each recurring template, find if there's an entry this month (settled or pending)
   const now          = new Date()
+  const yearMonth    = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const monthStart   = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthEnd     = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+  // A template with a future startMonth ("1ª data" in a later month) hasn't
+  // started yet — exclude it from all current-month math (balance/map).
+  const isStarted = (r: { startMonth?: string | null }) => !r.startMonth || yearMonth >= r.startMonth
 
   // Map: recurringId → ANY entry this month (settled or not)
   // Used for: monthEntryId (card tracking) + balance (if settled → payment done, don't add again)
@@ -168,6 +172,7 @@ export default async function PersonPage({ params }: Props) {
   let recurringTheyOwe = 0
   let recurringIOwe    = 0
   for (const r of activeRecurring) {
+    if (!isStarted(r)) continue // future "1ª data" — not owed this month yet
     if (recurringEntryMap.has(r.id)) continue // entry exists (settled or not) — skip
     if (r.type === 'THEY_OWE_ME') recurringTheyOwe += Number(r.amount)
     else                           recurringIOwe    += Number(r.amount)
@@ -225,8 +230,10 @@ export default async function PersonPage({ params }: Props) {
     // matched via the recurringEntryId FK, not a description/type/date heuristic).
     const dStart = new Date(d.getFullYear(), d.getMonth(), 1)
     const dEnd   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
+    const dKey   = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 
     for (const r of activeRecurring) {
+      if (r.startMonth && dKey < r.startMonth) continue // not started yet in this projected month
       // Match ANY entry (settled or not) — settled means paid (nothing to
       // add), unsettled means it's already counted via dueEntries above.
       // Filtering to unsettled-only here made a paid recurring entry look
@@ -296,6 +303,7 @@ export default async function PersonPage({ params }: Props) {
 
   // Recurring templates — only the ones still owed this month (skip if already paid)
   for (const r of activeRecurring) {
+    if (!isStarted(r)) continue // future "1ª data" — not owed yet
     const entry = recurringEntryMap.get(r.id)
     if (entry?.isSettled) continue
     const bucket = r.type === 'I_OWE_THEM' ? shareIOwe : shareTheyOwe
