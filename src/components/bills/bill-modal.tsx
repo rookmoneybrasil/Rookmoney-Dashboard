@@ -57,14 +57,14 @@ export function BillModal({ categories }: Props) {
   )
 
   const { mutate: mutateRecurring, pending: pendingRecurring, error: errorRecurring } = useMutation(
-    (data: { name: string; amount: string; dayOfMonth: string; categoryId: string; notes: string }) =>
+    (data: { name: string; amount: string; dayOfMonth: string; categoryId: string; notes: string; firstDate: string }) =>
       clientApi.createRecurringBill({
         name:       data.name,
         amount:     parseFloat(data.amount),
         dayOfMonth: parseInt(data.dayOfMonth) || 1,
         categoryId: data.categoryId || null,
         notes:      data.notes || null,
-        generateNow: true, // also create this month's instance if day has passed
+        firstDate:  data.firstDate || undefined, // month drives startMonth; if this month & past, gera já
       }),
     { onSuccess: () => { reset(); triggerMascot('determined', 'Conta fixa cadastrada! Vou gerar automaticamente todo mês. 🔁') } },
   )
@@ -83,6 +83,7 @@ export function BillModal({ categories }: Props) {
         dayOfMonth: fd.get('dayOfMonth') as string,
         categoryId,
         notes:      fd.get('notes') as string,
+        firstDate:  fd.get('firstDate') as string,
       })
       return
     }
@@ -218,6 +219,11 @@ export function BillModal({ categories }: Props) {
               </FormField>
             )}
           </div>
+          {mode === 'recorrente' && (
+            <FormField label="1ª data (quando começa)" htmlFor="firstDate" required>
+              <DateInput id="firstDate" name="firstDate" defaultValue={new Date().toISOString().split('T')[0]} required />
+            </FormField>
+          )}
           {mode === 'recorrente' && (
             <p className="text-xs text-slate-600 -mt-2 px-1">
               {t('autoGenerate')}

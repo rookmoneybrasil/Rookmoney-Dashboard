@@ -136,6 +136,21 @@ export default async function PersonPage({ params }: Props) {
     )
     if (match) recurringEntryMap.set(r.id, match)
   }
+
+  // For the recurring CARD: this month's generated entry per template (active OR
+  // paused), settled or not. Powers the Pay button / "Pago" state on the card,
+  // and lets us hide that same entry from the Pendentes list — it's now surfaced
+  // through the card, not as a separate pending row. Past-month unpaid entries
+  // (not this-month) stay in Pendentes as overdue "avulsas".
+  const monthEntryByRecurringId = new Map<string, typeof allEntries[number]>()
+  for (const r of recurring) {
+    const match = allEntries.find(e =>
+      e.recurringEntryId === r.id &&
+      new Date(e.date) >= monthStart && new Date(e.date) <= monthEnd
+    )
+    if (match) monthEntryByRecurringId.set(r.id, match)
+  }
+  const monthRecurringEntryIds = new Set(Array.from(monthEntryByRecurringId.values()).map(e => e.id))
   const today        = new Date()
   const cutoff       = new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
 
@@ -149,8 +164,21 @@ export default async function PersonPage({ params }: Props) {
   let theyOweTotal = 0
   let iOweTotal    = 0
 
+  // This month's recurring entry of a PAUSED template must NOT count (pausing
+  // stops the current month). Past-month overdue entries still count even if the
+  // template is now paused (those are independent "atrasos"). Active templates'
+  // current entries DO count (rule 6).
+  const activeRecurringIds = new Set(activeRecurring.map(r => r.id))
+  const pausedMonthEntryIds = new Set(
+    recurring
+      .filter(r => !activeRecurringIds.has(r.id))
+      .map(r => monthEntryByRecurringId.get(r.id)?.id)
+      .filter((id): id is string => Boolean(id))
+  )
+
   const balMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
   for (const e of openEntries) {
+    if (pausedMonthEntryIds.has(e.id)) continue
     const isOldRecurring = (e.installmentTotal ?? 0) >= 24
     if (isOldRecurring && new Date(e.date) > cutoff) continue
 
@@ -262,7 +290,9 @@ export default async function PersonPage({ params }: Props) {
 
   // For display: group ALL entries (open + settled) by installmentGroupId so we render each
   // group once. A group is "pending" if any entry is unsettled; "settled" if all settled.
-  const { singles: singleOpen }    = groupEntries(openEntries)
+  const { singles: singleOpenAll } = groupEntries(openEntries)
+  // Hide this month's recurring-generated entry — surfaced on the card now.
+  const singleOpen = singleOpenAll.filter(e => !monthRecurringEntryIds.has(e.id))
   // Settled singles only (groups with all settled appear in their own grouped section)
   const { singles: singleSettled } = groupEntries(settledEntries)
 
@@ -474,7 +504,7 @@ export default async function PersonPage({ params }: Props) {
             </h2>
           </div>
           <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
-            🔁 <strong className="text-slate-300">Recorrentes</strong> geram automaticamente um lançamento pendente no dia configurado, todo mês — acerte pelo bloco <strong className="text-slate-300">Pendentes</strong> ao lado.
+            🔁 <strong className="text-slate-300">Recorrentes</strong> se pagam no próprio cartão, todo mês. Ao pagar, trava até o dia 1 do mês que vem. Meses não pagos acumulam em <strong className="text-slate-300">Pendentes</strong>.
           </div>
           {recurring.length === 0 ? (
             <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
@@ -482,9 +512,17 @@ export default async function PersonPage({ params }: Props) {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {recurring.map(item => (
-                <RecurringEntryCard key={item.id} item={item} categories={categories} />
-              ))}
+              {recurring.map(item => {
+                const me = monthEntryByRecurringId.get(item.id)
+                return (
+                  <RecurringEntryCard
+                    key={item.id}
+                    item={item}
+                    categories={categories}
+                    monthRow={me ? { id: me.id, paid: me.isSettled } : undefined}
+                  />
+                )
+              })}
             </div>
           )}
         </div>

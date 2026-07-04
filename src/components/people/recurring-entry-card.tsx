@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { RefreshCw, X, AlertTriangle, ToggleLeft, ToggleRight } from 'lucide-react'
+import { RefreshCw, X, AlertTriangle, ToggleLeft, ToggleRight, Check, CalendarClock } from 'lucide-react'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { formatCurrency } from '@/lib/utils'
 import { EditRecurringModal } from './edit-recurring-modal'
@@ -12,20 +12,48 @@ interface Category { id: string; name: string; icon: string; color: string }
 interface Props {
   item:        PersonEntryRecurringItem
   categories?: Category[]
+  // This month's generated entry for this template (if any) — powers the Pay
+  // button / "Pago" state. Undefined when nothing is generated yet (future
+  // startMonth → "Agendado", or the current month before the generator ran).
+  monthRow?:   { id: string; paid: boolean }
 }
 
-// Standardized to match RecurringBillRow (Contas Fixas): the template only
-// toggles active/paused, edits, or deletes — it does NOT have a "Pago"
-// action. The month's actual generated entry (with its own pay button)
-// already appears in the regular entries list further down the page, so a
-// pay button here would just be a redundant second way to do the same thing.
-export function RecurringEntryCard({ item, categories = [] }: Props) {
+const monthLabel = (ym: string) => {
+  const [y, m] = ym.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+}
+
+// The recurring template is now the single payable card: it carries the Pay
+// button (acting on this month's generated entry) + the active/paused toggle,
+// so there's no separate "Pendente" card for the current month.
+export function RecurringEntryCard({ item, categories = [], monthRow }: Props) {
   const router = useRouter()
   const [confirming, setConfirming] = useState(false)
   const [stopping,   setStopping]   = useState(false)
   const [toggling,   setToggling]   = useState(false)
+  const [paying,     setPaying]     = useState(false)
 
   const isTheyOwe = item.type === 'THEY_OWE_ME'
+  const payLabel  = isTheyOwe ? 'Receber' : 'Pagar'
+
+  const now         = new Date()
+  const curMonth    = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  const scheduled   = !!item.startMonth && curMonth < item.startMonth
+  const paid        = monthRow?.paid ?? false
+
+  async function handlePay() {
+    if (!monthRow || paying) return
+    setPaying(true)
+    try {
+      if (paid) await clientApi.unsettleEntry(monthRow.id)  // undo: card volta a "a pagar", transação some
+      else      await clientApi.settleEntry(monthRow.id)
+      router.refresh()
+    } catch {
+      alert('Não foi possível atualizar o pagamento. Tente novamente.')
+    } finally {
+      setPaying(false)
+    }
+  }
 
   async function handleToggle() {
     setToggling(true)
@@ -68,6 +96,14 @@ export function RecurringEntryCard({ item, categories = [] }: Props) {
           {!item.isActive && (
             <span className="text-[10px] bg-ink-700 text-slate-600 border border-ink-600 px-1.5 py-0.5 rounded-full font-medium shrink-0">Pausada</span>
           )}
+          {item.isActive && scheduled && (
+            <span className="text-[10px] bg-ink-700 text-slate-400 border border-ink-600 px-1.5 py-0.5 rounded-full font-medium shrink-0 flex items-center gap-0.5">
+              <CalendarClock className="size-2.5" /> {monthLabel(item.startMonth!)}
+            </span>
+          )}
+          {item.isActive && !scheduled && paid && (
+            <span className="text-[10px] bg-success/15 text-success border border-success/30 px-1.5 py-0.5 rounded-full font-medium shrink-0">Pago este mês</span>
+          )}
         </div>
         <p className="text-xs text-slate-500 mt-0.5">
           <span className={isTheyOwe ? 'text-success' : 'text-danger'}>
@@ -79,6 +115,30 @@ export function RecurringEntryCard({ item, categories = [] }: Props) {
       </div>
 
       <div className="flex items-center gap-1 shrink-0">
+        {/* Pay / paid state — only for active, already-started templates */}
+        {!confirming && item.isActive && !scheduled && monthRow && (
+          paid ? (
+            <button
+              type="button"
+              onClick={handlePay}
+              disabled={paying}
+              title="Desfazer pagamento deste mês"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-success hover:bg-success/10 transition-colors disabled:opacity-50"
+            >
+              <Check className="size-3.5" /> Pago
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handlePay}
+              disabled={paying}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-success/15 text-success border border-success/30 hover:bg-success/25 transition-colors disabled:opacity-50"
+            >
+              <Check className="size-3.5" /> {paying ? '...' : payLabel}
+            </button>
+          )
+        )}
+
         {!confirming && (
           <button
             type="button"

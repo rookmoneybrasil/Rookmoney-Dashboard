@@ -56,8 +56,34 @@ export default async function BillsPage() {
     .sort((a, b) => b.grandTotal - a.grandTotal)
 
   const now = new Date()
+  const inCurMonth = (d: string | Date) => {
+    const x = new Date(d)
+    return x.getFullYear() === now.getFullYear() && x.getMonth() === now.getMonth()
+  }
+  const activeRecurringIds = new Set(recurringBills.filter(r => r.isActive).map(r => r.id))
 
-  const pending = regular.filter((b) => !b.isPaid)
+  // This month's generated Bill per recurring template — powers the Pay button /
+  // paid state on the recurring card, and is hidden from the Pendentes list (it's
+  // surfaced through the card now). Past-month unpaid recurring bills stay in
+  // Pendentes as overdue "avulsas".
+  const recurringBillMap = new Map<string, typeof bills[number]>()
+  for (const b of regular) {
+    if (b.recurringBillId && inCurMonth(b.dueDate)) recurringBillMap.set(b.recurringBillId, b)
+  }
+  const curMonthRecurringBillIds = new Set(Array.from(recurringBillMap.values()).map(b => b.id))
+  // A PAUSED template's current-month bill must NOT count (pausing stops the
+  // current month) — exclude it from totals too. Active templates' current bills
+  // still count (rule 6), just render on the card instead of in the list.
+  const pausedCurMonthBillIds = new Set(
+    Array.from(recurringBillMap.entries())
+      .filter(([rid]) => !activeRecurringIds.has(rid))
+      .map(([, b]) => b.id)
+  )
+
+  const pending = regular.filter((b) => !b.isPaid && !pausedCurMonthBillIds.has(b.id))
+  // List-only view: also drop the current month's recurring bill of ACTIVE
+  // templates (shown on the card).
+  const pendingVisible = pending.filter((b) => !curMonthRecurringBillIds.has(b.id))
   // Current month paid bills (for "Pagas este mês" card)
   const paid = regular.filter((b) => {
     if (!b.isPaid) return false
@@ -120,6 +146,9 @@ export default async function BillsPage() {
       const dd = new Date(dateStr)
       return dd.getFullYear() === yr && dd.getMonth() === mo
     }
+    const monthKey = `${yr}-${String(mo + 1).padStart(2, '0')}`
+    // Only templates that have started by this projected month (respect startMonth).
+    const startedActive = activeRecurring.filter(r => !r.startMonth || monthKey >= r.startMonth)
 
     const avulsoAmount = pending
       .filter(b => !b.recurringBillId && !b.installmentGroupId && inMonth(b.dueDate))
@@ -136,7 +165,7 @@ export default async function BillsPage() {
         .filter(b => !!b.recurringBillId && inMonth(b.dueDate))
         .reduce((s, b) => s + Number(b.amount), 0)
     } else {
-      fixedAmount = monthlyFixed
+      fixedAmount = startedActive.reduce((s, r) => s + Number(r.amount), 0)
     }
 
     // Bills para o popup — avulsos + fixas geradas já em pending para este mês
@@ -190,7 +219,7 @@ export default async function BillsPage() {
           }))),
       // Meses futuros: adicionar fixas como templates se não estiverem em pending
       ...(i > 0
-        ? activeRecurring
+        ? startedActive
             .filter(r => !pending.some(b => b.recurringBillId === r.id && inMonth(b.dueDate)))
             .map(r => ({
               id:            r.id,
@@ -229,7 +258,7 @@ export default async function BillsPage() {
           </p>
           <h1 className="text-xl font-semibold text-slate-100">Contas a pagar</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            {pending.length + activeGroups.length} pendente{pending.length + activeGroups.length !== 1 ? 's' : ''} ·{' '}
+            {pendingVisible.length + activeGroups.length} pendente{pendingVisible.length + activeGroups.length !== 1 ? 's' : ''} ·{' '}
             {paid.length} paga{paid.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -329,7 +358,7 @@ export default async function BillsPage() {
               </h2>
             </div>
             <div className="bg-brand-900/20 border border-brand-700/30 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
-              🔁 <strong className="text-slate-300">Fixas</strong> se repetem todo mês no dia configurado — cadastre uma vez e aparecem automaticamente.
+              🔁 <strong className="text-slate-300">Fixas</strong> se pagam no próprio cartão, todo mês. Ao pagar, trava até o dia 1 do mês que vem. Meses não pagos acumulam em <strong className="text-slate-300">Pendentes</strong>.
             </div>
             {recurringBills.length === 0 ? (
               <div className="flex flex-col items-center gap-1 py-8 text-center bg-ink-800/50 rounded-xl border border-ink-700 border-dashed">
@@ -337,9 +366,10 @@ export default async function BillsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                {activeRecurring.map((r) => (
-                  <RecurringBillRow key={r.id} bill={r} categories={categories} />
-                ))}
+                {activeRecurring.map((r) => {
+                  const mb = recurringBillMap.get(r.id)
+                  return <RecurringBillRow key={r.id} bill={r} categories={categories} monthRow={mb ? { id: mb.id, paid: mb.isPaid } : undefined} />
+                })}
                 {pausedRecurring.map((r) => (
                   <RecurringBillRow key={r.id} bill={r} categories={categories} />
                 ))}
@@ -359,9 +389,9 @@ export default async function BillsPage() {
               </h2>
             </div>
             <div className="bg-ink-800 border border-ink-600 rounded-xl px-3 py-2.5 text-[11px] text-slate-400 leading-relaxed">
-              💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e as parcelas geradas pelas contas fixas — marque como pago quando quitar.
+              💸 <strong className="text-slate-300">Pendentes</strong> são boletos avulsos e meses de contas fixas que ficaram atrasados — marque como pago quando quitar.
             </div>
-            <PendingBillsList bills={pending} categories={categories} />
+            <PendingBillsList bills={pendingVisible} categories={categories} />
           </div>
 
           </div>
