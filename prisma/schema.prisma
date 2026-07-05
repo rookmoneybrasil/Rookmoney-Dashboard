@@ -462,6 +462,21 @@ model ChatUsageLog {
   @@index([createdAt])
 }
 
+// ─── CronRun ──────────────────────────────────────────────────────────────────
+
+model CronRun {
+  id         String    @id @default(cuid())
+  name       String    // 'daily' | 'blog-generate'
+  status     String    // 'success' | 'error'
+  startedAt  DateTime
+  finishedAt DateTime?
+  durationMs Int?
+  error      String?
+  meta       Json?
+
+  @@index([name, startedAt])
+}
+
 // ─── BlogPost ─────────────────────────────────────────────────────────────────
 
 model BlogPost {
