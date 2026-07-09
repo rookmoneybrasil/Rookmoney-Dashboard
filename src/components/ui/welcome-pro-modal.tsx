@@ -39,6 +39,11 @@ export function WelcomeProModal() {
       setOpen(true)
       playProUpgrade()
       window.fbq?.('track', 'Subscribe', { value: plan === 'PRO_PLUS' ? 34.90 : 19.90, currency: 'BRL' })
+      // Evita colisão: quem acabou de assinar cai no /dashboard, mas o server pode
+      // ter renderizado como FREE (webhook ainda não processou) e montado o
+      // UpsellModal (timer 8s). Marcar o flag impede o "Assine o PRO" logo após o
+      // "Bem-vindo ao PRO!". (Mesma STORAGE_KEY do upsell-modal.tsx.)
+      try { sessionStorage.setItem('rook_upsell_shown', '1') } catch {}
       router.replace('/dashboard', { scroll: false })
     }
   }, [params, router])

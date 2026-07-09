@@ -28,7 +28,14 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default async function DashboardPage() {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export default async function DashboardPage({ searchParams }: { searchParams: SearchParams }) {
+  const sp = await searchParams
+  // Quem acabou de assinar cai aqui (?upgraded=1) e vê o WelcomeProModal — não
+  // pode ver o UpsellModal junto, mesmo que o webhook ainda não tenha marcado
+  // isPro no server (senão dá "Bem-vindo ao PRO!" seguido de "Assine o PRO").
+  const justUpgraded = sp?.upgraded === '1'
   const now = new Date()
   const currentMonth = format(now, 'yyyy-MM')
   const [data, budgets, me] = await Promise.all([
@@ -88,7 +95,7 @@ export default async function DashboardPage() {
       {/* PRO welcome modal — fires when ?upgraded=1 is in URL */}
       <Suspense><WelcomeProModal /></Suspense>
       {/* Upsell modal — shown to free users after 8s, once per day */}
-      {!isPro && <UpsellModal />}
+      {!isPro && !justUpgraded && <UpsellModal />}
 
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <DashboardGreeting firstName={firstName} mood={mood} moodLabel={moodLabel[mood] ?? ''} />
