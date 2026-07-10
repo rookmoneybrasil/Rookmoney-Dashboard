@@ -52,8 +52,8 @@ export default async function BillsPage() {
     const paidInApp = items.filter((b) => b.isPaid).length
     const paidCount = alreadyPaid + paidInApp
     const nextDue   = sorted.find((b) => !b.isPaid) ?? sorted[sorted.length - 1]
-    const grandTotal = total * items[0].amount
-    return { items: sorted, paidCount, total, nextDue, name: items[0].name, amount: items[0].amount, groupId: items[0].installmentGroupId!, totalPaid: paidCount * items[0].amount, grandTotal }
+    const grandTotal = total * first.amount
+    return { items: sorted, paidCount, total, nextDue, name: first.name, amount: first.amount, groupId: first.installmentGroupId!, totalPaid: paidCount * first.amount, grandTotal }
   })
 
   const activeGroups    = allGroups.filter((g) => g.paidCount < g.total)
