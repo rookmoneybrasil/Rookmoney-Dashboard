@@ -155,7 +155,7 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <IncomeSourceModal source={source} categories={categories} disabled={!!received} />
+                    <IncomeSourceModal source={source} categories={categories} />
                     <DeleteInline id={source.id} busy={busy} onDelete={deleteSource} />
                   </div>
                 </div>
