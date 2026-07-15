@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
     ],
   },
 
@@ -38,7 +39,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net https://pagead2.googlesyndication.com https://www.googletagservices.com https://adservice.google.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com https://www.facebook.com https://pagead2.googlesyndication.com https://images.unsplash.com",
+              "img-src 'self' data: blob: https://*.googleusercontent.com https://lh3.googleusercontent.com https://www.facebook.com https://pagead2.googlesyndication.com https://images.unsplash.com https://*.public.blob.vercel-storage.com",
               "font-src 'self'",
               "connect-src 'self' https://rookmoney-api-production.up.railway.app https://api.stripe.com https://api.pluggy.ai https://www.facebook.com https://connect.facebook.net https://pagead2.googlesyndication.com",
               "frame-src https://*.pluggy.ai https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
