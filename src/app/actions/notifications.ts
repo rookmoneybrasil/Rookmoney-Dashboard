@@ -20,6 +20,16 @@ function hashId(...parts: string[]): string {
   return parts.join('-').replace(/[^a-z0-9-]/gi, '_')
 }
 
+// PushLog.screen is shared with mobile (Expo Router), which uses route-group
+// syntax like "/(tabs)" that isn't a real web route — strip any leading
+// slashes before re-adding one, and map the mobile home tab to /dashboard.
+function webHrefFromScreen(screen: string | null): string {
+  if (!screen) return '/'
+  const clean = screen.replace(/^\/+/, '')
+  if (clean === '(tabs)') return '/dashboard'
+  return `/${clean}`
+}
+
 export async function markNotificationsRead(): Promise<void> {
   const session = await getSession()
   if (!session) redirect('/login')
@@ -212,7 +222,7 @@ export async function getNotifications(): Promise<{ notifications: AppNotificati
       type:    'rookinho',
       title:   log.title,
       message: log.body,
-      href:    log.screen ? `/${log.screen}` : '/',
+      href:    webHrefFromScreen(log.screen),
       urgency: 'low',
       isNew:   !readAt || new Date(log.createdAt) > readAt,
     })
