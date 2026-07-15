@@ -26,7 +26,8 @@ function hashId(...parts: string[]): string {
 function webHrefFromScreen(screen: string | null): string {
   if (!screen) return '/'
   const clean = screen.replace(/^\/+/, '')
-  if (clean === '(tabs)') return '/dashboard'
+  if (clean === '(tabs)')  return '/dashboard'
+  if (clean === 'ai-chat') return '/chat'
   return `/${clean}`
 }
 
