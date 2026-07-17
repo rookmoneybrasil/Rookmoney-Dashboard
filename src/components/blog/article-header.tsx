@@ -21,7 +21,9 @@ export function ArticleHeader({ post }: { post: PostFrontmatter }) {
       </div>
 
       <div className="flex items-center gap-4 text-sm text-slate-400">
-        <span className="flex items-center gap-1.5"><User className="size-3.5" />{post.author}</span>
+        <Link href="/blog/sobre" className="flex items-center gap-1.5 hover:text-slate-600 transition-colors">
+          <User className="size-3.5" />{post.author}
+        </Link>
         <span className="flex items-center gap-1.5"><Calendar className="size-3.5" />{dateStr}</span>
         <span className="flex items-center gap-1.5"><Clock className="size-3.5" />{post.readingTime}</span>
       </div>
