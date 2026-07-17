@@ -8,8 +8,7 @@ import { ArticleCTA } from '@/components/blog/article-cta'
 import { ShareButtons } from '@/components/blog/share-buttons'
 import { AdSenseUnit } from '@/components/blog/adsense-unit'
 import { NewsletterBanner } from '@/components/blog/newsletter-banner'
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
+import { APP_URL } from '@/lib/app-url'
 
 export async function generateMetadata({
   params,

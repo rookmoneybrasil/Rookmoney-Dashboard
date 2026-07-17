@@ -1,3 +1,5 @@
+import { APP_URL } from '@/lib/app-url'
+
 export async function sendPasswordResetEmail(
   to:       string,
   name:     string,
@@ -8,7 +10,7 @@ export async function sendPasswordResetEmail(
   const firstName = name.split(' ')[0]
   const from      = process.env.FROM_EMAIL ?? 'Rook Money <noreply@rook.money>'
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
+  const appUrl = APP_URL
   const mascotUrl = `${appUrl}/rookinho.png`
 
   const html = `<!DOCTYPE html>
@@ -105,7 +107,7 @@ export async function sendBillReminders(
   const count     = bills.length
   const subject   = `Lembrete: ${count} conta${count > 1 ? 's' : ''} vence${count === 1 ? '' : 'm'} em 2 dias`
   const from      = process.env.FROM_EMAIL ?? 'Rook Money <noreply@rook.money>'
-  const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const appUrl    = APP_URL
 
   const rows = bills
     .map(
@@ -170,7 +172,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
 
   const firstName = name.split(' ')[0]
   const from      = process.env.FROM_EMAIL ?? 'Rook Money <noreply@rookmoney.com>'
-  const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
+  const appUrl    = APP_URL
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">

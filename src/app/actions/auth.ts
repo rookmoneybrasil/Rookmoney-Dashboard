@@ -7,6 +7,7 @@ import { db } from '@/lib/db'
 import { createSession, deleteSession } from '@/lib/auth'
 import { LoginSchema, RegisterSchema } from '@/lib/validations/auth'
 import { sendPasswordResetEmail, sendWelcomeEmail } from '@/lib/email'
+import { APP_URL } from '@/lib/app-url'
 import type { AuthFormState } from '@/types'
 
 export async function login(state: AuthFormState | undefined, formData: FormData): Promise<AuthFormState> {
@@ -111,7 +112,7 @@ export async function requestPasswordReset(
     })
 
     // Send the RAW token in the email link
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${rawToken}`
+    const resetUrl = `${APP_URL}/reset-password?token=${rawToken}`
     await sendPasswordResetEmail(user.email, user.name, resetUrl)
   }
 

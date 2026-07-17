@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import Script from 'next/script'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
+import { APP_URL } from '@/lib/app-url'
 import './globals.css'
 
 const poppins = Poppins({
@@ -13,8 +14,6 @@ const poppins = Poppins({
   variable: '--font-poppins',
   display: 'swap',
 })
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://rookmoney.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
