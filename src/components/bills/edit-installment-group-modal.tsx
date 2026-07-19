@@ -23,20 +23,24 @@ interface Props {
   total: number
   paidCount: number
   categories: Category[]
+  firstDueDate?: string  // "YYYY-MM-DD" da próxima parcela pendente (pré-preenche o campo de data)
 }
 
-export function EditInstallmentGroupModal({ groupId, name, amount, categoryId, notes, total, paidCount, categories }: Props) {
+export function EditInstallmentGroupModal({ groupId, name, amount, categoryId, notes, total, paidCount, categories, firstDueDate }: Props) {
   const [open, setOpen]      = useState(false)
   const [catId, setCatId]    = useState(categoryId ?? '')
   const remaining = total - paidCount
+  const origDueDate = firstDueDate ?? ''
 
   const { mutate, pending, error } = useMutation(
-    (data: { name: string; amount: string; categoryId: string; notes: string }) =>
+    (data: { name: string; amount: string; categoryId: string; notes: string; dueDate: string }) =>
       clientApi.updateBillGroup(groupId, {
         name: data.name,
         amount: parseFloat(data.amount),
         categoryId: data.categoryId || undefined,
         notes: data.notes || undefined,
+        // Só re-ancora as datas se o usuário mudou o campo.
+        ...(data.dueDate && data.dueDate !== origDueDate ? { firstDueDate: data.dueDate } : {}),
       }),
     { onSuccess: () => setOpen(false) },
   )
@@ -49,6 +53,7 @@ export function EditInstallmentGroupModal({ groupId, name, amount, categoryId, n
       amount: fd.get('amount') as string,
       categoryId: catId,
       notes: fd.get('notes') as string,
+      dueDate: fd.get('dueDate') as string,
     })
   }
 
@@ -69,7 +74,7 @@ export function EditInstallmentGroupModal({ groupId, name, amount, categoryId, n
           )}
 
           <div className="bg-brand-900/20 border border-brand-700/30 rounded-lg px-3 py-2 text-xs text-slate-400">
-            As alterações de valor e categoria serão aplicadas nas <strong className="text-slate-200">{remaining} parcelas pendentes</strong>.
+            As alterações de valor, categoria e vencimentos serão aplicadas nas <strong className="text-slate-200">{remaining} parcelas pendentes</strong>.
             {paidCount > 0 && <> As {paidCount} já pagas mantêm o valor original.</>}
           </div>
 
@@ -86,6 +91,13 @@ export function EditInstallmentGroupModal({ groupId, name, amount, categoryId, n
               <span className="text-xs text-slate-500">{paidCount} paga{paidCount !== 1 ? 's' : ''} · {remaining} pendente{remaining !== 1 ? 's' : ''}</span>
             </div>
           </div>
+
+          {remaining > 0 && (
+            <FormField label={`Vencimento da ${paidCount > 0 ? 'próxima parcela' : '1ª parcela'}`} htmlFor="dueDate">
+              <Input id="dueDate" name="dueDate" type="date" defaultValue={origDueDate} />
+              <p className="text-xs text-slate-600 mt-1">As parcelas seguintes seguem de mês em mês a partir dessa data.</p>
+            </FormField>
+          )}
 
           <FormField label="Categoria" htmlFor="categoryId">
             <CategorySelect categories={categories} value={catId} onChange={setCatId} placeholder="Opcional" />

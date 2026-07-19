@@ -277,7 +277,7 @@ export const clientApi = {
     clientFetch<void>(`/bills/recurring/${id}${deleteHistory ? '?deleteHistory=true' : ''}`, { method: 'DELETE' }),
 
   // Bill groups
-  updateBillGroup:        (groupId: string, data: { name?: string; amount?: number; categoryId?: string; notes?: string }) =>
+  updateBillGroup:        (groupId: string, data: { name?: string; amount?: number; categoryId?: string; notes?: string; firstDueDate?: string }) =>
     clientFetch<{ updated: number }>(`/bills/group/${groupId}`, { method: 'PATCH', body: JSON.stringify(data) }),
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),

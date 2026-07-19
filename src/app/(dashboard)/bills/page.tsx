@@ -480,6 +480,7 @@ export default async function BillsPage() {
                             total={group.total}
                             paidCount={group.paidCount}
                             categories={categories}
+                            firstDueDate={group.items.filter(it => !it.isPaid).map(it => it.dueDate).sort()[0]?.slice(0, 10)}
                           />
                           <DeleteBillGroupButton groupId={group.groupId} />
                         </div>
