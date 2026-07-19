@@ -12,6 +12,7 @@ import { formatCurrency, formatDate, calculateProgress } from '@/lib/utils'
 import { clientApi, type Goal, type Category } from '@/lib/api-client'
 import { EditGoalModal } from './edit-goal-modal'
 import { ContributeButton } from './contribute-button'
+import { InfoModal } from '@/components/ui/info-modal'
 
 interface Props {
   goals: Goal[]
@@ -138,6 +139,21 @@ export function GoalsList({ goals, categories }: Props) {
                 ) : <span />}
 
                 <div className="flex items-center gap-2">
+                  <InfoModal
+                    typeLabel="Meta"
+                    title={goal.name}
+                    amount={formatCurrency(current)}
+                    amountClass="text-brand-400"
+                    badge={goal.isCompleted ? { label: 'Concluída', variant: 'success' } : { label: `${pct}%`, variant: 'default' }}
+                    rows={[
+                      { label: 'Guardado',  value: formatCurrency(current) },
+                      { label: 'Meta',      value: formatCurrency(target) },
+                      { label: 'Progresso', value: `${pct}%` },
+                      { label: 'Falta',     value: formatCurrency(remaining) },
+                      { label: 'Prazo',     value: goal.deadline ? formatDate(goal.deadline, 'MMM yyyy') : '' },
+                      { label: 'Descrição', value: goal.description ?? '' },
+                    ]}
+                  />
                   <ContributeButton goalId={goal.id} goalName={goal.name} remaining={remaining} current={current} categories={categories} />
                   <EditGoalModal goal={{ id: goal.id, name: goal.name, targetAmount: Number(goal.targetAmount), currentAmount: Number(goal.currentAmount), deadline: goal.deadline, description: goal.description, icon: goal.icon, color: goal.color }} />
                   <DeleteGoalInline id={goal.id} onDelete={deleteGoal} busy={busy} />
