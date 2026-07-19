@@ -105,7 +105,22 @@ export function GoalsList({ goals, categories }: Props) {
           return (
             <Card key={goal.id} className={`flex flex-col gap-4 group transition-opacity ${busy ? 'opacity-50 pointer-events-none' : ''}`}>
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
+                <InfoModal
+                  className="flex items-center gap-3 min-w-0"
+                  typeLabel="Meta"
+                  title={goal.name}
+                  amount={formatCurrency(current)}
+                  amountClass="text-brand-400"
+                  badge={goal.isCompleted ? { label: 'Concluída', variant: 'success' } : { label: `${pct}%`, variant: 'default' }}
+                  rows={[
+                    { label: 'Guardado',  value: formatCurrency(current) },
+                    { label: 'Meta',      value: formatCurrency(target) },
+                    { label: 'Progresso', value: `${pct}%` },
+                    { label: 'Falta',     value: formatCurrency(remaining) },
+                    { label: 'Prazo',     value: goal.deadline ? formatDate(goal.deadline, 'MMM yyyy') : '' },
+                    { label: 'Descrição', value: goal.description ?? '' },
+                  ]}
+                >
                   <div
                     className="size-10 rounded-xl flex items-center justify-center text-xl shrink-0"
                     style={{ backgroundColor: (goal.color ?? '#3B82F6') + '20' }}
@@ -116,7 +131,7 @@ export function GoalsList({ goals, categories }: Props) {
                     <p className="text-sm font-semibold text-slate-200 leading-tight truncate">{goal.name}</p>
                     {goal.description && <p className="text-xs text-slate-600 mt-0.5 truncate">{goal.description}</p>}
                   </div>
-                </div>
+                </InfoModal>
                 <CircularProgress value={current} max={target} size={44} strokeWidth={4} variant="brand">
                   <span className="text-[10px] font-bold text-slate-300">{pct}%</span>
                 </CircularProgress>
@@ -139,21 +154,6 @@ export function GoalsList({ goals, categories }: Props) {
                 ) : <span />}
 
                 <div className="flex items-center gap-2">
-                  <InfoModal
-                    typeLabel="Meta"
-                    title={goal.name}
-                    amount={formatCurrency(current)}
-                    amountClass="text-brand-400"
-                    badge={goal.isCompleted ? { label: 'Concluída', variant: 'success' } : { label: `${pct}%`, variant: 'default' }}
-                    rows={[
-                      { label: 'Guardado',  value: formatCurrency(current) },
-                      { label: 'Meta',      value: formatCurrency(target) },
-                      { label: 'Progresso', value: `${pct}%` },
-                      { label: 'Falta',     value: formatCurrency(remaining) },
-                      { label: 'Prazo',     value: goal.deadline ? formatDate(goal.deadline, 'MMM yyyy') : '' },
-                      { label: 'Descrição', value: goal.description ?? '' },
-                    ]}
-                  />
                   <ContributeButton goalId={goal.id} goalName={goal.name} remaining={remaining} current={current} categories={categories} />
                   <EditGoalModal goal={{ id: goal.id, name: goal.name, targetAmount: Number(goal.targetAmount), currentAmount: Number(goal.currentAmount), deadline: goal.deadline, description: goal.description, icon: goal.icon, color: goal.color }} />
                   <DeleteGoalInline id={goal.id} onDelete={deleteGoal} busy={busy} />

@@ -116,7 +116,21 @@ export function PendingBillsList({ bills, categories }: Props) {
                 : <Icon className={`size-3.5 ${status === 'overdue' ? 'text-danger' : status === 'urgent' ? 'text-warning' : 'text-slate-500'}`} />
               }
             </div>
-            <div className="flex-1 min-w-0">
+            <InfoModal
+              className="flex-1 min-w-0"
+              typeLabel={bill.recurringBillId ? 'Conta fixa (mês)' : bill.installmentTotal && bill.installmentTotal > 1 ? 'Parcela' : 'Conta avulsa'}
+              title={bill.name}
+              amount={`-${formatCurrency(bill.amount)}`}
+              amountClass="text-danger"
+              badge={{ label: cfg.label, variant: cfg.variant }}
+              rows={[
+                { label: 'Vencimento',  value: formatDate(bill.dueDate) },
+                { label: 'Categoria',   value: bill.category?.name ? `${bill.category.icon ?? ''} ${bill.category.name}`.trim() : 'Sem categoria' },
+                { label: 'Parcela',     value: bill.installmentTotal && bill.installmentTotal > 1 ? `${bill.installmentCurrent}/${bill.installmentTotal}` : '' },
+                { label: 'Recorrente',  value: bill.isRecurring ? 'Sim' : '' },
+                { label: 'Observações', value: bill.notes ?? '' },
+              ]}
+            >
               <div className="flex items-center gap-1.5 flex-wrap">
                 <p className="text-sm font-medium text-slate-200 truncate">{bill.name}</p>
                 {bill.recurringBillId && <span className="text-[10px] text-brand-500">↻ fixa</span>}
@@ -125,23 +139,9 @@ export function PendingBillsList({ bills, categories }: Props) {
               <p className="text-xs text-slate-500 mt-0.5">
                 {bill.category?.name ?? 'Sem categoria'} · vence {formatDate(bill.dueDate)}
               </p>
-            </div>
+            </InfoModal>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
-              <InfoModal
-                typeLabel={bill.recurringBillId ? 'Conta fixa (mês)' : bill.installmentTotal && bill.installmentTotal > 1 ? 'Parcela' : 'Conta avulsa'}
-                title={bill.name}
-                amount={`-${formatCurrency(bill.amount)}`}
-                amountClass="text-danger"
-                badge={{ label: cfg.label, variant: cfg.variant }}
-                rows={[
-                  { label: 'Vencimento',  value: formatDate(bill.dueDate) },
-                  { label: 'Categoria',   value: bill.category?.name ? `${bill.category.icon ?? ''} ${bill.category.name}`.trim() : 'Sem categoria' },
-                  { label: 'Parcela',     value: bill.installmentTotal && bill.installmentTotal > 1 ? `${bill.installmentCurrent}/${bill.installmentTotal}` : '' },
-                  { label: 'Recorrente',  value: bill.isRecurring ? 'Sim' : '' },
-                  { label: 'Observações', value: bill.notes ?? '' },
-                ]}
-              />
               <button
                 onClick={() => markPaid(bill.id)}
                 disabled={busy}

@@ -73,17 +73,16 @@ function SettledEntryRow({ entry, personId, categories }: { entry: PersonEntryRo
       <div className="size-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
         <Check className="size-4 text-success" />
       </div>
-      <div className="flex-1 min-w-0">
+      <InfoModal className="flex-1 min-w-0" {...personEntryInfo(entry, true)}>
         <p className="text-sm text-slate-400 truncate">{entry.description}</p>
         <p className="text-xs text-slate-600">
           {entry.category?.name ?? 'Sem categoria'} · {formatDate(entry.settledAt ?? entry.createdAt)}
           {entry.recurringEntryId && <span className="ml-1 text-brand-600">↻ recorrente</span>}
         </p>
-      </div>
+      </InfoModal>
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(entry.amount)}</span>
         <Badge variant="success" size="sm">Pago</Badge>
-        <InfoModal {...personEntryInfo(entry, true)} />
         <EditEntryModal entry={entry} categories={categories} />
         <EntryActions entryId={entry.id} personId={personId} isSettled={true} />
       </div>

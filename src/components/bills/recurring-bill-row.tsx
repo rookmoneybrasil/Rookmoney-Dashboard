@@ -68,8 +68,21 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
         <RefreshCw className={`size-3.5 ${bill.isActive ? 'text-brand-400' : 'text-slate-500'}`} />
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
+      {/* Info (clique para detalhes) */}
+      <InfoModal
+        className="flex-1 min-w-0"
+        typeLabel="Conta fixa"
+        title={bill.name}
+        amount={`-${formatCurrency(bill.amount)}/mês`}
+        amountClass="text-danger"
+        badge={!bill.isActive ? { label: 'Pausada', variant: 'default' } : scheduled ? { label: 'Agendada', variant: 'default' } : paid ? { label: 'Paga este mês', variant: 'success' } : { label: 'Ativa', variant: 'default' }}
+        rows={[
+          { label: 'Vencimento',  value: `Todo dia ${bill.dayOfMonth}` },
+          { label: 'Categoria',   value: bill.category ? `${bill.category.icon} ${bill.category.name}` : 'Sem categoria' },
+          { label: '1ª cobrança', value: bill.startMonth ? monthLabel(bill.startMonth) : '' },
+          { label: 'Observações', value: bill.notes ?? '' },
+        ]}
+      >
         <div className="flex items-center gap-2">
           <p className={`text-sm font-medium truncate ${bill.isActive ? 'text-slate-200' : 'text-slate-500'}`}>
             {bill.name}
@@ -91,7 +104,7 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
           {' '}· dia {bill.dayOfMonth}
           {bill.category && ` · ${bill.category.icon} ${bill.category.name}`}
         </p>
-      </div>
+      </InfoModal>
 
       {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
@@ -126,20 +139,6 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
         >
           {bill.isActive ? <ToggleRight className="size-4 text-success" /> : <ToggleLeft className="size-4" />}
         </button>
-
-        <InfoModal
-          typeLabel="Conta fixa"
-          title={bill.name}
-          amount={`-${formatCurrency(bill.amount)}/mês`}
-          amountClass="text-danger"
-          badge={!bill.isActive ? { label: 'Pausada', variant: 'default' } : scheduled ? { label: 'Agendada', variant: 'default' } : paid ? { label: 'Paga este mês', variant: 'success' } : { label: 'Ativa', variant: 'default' }}
-          rows={[
-            { label: 'Vencimento',  value: `Todo dia ${bill.dayOfMonth}` },
-            { label: 'Categoria',   value: bill.category ? `${bill.category.icon} ${bill.category.name}` : 'Sem categoria' },
-            { label: '1ª cobrança', value: bill.startMonth ? monthLabel(bill.startMonth) : '' },
-            { label: 'Observações', value: bill.notes ?? '' },
-          ]}
-        />
 
         <EditRecurringBillModal bill={bill} categories={categories} />
 

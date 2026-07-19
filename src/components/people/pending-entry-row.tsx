@@ -44,7 +44,7 @@ export function PendingEntryRow({ entry, personId, categories }: { entry: Person
           : isTheyOwe ? <TrendingUp className="size-3.5 text-success" /> : <TrendingDown className="size-3.5 text-danger" />
         }
       </div>
-      <div className="flex-1 min-w-0">
+      <InfoModal className="flex-1 min-w-0" {...personEntryInfo(entry, false)}>
         <div className="flex items-center gap-1.5 flex-wrap">
           <p className="text-sm font-medium text-slate-200 truncate">{entry.description}</p>
           {entry.recurringEntryId && <span className="text-[10px] text-brand-500">↻ recorrente</span>}
@@ -53,12 +53,11 @@ export function PendingEntryRow({ entry, personId, categories }: { entry: Person
         <p className="text-xs text-slate-500 mt-0.5">
           {entry.category?.name ?? 'Sem categoria'} · {formatDate(entry.date)}
         </p>
-      </div>
+      </InfoModal>
       <div className="flex items-center gap-2 shrink-0">
         <span className={`text-sm font-semibold tabular-nums ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
           {formatCurrency(entry.amount)}
         </span>
-        <InfoModal {...personEntryInfo(entry, false)} />
         <MarkEntrySettledButton entryId={entry.id} isSettled={false} showLabel />
         {confirming ? (
           <div className="flex items-center gap-1 animate-in fade-in duration-150">

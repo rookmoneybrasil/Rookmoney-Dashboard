@@ -166,7 +166,7 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                   <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 text-base ${received ? 'bg-success/15' : 'bg-success/10'}`}>
                     {cfg.icon}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <InfoModal className="flex-1 min-w-0" {...incomeInfo(source, currentMonth, categories)}>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
                       {isFuture  && <Badge variant="default" size="sm" dot>Começa em {startLabel}</Badge>}
@@ -178,13 +178,10 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                       {source.dayOfMonth && ` · dia ${source.dayOfMonth}`}
                       {received && ` · ${receivedDateLabel(source)}`}
                     </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <InfoModal {...incomeInfo(source, currentMonth, categories)} />
-                    <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      <IncomeSourceModal source={source} categories={categories} />
-                      <DeleteInline id={source.id} busy={busy} onDelete={deleteSource} />
-                    </div>
+                  </InfoModal>
+                  <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <IncomeSourceModal source={source} categories={categories} />
+                    <DeleteInline id={source.id} busy={busy} onDelete={deleteSource} />
                   </div>
                 </div>
               )
@@ -221,7 +218,7 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                   <div className="size-8 rounded-lg flex items-center justify-center shrink-0 text-base bg-warning/10">
                     {cfg.icon}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <InfoModal className="flex-1 min-w-0" {...incomeInfo(source, currentMonth, categories)}>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="text-sm font-medium text-slate-200 truncate">{source.name}</p>
                       <Badge variant={cfg.variant} size="sm">{cfg.label}</Badge>
@@ -230,9 +227,8 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                       <span className="text-success font-medium">+{formatCurrency(source.amount)}</span>
                       {source.notes ? ` · ${source.notes}` : ' · Pontual'}
                     </p>
-                  </div>
+                  </InfoModal>
                   <div className="flex items-center gap-1 shrink-0">
-                    <InfoModal {...incomeInfo(source, currentMonth, categories)} />
                     <RegisterReceiptModal source={source} categories={categories} />
                     <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
                       <IncomeSourceModal source={source} categories={categories} />
