@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 import { clientApi, type BudgetItem, type Category } from '@/lib/api-client'
 import { BudgetModal } from './budget-modal'
+import { InfoModal } from '@/components/ui/info-modal'
 
 interface Props {
   budgets: BudgetItem[]
@@ -65,7 +66,20 @@ export function BudgetList({ budgets, categories, month }: Props) {
                   style={{ backgroundColor: b.category.color + '22', color: b.category.color }}>
                   {b.category.icon}
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                <InfoModal
+                  className="flex-1 min-w-0 flex flex-col gap-1.5"
+                  typeLabel="Orçamento"
+                  title={`${b.category.icon} ${b.category.name}`}
+                  amount={formatCurrency(b.spent)}
+                  amountClass={isOver ? 'text-danger' : 'text-slate-100'}
+                  badge={isOver ? { label: 'Acima do limite', variant: 'danger' } : isWarning ? { label: `Atenção ${pct}%`, variant: 'warning' } : { label: `${pct}%`, variant: 'default' }}
+                  rows={[
+                    { label: 'Limite',                 value: formatCurrency(Number(b.amount)) },
+                    { label: 'Gasto',                  value: formatCurrency(b.spent) },
+                    { label: isOver ? 'Excedeu' : 'Resta', value: formatCurrency(Math.abs(Number(b.amount) - b.spent)) },
+                    { label: 'Uso',                    value: `${pct}%` },
+                  ]}
+                >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium text-slate-200 truncate">{b.category.name}</span>
                     <div className="flex items-center gap-2 shrink-0">
@@ -78,7 +92,7 @@ export function BudgetList({ budgets, categories, month }: Props) {
                     </div>
                   </div>
                   <Progress value={b.spent} max={Number(b.amount)} variant={isOver ? 'danger' : isWarning ? 'warning' : 'brand'} size="sm" />
-                </div>
+                </InfoModal>
                 <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <BudgetModal categories={categories} month={month} budget={b} />
                   {confirmingId === b.id ? (

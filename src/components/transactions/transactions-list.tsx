@@ -10,6 +10,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { clientApi, type Transaction, type Category } from '@/lib/api-client'
 import { getServiceBrand } from '@/lib/service-brands'
 import { EditTransactionModal } from './edit-transaction-modal'
+import { InfoModal } from '@/components/ui/info-modal'
 
 interface Props {
   transactions: Transaction[]
@@ -81,7 +82,20 @@ export function TransactionsList({ transactions, categories }: Props) {
                   </div>
                 </WithTooltip>
 
-                <div className="flex-1 min-w-0">
+                <InfoModal
+                  className="flex-1 min-w-0"
+                  typeLabel="Transação"
+                  title={tx.description ?? tx.category.name}
+                  amount={`${tx.type === 'INCOME' ? '+' : '-'}${formatCurrency(Number(tx.amount))}`}
+                  amountClass={tx.type === 'INCOME' ? 'text-success' : 'text-slate-100'}
+                  badge={{ label: tx.type === 'INCOME' ? 'Receita' : 'Despesa', variant: tx.type === 'INCOME' ? 'success' : 'danger' }}
+                  rows={[
+                    { label: 'Tipo',      value: tx.type === 'INCOME' ? 'Receita' : 'Despesa' },
+                    { label: 'Data',      value: formatDate(tx.date) },
+                    { label: 'Categoria', value: `${tx.category.icon} ${tx.category.name}` },
+                    { label: 'Descrição', value: tx.description ?? '' },
+                  ]}
+                >
                   <p className="text-sm font-medium text-slate-200 truncate">
                     {tx.description ?? tx.category.name}
                   </p>
@@ -94,7 +108,7 @@ export function TransactionsList({ transactions, categories }: Props) {
                     </span>
                     <span className="text-xs text-slate-600">{formatDate(tx.date)}</span>
                   </div>
-                </div>
+                </InfoModal>
 
                 <div className="flex items-center gap-3 shrink-0">
                   <div className="flex flex-col items-end">
