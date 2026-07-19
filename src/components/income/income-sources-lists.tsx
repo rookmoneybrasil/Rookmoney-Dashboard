@@ -10,6 +10,31 @@ import { formatCurrency } from '@/lib/utils'
 import { clientApi, type IncomeSource, type Category } from '@/lib/api-client'
 import { IncomeSourceModal } from './income-source-modal'
 import { RegisterReceiptModal } from './register-receipt-modal'
+import { InfoModal } from '@/components/ui/info-modal'
+
+function incomeInfo(source: IncomeSource, currentMonth: string, categories: Category[]) {
+  const cfg = TYPE_CONFIG[source.type as keyof typeof TYPE_CONFIG] ?? TYPE_CONFIG.OTHER
+  const received = source.lastAutoPayMonth === currentMonth
+  const cat = source.categoryId ? categories.find(c => c.id === source.categoryId) : null
+  const badge: { label: string; variant: 'success' | 'warning' | 'default' } = source.isRecurring
+    ? (received ? { label: 'Recebido', variant: 'success' } : { label: 'A receber', variant: 'warning' })
+    : { label: 'Eventual', variant: 'warning' }
+  return {
+    typeLabel:   'Receita',
+    title:       source.name,
+    amount:      `+${formatCurrency(source.amount)}${source.isRecurring ? '/mês' : ''}`,
+    amountClass: 'text-success',
+    badge,
+    rows: [
+      { label: 'Tipo',             value: `${cfg.icon} ${cfg.label}` },
+      { label: 'Frequência',       value: source.isRecurring ? (source.dayOfMonth ? `Mensal · dia ${source.dayOfMonth}` : 'Mensal') : 'Eventual' },
+      { label: 'Categoria',        value: cat ? `${cat.icon} ${cat.name}` : '' },
+      { label: 'Início',           value: source.startDate ? format(new Date(source.startDate), 'dd/MM/yyyy') : '' },
+      { label: 'Últ. recebimento', value: received ? receivedDateLabel(source) : '' },
+      { label: 'Observações',      value: source.notes ?? '' },
+    ],
+  }
+}
 
 const TYPE_CONFIG = {
   EMPLOYMENT: { label: 'CLT / PJ',  icon: '💼', variant: 'brand'   as const },
@@ -154,9 +179,12 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                       {received && ` · ${receivedDateLabel(source)}`}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <IncomeSourceModal source={source} categories={categories} />
-                    <DeleteInline id={source.id} busy={busy} onDelete={deleteSource} />
+                  <div className="flex items-center gap-1 shrink-0">
+                    <InfoModal {...incomeInfo(source, currentMonth, categories)} />
+                    <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      <IncomeSourceModal source={source} categories={categories} />
+                      <DeleteInline id={source.id} busy={busy} onDelete={deleteSource} />
+                    </div>
                   </div>
                 </div>
               )
@@ -204,6 +232,7 @@ export function IncomeSourcesLists({ sources, categories, currentMonth, now: now
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <InfoModal {...incomeInfo(source, currentMonth, categories)} />
                     <RegisterReceiptModal source={source} categories={categories} />
                     <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center gap-1">
                       <IncomeSourceModal source={source} categories={categories} />

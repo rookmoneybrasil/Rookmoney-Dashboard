@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Clock, AlertCircle, AlertTriangle, Check, Trash2, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { EditBillModal } from './edit-bill-modal'
+import { InfoModal } from '@/components/ui/info-modal'
 import { formatCurrency, formatDate, classifyBillStatus } from '@/lib/utils'
 import { clientApi, type Bill, type Category } from '@/lib/api-client'
 import { playBillPaid } from '@/lib/sounds'
@@ -127,6 +128,20 @@ export function PendingBillsList({ bills, categories }: Props) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-slate-200 tabular-nums">{formatCurrency(bill.amount)}</span>
+              <InfoModal
+                typeLabel={bill.recurringBillId ? 'Conta fixa (mês)' : bill.installmentTotal && bill.installmentTotal > 1 ? 'Parcela' : 'Conta avulsa'}
+                title={bill.name}
+                amount={`-${formatCurrency(bill.amount)}`}
+                amountClass="text-danger"
+                badge={{ label: cfg.label, variant: cfg.variant }}
+                rows={[
+                  { label: 'Vencimento',  value: formatDate(bill.dueDate) },
+                  { label: 'Categoria',   value: bill.category?.name ? `${bill.category.icon ?? ''} ${bill.category.name}`.trim() : 'Sem categoria' },
+                  { label: 'Parcela',     value: bill.installmentTotal && bill.installmentTotal > 1 ? `${bill.installmentCurrent}/${bill.installmentTotal}` : '' },
+                  { label: 'Recorrente',  value: bill.isRecurring ? 'Sim' : '' },
+                  { label: 'Observações', value: bill.notes ?? '' },
+                ]}
+              />
               <button
                 onClick={() => markPaid(bill.id)}
                 disabled={busy}

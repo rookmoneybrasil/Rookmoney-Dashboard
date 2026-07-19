@@ -7,6 +7,7 @@ import { clientApi, type RecurringBill, type Category } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { formatCurrency } from '@/lib/utils'
 import { EditRecurringBillModal } from './edit-recurring-bill-modal'
+import { InfoModal } from '@/components/ui/info-modal'
 
 interface Props {
   bill:       RecurringBill
@@ -125,6 +126,20 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
         >
           {bill.isActive ? <ToggleRight className="size-4 text-success" /> : <ToggleLeft className="size-4" />}
         </button>
+
+        <InfoModal
+          typeLabel="Conta fixa"
+          title={bill.name}
+          amount={`-${formatCurrency(bill.amount)}/mês`}
+          amountClass="text-danger"
+          badge={!bill.isActive ? { label: 'Pausada', variant: 'default' } : scheduled ? { label: 'Agendada', variant: 'default' } : paid ? { label: 'Paga este mês', variant: 'success' } : { label: 'Ativa', variant: 'default' }}
+          rows={[
+            { label: 'Vencimento',  value: `Todo dia ${bill.dayOfMonth}` },
+            { label: 'Categoria',   value: bill.category ? `${bill.category.icon} ${bill.category.name}` : 'Sem categoria' },
+            { label: '1ª cobrança', value: bill.startMonth ? monthLabel(bill.startMonth) : '' },
+            { label: 'Observações', value: bill.notes ?? '' },
+          ]}
+        />
 
         <EditRecurringBillModal bill={bill} categories={categories} />
 
