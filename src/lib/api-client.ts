@@ -273,8 +273,8 @@ export const clientApi = {
     clientFetch<RecurringBill>('/bills/recurring', { method: 'POST', body: JSON.stringify(data) }),
   updateRecurringBill: (id: string, data: Partial<RecurringBillInput> & { isActive?: boolean }) =>
     clientFetch<RecurringBill>(`/bills/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-  deleteRecurringBill: (id: string) =>
-    clientFetch<void>(`/bills/recurring/${id}`, { method: 'DELETE' }),
+  deleteRecurringBill: (id: string, deleteHistory?: boolean) =>
+    clientFetch<void>(`/bills/recurring/${id}${deleteHistory ? '?deleteHistory=true' : ''}`, { method: 'DELETE' }),
 
   // Bill groups
   updateBillGroup:        (groupId: string, data: { name?: string; amount?: number; categoryId?: string; notes?: string }) =>

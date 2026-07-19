@@ -40,7 +40,7 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
   )
 
   const { mutate: remove, pending: removing } = useMutation(
-    () => clientApi.deleteRecurringBill(bill.id),
+    (deleteHistory: boolean) => clientApi.deleteRecurringBill(bill.id, deleteHistory),
   )
 
   async function handlePay() {
@@ -140,22 +140,32 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
         ) : (
           <div className="flex items-center gap-1">
             <span className="text-xs text-slate-500 flex items-center gap-0.5 mr-1">
-              <AlertTriangle className="size-3 text-warning" /> Remover?
+              <AlertTriangle className="size-3 text-warning" /> Histórico:
             </span>
             <button
               type="button"
-              onClick={() => remove(undefined as never)}
+              onClick={() => remove(false)}
+              disabled={removing}
+              className="text-xs text-slate-300 hover:text-white px-1.5 py-1 rounded hover:bg-ink-700 transition-colors"
+              title="Remove a conta fixa; os meses já pagos ficam no histórico"
+            >
+              {removing ? '...' : 'Manter'}
+            </button>
+            <button
+              type="button"
+              onClick={() => remove(true)}
               disabled={removing}
               className="text-xs text-danger hover:text-danger/80 px-1.5 py-1 rounded hover:bg-danger/10 transition-colors"
+              title="Remove a conta fixa E apaga os lançamentos já pagos"
             >
-              {removing ? '...' : 'Sim'}
+              Apagar tudo
             </button>
             <button
               type="button"
               onClick={() => setConfirming(false)}
               className="text-xs text-slate-500 hover:text-slate-300 px-1.5 py-1 rounded hover:bg-ink-700 transition-colors"
             >
-              Não
+              ✕
             </button>
           </div>
         )}
