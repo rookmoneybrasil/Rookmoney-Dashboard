@@ -19,6 +19,8 @@ import { RecurringEntryCard } from '@/components/people/recurring-entry-card'
 import { MigrateRecurringButton } from '@/components/people/migrate-recurring-button'
 import { PersonProjectionSection } from '@/components/people/person-projection-section'
 import { PendingEntryRow } from '@/components/people/pending-entry-row'
+import { InfoModal } from '@/components/ui/info-modal'
+import { personEntryInfo } from '@/components/people/entry-info'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -81,6 +83,7 @@ function SettledEntryRow({ entry, personId, categories }: { entry: PersonEntryRo
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-sm text-slate-500 tabular-nums">{formatCurrency(entry.amount)}</span>
         <Badge variant="success" size="sm">Pago</Badge>
+        <InfoModal {...personEntryInfo(entry, true)} />
         <EditEntryModal entry={entry} categories={categories} />
         <EntryActions entryId={entry.id} personId={personId} isSettled={true} />
       </div>

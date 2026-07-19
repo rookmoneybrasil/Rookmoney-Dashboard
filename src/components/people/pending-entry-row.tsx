@@ -6,6 +6,8 @@ import { TrendingUp, TrendingDown, AlertTriangle, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { EditEntryModal } from './edit-entry-modal'
 import { MarkEntrySettledButton } from './mark-entry-settled-button'
+import { InfoModal } from '@/components/ui/info-modal'
+import { personEntryInfo } from './entry-info'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { clientApi, type PersonEntryRow } from '@/lib/api-client'
 
@@ -56,6 +58,7 @@ export function PendingEntryRow({ entry, personId, categories }: { entry: Person
         <span className={`text-sm font-semibold tabular-nums ${isTheyOwe ? 'text-success' : 'text-danger'}`}>
           {formatCurrency(entry.amount)}
         </span>
+        <InfoModal {...personEntryInfo(entry, false)} />
         <MarkEntrySettledButton entryId={entry.id} isSettled={false} showLabel />
         {confirming ? (
           <div className="flex items-center gap-1 animate-in fade-in duration-150">
