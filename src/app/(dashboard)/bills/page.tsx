@@ -9,6 +9,7 @@ import { serverApi } from '@/lib/api-client'
 import { DeleteBillGroupButton, DeleteInstallmentGroupButton, MarkBillPaidButton } from '@/components/ui/delete-buttons'
 import { BillModal } from '@/components/bills/bill-modal'
 import { EditBillModal } from '@/components/bills/edit-bill-modal'
+import { DeleteInstallmentButton } from '@/components/bills/delete-installment-button'
 import { EditInstallmentGroupModal } from '@/components/bills/edit-installment-group-modal'
 import { RecurringBillRow } from '@/components/bills/recurring-bill-row'
 import { PendingBillsList } from '@/components/bills/pending-bills-list'
@@ -457,12 +458,13 @@ export default async function BillsPage() {
                                   <span className="text-xs text-slate-500">{formatDate(inst.dueDate)}</span>
                                   <span className="text-xs font-semibold text-slate-300 tabular-nums">{formatCurrency(Number(inst.amount))}</span>
                                 </div>
-                                <div className="flex items-center gap-1.5 shrink-0">
+                                <div className="relative flex items-center gap-1.5 shrink-0">
                                   <Badge variant={inst.isPaid ? 'success' : s === 'overdue' || s === 'urgent' ? 'danger' : 'default'} size="sm">
                                     {inst.isPaid ? 'Pago' : s === 'overdue' ? 'Atrasado' : s === 'urgent' ? 'Urgente' : 'Pendente'}
                                   </Badge>
                                   <EditBillModal bill={inst} categories={categories} />
                                   <MarkBillPaidButton id={inst.id} isPaid={inst.isPaid} />
+                                  <DeleteInstallmentButton billId={inst.id} installmentCurrent={inst.installmentCurrent} total={group.total} name={group.name} />
                                 </div>
                               </div>
                             )

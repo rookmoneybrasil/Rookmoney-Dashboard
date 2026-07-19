@@ -184,8 +184,8 @@ export const clientApi = {
     clientFetch<Bill>('/bills', { method: 'POST', body: JSON.stringify(data) }),
   updateBill: (id: string, data: Partial<BillInput>) =>
     clientFetch<Bill>(`/bills/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-  deleteBill: (id: string) =>
-    clientFetch<void>(`/bills/${id}`, { method: 'DELETE' }),
+  deleteBill: (id: string, scope?: 'one' | 'future' | 'all') =>
+    clientFetch<void>(`/bills/${id}${scope ? `?scope=${scope}` : ''}`, { method: 'DELETE' }),
   markBillPaid: (id: string, paid = true) =>
     clientFetch<Bill>(`/bills/${id}?action=pay`, { method: 'POST', body: JSON.stringify({ paid }) }),
 
