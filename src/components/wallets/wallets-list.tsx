@@ -64,9 +64,10 @@ export function WalletsList({ accounts, total }: { accounts: Account[]; total: n
               </button>
               {confirmingId === a.id ? (
                 <span className="flex items-center gap-1">
-                  <AlertTriangle className="size-3 text-warning" />
-                  <button onClick={() => del(a.id)} className="text-xs text-danger px-1.5 py-1 rounded hover:bg-danger/10">Sim</button>
-                  <button onClick={() => setConfirmingId(null)} className="text-xs text-slate-500 px-1.5 py-1 rounded hover:bg-ink-600">Não</button>
+                  <AlertTriangle className="size-3 text-warning shrink-0" />
+                  <span className="hidden sm:inline text-xs text-slate-500 whitespace-nowrap">Saldo e lançamentos vão pra outra conta.</span>
+                  <button onClick={() => del(a.id)} className="text-xs text-danger px-1.5 py-1 rounded hover:bg-danger/10">Excluir</button>
+                  <button onClick={() => setConfirmingId(null)} className="text-xs text-slate-500 px-1.5 py-1 rounded hover:bg-ink-600">Cancelar</button>
                 </span>
               ) : (
                 <button onClick={() => setConfirmingId(a.id)} className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-danger hover:bg-danger/10" title="Excluir">
