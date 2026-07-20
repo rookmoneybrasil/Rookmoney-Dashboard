@@ -24,6 +24,7 @@ interface Transaction {
   date: Date | string
   categoryId: string
   accountId?: string | null
+  ignored?: boolean
 }
 
 interface Props {
@@ -37,6 +38,7 @@ export function EditTransactionModal({ transaction, categories, accounts = [] }:
   const [type, setType]        = useState<'INCOME' | 'EXPENSE'>(transaction.type)
   const [categoryId, setCatId] = useState(transaction.categoryId)
   const [accountId, setAccId]  = useState(transaction.accountId ?? '')
+  const [ignored, setIgnored]  = useState(!!transaction.ignored)
   const [description, setDesc] = useState(transaction.description ?? '')
   const activeAccounts = accounts.filter(a => !a.archived)
 
@@ -47,7 +49,7 @@ export function EditTransactionModal({ transaction, categories, accounts = [] }:
     : new Date(transaction.date).toISOString().slice(0, 10)
 
   const { mutate, pending, error } = useMutation(
-    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string; accountId: string }) =>
+    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string; accountId: string; ignored: boolean }) =>
       clientApi.updateTransaction(transaction.id, {
         amount: parseFloat(data.amount),
         type: data.type,
@@ -55,6 +57,7 @@ export function EditTransactionModal({ transaction, categories, accounts = [] }:
         date: data.date,
         categoryId: data.categoryId,
         accountId: data.accountId || undefined,
+        ignored: data.ignored,
       }),
     { onSuccess: () => setOpen(false) },
   )
@@ -69,6 +72,7 @@ export function EditTransactionModal({ transaction, categories, accounts = [] }:
       date: fd.get('date') as string,
       categoryId,
       accountId,
+      ignored,
     })
   }
 
@@ -167,6 +171,19 @@ export function EditTransactionModal({ transaction, categories, accounts = [] }:
               </div>
             </FormField>
           )}
+
+          <label className="flex items-start gap-2.5 cursor-pointer select-none rounded-lg border border-white/8 bg-ink-700 px-3 py-2.5">
+            <input
+              type="checkbox"
+              checked={ignored}
+              onChange={(e) => setIgnored(e.target.checked)}
+              className="mt-0.5 size-4 accent-brand-600 shrink-0"
+            />
+            <span className="flex flex-col gap-0.5">
+              <span className="text-sm text-slate-200">Ignorar transação</span>
+              <span className="text-xs text-slate-500">Não soma no saldo das contas nem nos totais/relatórios.</span>
+            </span>
+          </label>
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>

@@ -96,6 +96,7 @@ export function TransactionsList({ transactions, categories, accounts = [] }: Pr
                     { label: 'Categoria', value: `${tx.category.icon} ${tx.category.name}` },
                     { label: 'Conta',     value: tx.account ? `${tx.account.icon} ${tx.account.name}` : '' },
                     { label: 'Descrição', value: tx.description ?? '' },
+                    ...(tx.ignored ? [{ label: 'Ignorada', value: 'Sim — fora dos saldos e relatórios' }] : []),
                   ]}
                 >
                   <p className="text-sm font-medium text-slate-200 truncate">
@@ -110,6 +111,7 @@ export function TransactionsList({ transactions, categories, accounts = [] }: Pr
                     </span>
                     <span className="text-xs text-slate-600">{formatDate(tx.date)}</span>
                     {tx.account && <span className="text-xs text-slate-600">· {tx.account.icon} {tx.account.name}</span>}
+                    {tx.ignored && <span className="text-[10px] px-1.5 py-0.5 rounded-md font-medium bg-slate-500/15 text-slate-400 border border-slate-500/20">Ignorada</span>}
                   </div>
                 </InfoModal>
 
