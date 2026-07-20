@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { Pencil } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -23,6 +24,7 @@ interface Bill {
   isRecurring: boolean
   notes: string | null
   categoryId: string | null
+  accountId?: string | null
   recurringBillId?: string | null  // if set, managed by a RecurringBill template
 }
 
@@ -32,6 +34,7 @@ export function EditBillModal({ bill, categories }: Props) {
   const [open, setOpen]        = useState(false)
   const [isRecurring, setRec]  = useState(bill.isRecurring)
   const [categoryId, setCatId] = useState(bill.categoryId ?? '')
+  const [accountId, setAccId]  = useState(bill.accountId ?? '')
 
   const dateStr = bill.dueDate.slice(0, 10)
 
@@ -42,6 +45,7 @@ export function EditBillModal({ bill, categories }: Props) {
         amount: parseFloat(data.amount),
         dueDate: data.dueDate,
         categoryId: data.categoryId || undefined,
+        accountId: accountId || null,
         notes: data.notes || undefined,
         isRecurring: data.isRecurring,
       }),
@@ -93,6 +97,8 @@ export function EditBillModal({ bill, categories }: Props) {
           <FormField label="Categoria" htmlFor="categoryId">
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
           </FormField>
+
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="notes">
             <Textarea id="notes" name="notes" placeholder="Opcional"

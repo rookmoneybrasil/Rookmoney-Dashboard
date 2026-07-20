@@ -29,6 +29,7 @@ function incomeInfo(source: IncomeSource, currentMonth: string, categories: Cate
       { label: 'Tipo',             value: `${cfg.icon} ${cfg.label}` },
       { label: 'Frequência',       value: source.isRecurring ? (source.dayOfMonth ? `Mensal · dia ${source.dayOfMonth}` : 'Mensal') : 'Eventual' },
       { label: 'Categoria',        value: cat ? `${cat.icon} ${cat.name}` : '' },
+      { label: 'Conta',            value: source.account ? `${source.account.icon} ${source.account.name}` : '' },
       { label: 'Início',           value: source.startDate ? format(new Date(source.startDate), 'dd/MM/yyyy') : '' },
       { label: 'Últ. recebimento', value: received ? receivedDateLabel(source) : '' },
       { label: 'Observações',      value: source.notes ?? '' },

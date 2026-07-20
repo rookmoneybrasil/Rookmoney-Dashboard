@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { clientApi, type RecurringBill, type Category } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -15,6 +16,7 @@ interface Props { bill: RecurringBill; categories: Category[] }
 export function EditRecurringBillModal({ bill, categories }: Props) {
   const [open, setOpen] = useState(false)
   const [categoryId, setCatId] = useState(bill.categoryId ?? '')
+  const [accountId, setAccId]  = useState(bill.accountId ?? '')
 
   const { mutate, pending, error } = useMutation(
     (data: { name: string; amount: string; dayOfMonth: string; notes: string }) =>
@@ -23,6 +25,7 @@ export function EditRecurringBillModal({ bill, categories }: Props) {
         amount:     parseFloat(data.amount),
         dayOfMonth: parseInt(data.dayOfMonth) || bill.dayOfMonth,
         categoryId: categoryId || null,
+        accountId:  accountId || null,
         notes:      data.notes || null,
       }),
     { onSuccess: () => setOpen(false) },
@@ -73,6 +76,8 @@ export function EditRecurringBillModal({ bill, categories }: Props) {
           <FormField label="Categoria" htmlFor="rb-cat">
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
           </FormField>
+
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="rb-notes">
             <Textarea id="rb-notes" name="notes" defaultValue={bill.notes ?? ''} className="min-h-[56px]" />

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -28,6 +29,7 @@ export function BillModal({ categories }: Props) {
   const [open,         setOpen]       = useState(false)
   const [mode,         setMode]       = useState<Mode>('avulso')
   const [categoryId,   setCatId]      = useState('')
+  const [accountId,    setAccId]      = useState('')
   const [installments, setInst]       = useState(2)
   const [alreadyPaid,  setAlready]    = useState(0)
   const [amountNum,    setAmountNum]  = useState(0)
@@ -49,6 +51,7 @@ export function BillModal({ categories }: Props) {
         dueDate: data.dueDate,
         isRecurring: false,
         categoryId: data.categoryId || undefined,
+        accountId: accountId || null,
         installments: data.installments,
         alreadyPaid:  data.alreadyPaid,
         notes: data.notes || undefined,
@@ -63,6 +66,7 @@ export function BillModal({ categories }: Props) {
         amount:     parseFloat(data.amount),
         dayOfMonth: parseInt(data.dayOfMonth) || 1,
         categoryId: data.categoryId || null,
+        accountId:  accountId || null,
         notes:      data.notes || null,
         firstDate:  data.firstDate || undefined, // month drives startMonth; if this month & past, gera já
       }),
@@ -278,6 +282,8 @@ export function BillModal({ categories }: Props) {
           <FormField label={c('category')} htmlFor="categoryId">
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder={c('optional')} />
           </FormField>
+
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label={c('notes')} htmlFor="notes">
             <Textarea id="notes" name="notes" placeholder={c('optional')} className="min-h-[56px]" />

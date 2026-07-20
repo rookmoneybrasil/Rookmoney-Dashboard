@@ -287,6 +287,8 @@ export const clientApi = {
 
   // Accounts / Carteiras (deleteAccount já é a exclusão da conta do usuário —
   // por isso as carteiras usam createWallet/updateWallet/deleteWallet)
+  accounts: () =>
+    clientFetch<{ accounts: Account[]; total: number }>('/accounts'),
   createWallet: (data: AccountInput) =>
     clientFetch<Account>('/accounts', { method: 'POST', body: JSON.stringify(data) }),
   updateWallet: (id: string, data: Partial<AccountInput> & { archived?: boolean; isDefault?: boolean }) =>
@@ -363,10 +365,10 @@ export interface TransactionPage { items: Transaction[]; total: number; page: nu
 export interface GoalContribution { id: string; amount: number; note: string | null; createdAt: string }
 export interface Goal { id: string; name: string; targetAmount: number; currentAmount: number; deadline: string | null; description: string | null; icon: string | null; color: string | null; isCompleted: boolean; completedAt: string | null; createdAt: string; updatedAt: string; userId: string; contributions: GoalContribution[] }
 export interface GoalInput { name: string; targetAmount: number; currentAmount?: number; deadline?: string; description?: string; icon?: string; color?: string }
-export interface Bill { id: string; name: string; amount: number; dueDate: string; isPaid: boolean; paidAt: string | null; isRecurring: boolean; notes: string | null; categoryId: string | null; category: Category | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; paidTransactionId: string | null; recurringBillId: string | null; createdAt: string; updatedAt: string; userId: string }
-export interface BillInput { name: string; amount: number; dueDate: string; isRecurring?: boolean; categoryId?: string; installments?: number; alreadyPaid?: number; notes?: string }
-export interface RecurringBill { id: string; name: string; amount: number; dayOfMonth: number; isActive: boolean; lastAutoMonth: string | null; startMonth: string | null; notes: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
-export interface RecurringBillInput { name: string; amount: number; dayOfMonth: number; categoryId?: string | null; notes?: string | null; generateNow?: boolean; firstDate?: string }
+export interface Bill { id: string; name: string; amount: number; dueDate: string; isPaid: boolean; paidAt: string | null; isRecurring: boolean; notes: string | null; categoryId: string | null; category: Category | null; accountId?: string | null; account?: { id: string; name: string; icon: string; color: string } | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; paidTransactionId: string | null; recurringBillId: string | null; createdAt: string; updatedAt: string; userId: string }
+export interface BillInput { name: string; amount: number; dueDate: string; isRecurring?: boolean; categoryId?: string; installments?: number; alreadyPaid?: number; notes?: string; accountId?: string | null }
+export interface RecurringBill { id: string; name: string; amount: number; dayOfMonth: number; isActive: boolean; lastAutoMonth: string | null; startMonth: string | null; notes: string | null; categoryId: string | null; category: Category | null; accountId?: string | null; account?: { id: string; name: string; icon: string; color: string } | null; createdAt: string; updatedAt: string; userId: string }
+export interface RecurringBillInput { name: string; amount: number; dayOfMonth: number; categoryId?: string | null; notes?: string | null; generateNow?: boolean; firstDate?: string; accountId?: string | null }
 export interface Budget { id: string; categoryId: string; month: string; amount: number; category: Category }
 
 export type AccountType = 'CASH' | 'CHECKING' | 'SAVINGS' | 'CREDIT_CARD'
@@ -375,7 +377,7 @@ export interface Account {
   initialBalance: number; isDefault: boolean; archived: boolean; balance: number
 }
 export interface AccountInput { name: string; type?: AccountType; icon?: string; color?: string; initialBalance?: number }
-export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; startDate?: string | null; notes?: string | null; categoryId?: string | null }
+export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; startDate?: string | null; notes?: string | null; categoryId?: string | null; accountId?: string | null }
 export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
 export interface PersonInput { name: string; color?: string | null; notes?: string | null }
 export interface EntryInput { type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; notes?: string | null; categoryId?: string | null }
@@ -386,7 +388,7 @@ export interface PersonEntryRecurringItem { id: string; type: 'THEY_OWE_ME' | 'I
 export interface PersonEntry { id: string; type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; isSettled: boolean; settledAt: string | null; notes: string | null; installmentTotal: number | null; installmentCurrent: number | null; installmentGroupId: string | null; settledTransactionId: string | null; recurringEntryId: string | null; category: { id: string; name: string; icon: string; color: string } | null; categoryId: string | null; personId: string; userId: string; createdAt: string; updatedAt: string }
 // PersonEntryRow with date as Date — used by components that expect Prisma types
 export type PersonEntryRow = Omit<PersonEntry, 'date' | 'settledAt' | 'createdAt'> & { date: Date | string; settledAt: Date | string | null; createdAt: Date | string }
-export interface IncomeSource { id: string; name: string; type: string; amount: number; isRecurring: boolean; dayOfMonth: number | null; startDate: string | null; notes: string | null; lastAutoPayMonth: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
+export interface IncomeSource { id: string; name: string; type: string; amount: number; isRecurring: boolean; dayOfMonth: number | null; startDate: string | null; notes: string | null; lastAutoPayMonth: string | null; categoryId: string | null; category: Category | null; accountId?: string | null; account?: { id: string; name: string; icon: string; color: string } | null; createdAt: string; updatedAt: string; userId: string }
 export interface RecurringTransaction { id: string; name: string; amount: number; type: 'INCOME' | 'EXPENSE'; frequency: string; isActive: boolean; dayOfMonth: number | null; description: string | null; lastAutoMonth: string | null; category: Category; categoryId: string; createdAt: string; updatedAt: string; userId: string }
 export interface UpcomingPersonPayable { id: string; description: string; amount: number; date: string; person: { name: string } }
 export interface MonthIncomeTransaction extends Transaction { isRecurringIncome: boolean }

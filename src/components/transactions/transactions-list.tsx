@@ -109,6 +109,7 @@ export function TransactionsList({ transactions, categories, accounts = [] }: Pr
                       {tx.category.icon} {tx.category.name}
                     </span>
                     <span className="text-xs text-slate-600">{formatDate(tx.date)}</span>
+                    {tx.account && <span className="text-xs text-slate-600">· {tx.account.icon} {tx.account.name}</span>}
                   </div>
                 </InfoModal>
 

@@ -79,6 +79,7 @@ export function RecurringBillRow({ bill, categories, monthRow }: Props) {
         rows={[
           { label: 'Vencimento',  value: `Todo dia ${bill.dayOfMonth}` },
           { label: 'Categoria',   value: bill.category ? `${bill.category.icon} ${bill.category.name}` : 'Sem categoria' },
+          { label: 'Conta',       value: bill.account ? `${bill.account.icon} ${bill.account.name}` : '' },
           { label: '1ª cobrança', value: bill.startMonth ? monthLabel(bill.startMonth) : '' },
           { label: 'Observações', value: bill.notes ?? '' },
         ]}

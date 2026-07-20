@@ -9,6 +9,7 @@ import { CurrencyInput } from '@/components/ui/currency-input'
 import { DateInput } from '@/components/ui/date-input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { triggerMascot } from '@/lib/mascot'
@@ -24,7 +25,7 @@ interface Category { id: string; name: string; icon: string; color: string }
 interface Source {
   id: string; name: string; type: string; amount: number
   isRecurring: boolean; dayOfMonth: number | null; startDate?: string | null
-  categoryId: string | null; notes: string | null
+  categoryId: string | null; notes: string | null; accountId?: string | null
 }
 interface Props { source?: Source; categories?: Category[]; className?: string; title?: string; disabled?: boolean }
 
@@ -34,6 +35,7 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
   const [type,        setType]    = useState(source?.type ?? 'EMPLOYMENT')
   const [isRecurring, setRec]     = useState(source?.isRecurring ?? true)
   const [categoryId,  setCatId]   = useState(source?.categoryId ?? '')
+  const [accountId,   setAccId]   = useState(source?.accountId ?? '')
 
   const { mutate, pending, error } = useMutation(
     (data: Parameters<typeof clientApi.createIncomeSource>[0]) =>
@@ -82,6 +84,7 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
               startDate:   startDateRaw || null,
               notes:       (fd.get('notes') as string) || null,
               categoryId:  categoryId || null,
+              accountId:   accountId || null,
             })
           }}
           className="flex flex-col gap-4"
@@ -160,6 +163,8 @@ export function IncomeSourceModal({ source, categories = [], className, title, d
               <p className="text-[11px] text-slate-600 mt-1">Necessária para registro automático mensal.</p>
             )}
           </FormField>
+
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="notes">
             <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[56px]"

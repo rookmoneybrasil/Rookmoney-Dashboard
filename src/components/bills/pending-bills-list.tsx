@@ -126,6 +126,7 @@ export function PendingBillsList({ bills, categories }: Props) {
               rows={[
                 { label: 'Vencimento',  value: formatDate(bill.dueDate) },
                 { label: 'Categoria',   value: bill.category?.name ? `${bill.category.icon ?? ''} ${bill.category.name}`.trim() : 'Sem categoria' },
+                { label: 'Conta',       value: bill.account ? `${bill.account.icon} ${bill.account.name}` : '' },
                 { label: 'Parcela',     value: bill.installmentTotal && bill.installmentTotal > 1 ? `${bill.installmentCurrent}/${bill.installmentTotal}` : '' },
                 { label: 'Recorrente',  value: bill.isRecurring ? 'Sim' : '' },
                 { label: 'Observações', value: bill.notes ?? '' },
