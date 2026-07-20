@@ -8,6 +8,7 @@ import { DashboardGreeting } from '@/components/dashboard/greeting'
 import { MonthPace } from '@/components/dashboard/month-pace'
 import { NextBillHighlight } from '@/components/dashboard/next-bill-highlight'
 import { CategoryDonut } from '@/components/dashboard/category-donut'
+import { WalletsSummary } from '@/components/dashboard/wallets-summary'
 import { isPro as checkIsPro } from '@/lib/plans'
 import { RookinhoInsight } from '@/components/dashboard/rookinho-insight'
 import { DashboardKPIs } from '@/components/dashboard/stat-card-modals'
@@ -144,6 +145,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
           <MonthPace income={data.monthIncome} expense={data.monthExpense} dayOfMonth={now.getDate()} daysInMonth={daysInMonth} />
           <CategoryDonut categories={data.topCategories ?? []} total={data.monthExpense} />
         </div>
+        <WalletsSummary accounts={data.accounts ?? []} total={data.accountsTotal ?? 0} />
       </div>
 
       {/* ── Atividade ────────────────────────────────────────────────── */}
