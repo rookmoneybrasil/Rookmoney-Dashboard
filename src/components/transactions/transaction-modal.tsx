@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
 import { playIncome, playExpense } from '@/lib/sounds'
@@ -17,7 +17,7 @@ import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { DateInput } from '@/components/ui/date-input'
 import { CategorySelect } from '@/components/ui/category-select'
-import { clientApi } from '@/lib/api-client'
+import { clientApi, type Account } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import { useTranslations } from 'next-intl'
 
@@ -30,15 +30,22 @@ interface Category {
 
 interface Props {
   categories: Category[]
+  accounts?:  Account[]
 }
 
-export function TransactionModal({ categories }: Props) {
+export function TransactionModal({ categories, accounts = [] }: Props) {
   const t = useTranslations('transactions')
   const c = useTranslations('common')
   const [open, setOpen]        = useState(false)
   const [type, setType]        = useState<'INCOME' | 'EXPENSE'>('EXPENSE')
   const [categoryId, setCatId] = useState('')
+  const [accountId, setAccId]  = useState('')
   const [description, setDesc] = useState('')
+
+  const activeAccounts = accounts.filter(a => !a.archived)
+  useEffect(() => {
+    if (!accountId && activeAccounts.length > 0) setAccId((activeAccounts.find(a => a.isDefault) ?? activeAccounts[0]).id)
+  }, [accounts])
 
   const detectedBrand = getServiceBrand(description, undefined)
 
@@ -49,13 +56,14 @@ export function TransactionModal({ categories }: Props) {
   }
 
   const { mutate, pending, error } = useMutation(
-    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }) =>
+    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string; accountId: string }) =>
       clientApi.createTransaction({
         amount: parseFloat(data.amount),
         type: data.type,
         description: data.description,
         date: data.date,
         categoryId: data.categoryId,
+        accountId: data.accountId || undefined,
       }),
     {
       onSuccess: () => {
@@ -83,6 +91,7 @@ export function TransactionModal({ categories }: Props) {
       description: fd.get('description') as string,
       date: fd.get('date') as string,
       categoryId,
+      accountId,
     })
   }
 
@@ -208,6 +217,19 @@ export function TransactionModal({ categories }: Props) {
               <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder={c('category')} />
             </FormField>
           </div>
+
+          {activeAccounts.length > 0 && (
+            <FormField label="Conta" htmlFor="account">
+              <div className="flex flex-wrap gap-2">
+                {activeAccounts.map(a => (
+                  <button type="button" key={a.id} onClick={() => setAccId(a.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${accountId === a.id ? 'bg-brand-900/40 border-brand-600 text-brand-300' : 'bg-ink-700 border-white/8 text-slate-400 hover:text-slate-200'}`}>
+                    {a.icon} {a.name}
+                  </button>
+                ))}
+              </div>
+            </FormField>
+          )}
 
           <ModalFooter>
             <Button

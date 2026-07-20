@@ -11,7 +11,7 @@ import { Input, FormField } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { DateInput } from '@/components/ui/date-input'
 import { getServiceBrand, QUICK_SERVICES } from '@/lib/service-brands'
-import { clientApi } from '@/lib/api-client'
+import { clientApi, type Account } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
 interface Category { id: string; name: string; icon: string; color: string }
@@ -23,18 +23,22 @@ interface Transaction {
   description: string | null
   date: Date | string
   categoryId: string
+  accountId?: string | null
 }
 
 interface Props {
   transaction: Transaction
   categories: Category[]
+  accounts?:  Account[]
 }
 
-export function EditTransactionModal({ transaction, categories }: Props) {
+export function EditTransactionModal({ transaction, categories, accounts = [] }: Props) {
   const [open, setOpen]        = useState(false)
   const [type, setType]        = useState<'INCOME' | 'EXPENSE'>(transaction.type)
   const [categoryId, setCatId] = useState(transaction.categoryId)
+  const [accountId, setAccId]  = useState(transaction.accountId ?? '')
   const [description, setDesc] = useState(transaction.description ?? '')
+  const activeAccounts = accounts.filter(a => !a.archived)
 
   const detectedBrand = getServiceBrand(description, undefined)
 
@@ -43,13 +47,14 @@ export function EditTransactionModal({ transaction, categories }: Props) {
     : new Date(transaction.date).toISOString().slice(0, 10)
 
   const { mutate, pending, error } = useMutation(
-    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }) =>
+    (data: { amount: string; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string; accountId: string }) =>
       clientApi.updateTransaction(transaction.id, {
         amount: parseFloat(data.amount),
         type: data.type,
         description: data.description,
         date: data.date,
         categoryId: data.categoryId,
+        accountId: data.accountId || undefined,
       }),
     { onSuccess: () => setOpen(false) },
   )
@@ -63,6 +68,7 @@ export function EditTransactionModal({ transaction, categories }: Props) {
       description: fd.get('description') as string,
       date: fd.get('date') as string,
       categoryId,
+      accountId,
     })
   }
 
@@ -148,6 +154,19 @@ export function EditTransactionModal({ transaction, categories }: Props) {
               <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
             </FormField>
           </div>
+
+          {activeAccounts.length > 0 && (
+            <FormField label="Conta" htmlFor="account">
+              <div className="flex flex-wrap gap-2">
+                {activeAccounts.map(a => (
+                  <button type="button" key={a.id} onClick={() => setAccId(a.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${accountId === a.id ? 'bg-brand-900/40 border-brand-600 text-brand-300' : 'bg-ink-700 border-white/8 text-slate-400 hover:text-slate-200'}`}>
+                    {a.icon} {a.name}
+                  </button>
+                ))}
+              </div>
+            </FormField>
+          )}
 
           <ModalFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>

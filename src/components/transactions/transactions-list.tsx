@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { WithTooltip } from '@/components/ui/tooltip'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { clientApi, type Transaction, type Category } from '@/lib/api-client'
+import { clientApi, type Transaction, type Category, type Account } from '@/lib/api-client'
 import { getServiceBrand } from '@/lib/service-brands'
 import { EditTransactionModal } from './edit-transaction-modal'
 import { InfoModal } from '@/components/ui/info-modal'
@@ -15,13 +15,14 @@ import { InfoModal } from '@/components/ui/info-modal'
 interface Props {
   transactions: Transaction[]
   categories: Category[]
+  accounts?:  Account[]
 }
 
 // Optimistic delete, same pattern as PendingBillsList: the row disappears
 // immediately with a plain (non-transition) state update, the mutation +
 // router.refresh() happen in the background, and a failed delete rolls
 // the row back instead of leaving the page stuck.
-export function TransactionsList({ transactions, categories }: Props) {
+export function TransactionsList({ transactions, categories, accounts = [] }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(transactions)
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set())
@@ -93,6 +94,7 @@ export function TransactionsList({ transactions, categories }: Props) {
                     { label: 'Tipo',      value: tx.type === 'INCOME' ? 'Receita' : 'Despesa' },
                     { label: 'Data',      value: formatDate(tx.date) },
                     { label: 'Categoria', value: `${tx.category.icon} ${tx.category.name}` },
+                    { label: 'Conta',     value: tx.account ? `${tx.account.icon} ${tx.account.name}` : '' },
                     { label: 'Descrição', value: tx.description ?? '' },
                   ]}
                 >
@@ -123,7 +125,7 @@ export function TransactionsList({ transactions, categories }: Props) {
                     </WithTooltip>
                   </div>
 
-                  <EditTransactionModal transaction={{ ...tx, amount: Number(tx.amount) }} categories={categories} />
+                  <EditTransactionModal transaction={{ ...tx, amount: Number(tx.amount) }} categories={categories} accounts={accounts} />
 
                   {confirmingId === tx.id ? (
                     <div className="flex items-center gap-1 animate-in fade-in duration-150">

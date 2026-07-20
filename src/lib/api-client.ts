@@ -356,8 +356,8 @@ export interface User { id: string; name: string; email: string; plan: string; h
 export interface AuthResponse { token: string; user: User; eventId?: string }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
 export interface CategoryInput { name: string; icon: string; color: string }
-export interface Transaction { id: string; amount: number; type: 'INCOME' | 'EXPENSE'; description: string | null; date: string; category: Category; categoryId: string; userId: string; createdAt: string; updatedAt: string }
-export interface TransactionInput { amount: number; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string }
+export interface Transaction { id: string; amount: number; type: 'INCOME' | 'EXPENSE'; description: string | null; date: string; category: Category; categoryId: string; userId: string; createdAt: string; updatedAt: string; accountId?: string | null; account?: { id?: string; name: string; icon: string; color: string } | null }
+export interface TransactionInput { amount: number; type: 'INCOME' | 'EXPENSE'; description: string; date: string; categoryId: string; accountId?: string }
 export type TransactionFilter = { month?: string; type?: 'INCOME' | 'EXPENSE' | 'ALL'; categoryId?: string; search?: string; page?: number; pageSize?: number }
 export interface TransactionPage { items: Transaction[]; total: number; page: number; totalPages: number }
 export interface GoalContribution { id: string; amount: number; note: string | null; createdAt: string }

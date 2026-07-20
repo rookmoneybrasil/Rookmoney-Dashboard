@@ -30,10 +30,12 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
   if (filter.categoryId) txParams.categoryId = filter.categoryId
   if (filter.month)      txParams.month      = filter.month
 
-  const [{ items: transactions, total, totalPages, page: currentPage }, categories] = await Promise.all([
+  const [{ items: transactions, total, totalPages, page: currentPage }, categories, accountsData] = await Promise.all([
     serverApi.transactions(txParams),
     serverApi.categories(),
+    serverApi.accounts().catch(() => ({ accounts: [], total: 0 })),
   ])
+  const accounts = accountsData.accounts
 
   const now        = new Date()
   const monthLabel = filter.month
@@ -72,7 +74,7 @@ export default async function TransactionsPage({ searchParams }: { searchParams:
           </div>
         </div>
       ) : (
-        <TransactionsList transactions={transactions} categories={categories} />
+        <TransactionsList transactions={transactions} categories={categories} accounts={accounts} />
       )}
 
       {/* Pagination */}
