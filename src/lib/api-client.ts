@@ -125,9 +125,6 @@ export const serverApi = {
   incomeSources: () => serverFetch<IncomeSource[]>('/income-sources'),
   incomeHistory: () => serverFetch<Record<string, { id: string; amount: number; date: string; category: { id: string; name: string; icon: string; color: string } | null }[]>>('/income-sources/history'),
 
-  // Recurring
-  recurring: () => serverFetch<RecurringTransaction[]>('/recurring'),
-
   // Calendar
   calendar: (month?: string) => serverFetch<CalendarData>(`/calendar${month ? `?month=${month}` : ''}`),
 
@@ -215,16 +212,6 @@ export const clientApi = {
     clientFetch<IncomeSource>(`/income-sources/${id}?action=revert`, { method: 'POST' }),
   deleteIncomeSource: (id: string) =>
     clientFetch<void>(`/income-sources/${id}`, { method: 'DELETE' }),
-
-  // Recurring Transactions
-  createRecurring: (data: RecurringInput) =>
-    clientFetch<RecurringTransaction>('/recurring', { method: 'POST', body: JSON.stringify(data) }),
-  updateRecurring: (id: string, data: Partial<RecurringInput>) =>
-    clientFetch<RecurringTransaction>(`/recurring/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-  deleteRecurring: (id: string) =>
-    clientFetch<void>(`/recurring/${id}`, { method: 'DELETE' }),
-  toggleRecurring: (id: string) =>
-    clientFetch<RecurringTransaction>(`/recurring/${id}?action=toggle`, { method: 'POST' }),
 
   // People
   createPerson: (data: PersonInput) =>
@@ -378,7 +365,6 @@ export interface Account {
 }
 export interface AccountInput { name: string; type?: AccountType; icon?: string; color?: string; initialBalance?: number }
 export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; startDate?: string | null; notes?: string | null; categoryId?: string | null; accountId?: string | null }
-export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
 export interface PersonInput { name: string; color?: string | null; notes?: string | null }
 export interface EntryInput { type: 'THEY_OWE_ME' | 'I_OWE_THEM'; description: string; amount: number; date: string; notes?: string | null; categoryId?: string | null; accountId?: string | null }
 export interface BudgetItem extends Budget { spent: number }
@@ -389,7 +375,6 @@ export interface PersonEntry { id: string; type: 'THEY_OWE_ME' | 'I_OWE_THEM'; d
 // PersonEntryRow with date as Date — used by components that expect Prisma types
 export type PersonEntryRow = Omit<PersonEntry, 'date' | 'settledAt' | 'createdAt'> & { date: Date | string; settledAt: Date | string | null; createdAt: Date | string }
 export interface IncomeSource { id: string; name: string; type: string; amount: number; isRecurring: boolean; dayOfMonth: number | null; startDate: string | null; notes: string | null; lastAutoPayMonth: string | null; categoryId: string | null; category: Category | null; accountId?: string | null; account?: { id: string; name: string; icon: string; color: string } | null; createdAt: string; updatedAt: string; userId: string }
-export interface RecurringTransaction { id: string; name: string; amount: number; type: 'INCOME' | 'EXPENSE'; frequency: string; isActive: boolean; dayOfMonth: number | null; description: string | null; lastAutoMonth: string | null; category: Category; categoryId: string; createdAt: string; updatedAt: string; userId: string }
 export interface UpcomingPersonPayable { id: string; description: string; amount: number; date: string; person: { name: string } }
 export interface MonthIncomeTransaction extends Transaction { isRecurringIncome: boolean }
 export interface MonthlyHistory { month: string; income: number; expense: number }

@@ -146,32 +146,6 @@ export function DeleteIncomeSourceButton({ id }: { id: string }) {
   )
 }
 
-// ─── Recurring Transactions ───────────────────────────────────────────────────
-
-export function DeleteRecurringButton({ id }: { id: string }) {
-  return (
-    <ConfirmDeleteButton
-      action={async () => { await clientApi.deleteRecurring(id); reload() }}
-      icon="trash" label="Excluir recorrência?"
-    />
-  )
-}
-
-export function ToggleRecurringButton({ id, isActive }: { id: string; isActive: boolean }) {
-  return (
-    <button
-      onClick={async () => { await clientApi.toggleRecurring(id); reload() }}
-      className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${
-        isActive
-          ? 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
-          : 'bg-ink-600 text-slate-500 border border-white/6 hover:bg-ink-500'
-      }`}
-      title={isActive ? 'Desativar' : 'Ativar'}
-    >
-      {isActive ? 'Ativa' : 'Inativa'}
-    </button>
-  )
-}
 
 // ─── People ───────────────────────────────────────────────────────────────────
 

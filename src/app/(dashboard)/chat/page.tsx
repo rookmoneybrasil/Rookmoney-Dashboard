@@ -41,7 +41,6 @@ const PAGE_LABELS: Record<string, string> = {
   '/reports':      'Relatórios',
   '/people':       'Pessoas',
   '/categories':   'Categorias',
-  '/recurring':    'Recorrências',
   '/income':       'Rendas',
   '/settings':     'Configurações',
   '/billing':      'Assinatura',

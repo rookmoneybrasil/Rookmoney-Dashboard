@@ -279,7 +279,6 @@ export function BillingClient({ user, hasStripeSubscription = false, cancelAtPer
             <UsageBar used={user.usage.bills}                 limit={user.limits.bills}                label="Contas" />
             <UsageBar used={user.usage.goals}                 limit={user.limits.goals}                label="Metas" />
             <UsageBar used={user.usage.people}                limit={user.limits.people}               label="Pessoas" />
-            <UsageBar used={user.usage.recurring}             limit={user.limits.recurring}            label="Recorrentes" />
           </div>
         </div>
       )}

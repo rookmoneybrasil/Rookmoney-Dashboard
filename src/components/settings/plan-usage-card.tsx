@@ -83,7 +83,6 @@ export function PlanUsageCard({ plan, usage, limits }: Props) {
         <Bar used={usage.goals}                 limit={limits.goals}                label="Metas"        />
         <Bar used={usage.people}                limit={limits.people}               label="Pessoas"      />
         <Bar used={usage.customCategories}      limit={limits.customCategories}     label="Categorias"   />
-        <Bar used={usage.recurring}             limit={limits.recurring}            label="Recorrentes"  />
       </div>
 
       {/* Features */}

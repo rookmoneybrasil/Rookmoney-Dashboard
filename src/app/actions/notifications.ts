@@ -257,7 +257,7 @@ export async function getNotifications(): Promise<{ notifications: AppNotificati
     { title: `📊 Fala ${firstName}`, message: 'Sabia que dá pra ver relatórios completos dos seus gastos?', href: '/reports' },
     { title: '📅 Psiu', message: `${firstName}, já experimentou o calendário financeiro? Vê tudo que entra e sai!`, href: '/calendar' },
     { title: `☀️ Bom dia, ${firstName}!`, message: 'Registrar gastos todo dia é o segredo. 2 minutinhos e pronto!', href: '/' },
-    { title: '🔄 Rookinho avisa', message: `${firstName}, contas tipo Netflix e internet podem ser automáticas. Já configurou?`, href: '/recurring' },
+    { title: '🔄 Rookinho avisa', message: `${firstName}, contas tipo Netflix e internet podem virar Conta Fixa. Já configurou?`, href: '/bills' },
     { title: `🍔 Ei ${firstName}`, message: 'Quanto gastou no iFood esse mês? Categoriza certinho que eu te mostro!', href: '/transactions' },
     { title: '📐 Curiosidade', message: `Regra 50/30/20: 50% necessidades, 30% desejos, 20% poupança. Bora tentar, ${firstName}?`, href: '/budget' },
     { title: `🔍 ${firstName}!`, message: 'Já olhou quanto gastou por categoria esse mês? Às vezes a gente se assusta!', href: '/reports' },
