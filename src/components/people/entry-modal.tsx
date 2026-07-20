@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { Plus, RefreshCw, Calendar } from 'lucide-react'
 import {
   Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter,
@@ -28,6 +29,7 @@ export function EntryModal({ personId, personName, categories, label, variant }:
   const [dayOfMonth, setDay]      = useState(1)
   const [amountNum, setAmountNum] = useState(0)
   const [categoryId, setCatId]    = useState('')
+  const [accountId, setAccId]     = useState<string | null>(null)
 
   function reset() {
     setOpen(false); setEntryType('THEY_OWE_ME'); setMode('single')
@@ -50,7 +52,7 @@ export function EntryModal({ personId, personName, categories, label, variant }:
   const error   = errorEntry || errorRecurring
   const mutate  = mode === 'recorrente'
     ? (data: Parameters<typeof clientApi.createEntry>[1] & { installments?: number }) =>
-        mutateRecurring({ personId, type: data.type, description: data.description, amount: parseFloat(String(data.amount)), dayOfMonth, firstDate: data.date, notes: data.notes, categoryId: data.categoryId ?? null })
+        mutateRecurring({ personId, type: data.type, description: data.description, amount: parseFloat(String(data.amount)), dayOfMonth, firstDate: data.date, notes: data.notes, categoryId: data.categoryId ?? null, accountId })
     : mutateEntry
 
   const today     = new Date().toISOString().split('T')[0]
@@ -90,6 +92,7 @@ export function EntryModal({ personId, personName, categories, label, variant }:
               date:         fd.get('date') as string,
               notes:        (fd.get('notes') as string) || null,
               categoryId:   (fd.get('categoryId') as string) || null,
+              accountId,
               installments: mode === 'parcelado' ? installments : 1,
               alreadyPaid:  mode === 'parcelado' ? alreadyPaid : 0,
             } as Parameters<typeof clientApi.createEntry>[1] & { installments?: number; alreadyPaid?: number })
@@ -218,6 +221,9 @@ export function EntryModal({ personId, personName, categories, label, variant }:
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
             <input type="hidden" name="categoryId" value={categoryId} />
           </FormField>
+
+          {/* Carteira — de onde sai (I_OWE_THEM) / pra onde entra (THEY_OWE_ME) */}
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="notes">
             <Textarea id="notes" name="notes" placeholder="Opcional" className="min-h-[56px]" />

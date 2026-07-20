@@ -19,6 +19,7 @@ export function personEntryInfo(entry: PersonEntryRow, settled: boolean) {
       { label: 'Tipo',        value: isTheyOwe ? 'Te deve' : 'Você deve' },
       { label: settled ? 'Acertado em' : 'Data', value: formatDate(settled ? (entry.settledAt ?? entry.createdAt) : entry.date) },
       { label: 'Categoria',   value: entry.category?.name ? `${entry.category.icon ?? ''} ${entry.category.name}`.trim() : '' },
+      { label: 'Carteira',    value: entry.account?.name ? `${entry.account.icon ?? ''} ${entry.account.name}`.trim() : '' },
       { label: 'Parcela',     value: isInstallment ? `${entry.installmentCurrent}/${entry.installmentTotal}` : '' },
       { label: 'Observações', value: entry.notes ?? '' },
     ],

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { clientApi, type PersonEntryRecurringItem } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 
@@ -16,6 +17,7 @@ interface Props { item: PersonEntryRecurringItem; categories: Category[] }
 export function EditRecurringModal({ item, categories }: Props) {
   const [open, setOpen]       = useState(false)
   const [categoryId, setCatId] = useState(item.categoryId ?? '')
+  const [accountId,  setAccId] = useState<string | null>(item.accountId ?? null)
 
   const { mutate, pending, error } = useMutation(
     (data: { description: string; amount: string; dayOfMonth: string; notes: string }) =>
@@ -24,6 +26,7 @@ export function EditRecurringModal({ item, categories }: Props) {
         amount:      parseFloat(data.amount),
         dayOfMonth:  parseInt(data.dayOfMonth) || item.dayOfMonth,
         categoryId:  categoryId || null,
+        accountId,
         notes:       data.notes || null,
       }),
     { onSuccess: () => setOpen(false) },
@@ -73,6 +76,7 @@ export function EditRecurringModal({ item, categories }: Props) {
           <FormField label="Categoria" htmlFor="er-cat">
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Opcional" />
           </FormField>
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="er-notes">
             <Textarea id="er-notes" name="notes" defaultValue={item.notes ?? ''} className="min-h-[56px]" />

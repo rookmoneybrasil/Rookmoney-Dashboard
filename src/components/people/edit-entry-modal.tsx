@@ -8,6 +8,7 @@ import { Input, FormField, Textarea } from '@/components/ui/input'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { DateInput } from '@/components/ui/date-input'
 import { CategorySelect } from '@/components/ui/category-select'
+import { AccountPicker } from '@/components/ui/account-picker'
 import { clientApi } from '@/lib/api-client'
 import { useMutation } from '@/hooks/use-mutation'
 import type { PersonEntryRow } from '@/lib/api-client'
@@ -24,6 +25,7 @@ interface Props {
 export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props) {
   const [open,       setOpen]    = useState(false)
   const [categoryId, setCatId]   = useState(entry.categoryId ?? '')
+  const [accountId,  setAccId]   = useState<string | null>(entry.accountId ?? null)
   const [entryType,  setType]    = useState(entry.type)
 
   const dateStr  = entry.date ? new Date(entry.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
@@ -37,6 +39,7 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
         amount:       parseFloat(data.amount),
         date:         data.date || undefined,
         categoryId:   categoryId || null,
+        accountId,
         notes:        data.notes || null,
         applyToGroup: isGroup,
       }),
@@ -117,6 +120,7 @@ export function EditEntryModal({ entry, categories, isGroup, groupSize }: Props)
           <FormField label="Categoria" htmlFor="categoryId">
             <CategorySelect categories={categories} value={categoryId} onChange={setCatId} placeholder="Sem categoria" />
           </FormField>
+          <AccountPicker value={accountId} onChange={setAccId} />
 
           <FormField label="Observações" htmlFor="notes">
             <Textarea id="notes" name="notes" defaultValue={entry.notes ?? ''} className="min-h-[56px]" placeholder="Opcional" />
