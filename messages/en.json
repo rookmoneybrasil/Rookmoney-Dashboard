@@ -85,7 +85,8 @@
       "transactions": "Transactions",
       "settings": "Settings",
       "recurring": "Recurring",
-      "achievements": "Achievements"
+      "achievements": "Achievements",
+      "wallets": "Wallets"
     },
     "desc": {
       "dashboard": "Balance, goals, bills and monthly projections",
@@ -101,7 +102,8 @@
       "import": "Import bank statements in OFX or CSV",
       "billing": "Manage your subscription and plan limits",
       "support": "Open a ticket, report bugs or send suggestions",
-      "achievements": "Unlock achievements by using the system"
+      "achievements": "Unlock achievements by using the system",
+      "wallets": "Accounts and cards with balance"
     }
   },
   "auth": {
@@ -272,7 +274,6 @@
     "alreadyPaidNote": "{count} installment(s) already paid will not be created",
     "recurringInfo": "🔁 Monthly recurring payment",
     "recurringNote": "/month · repeats every month on the given date",
-    "perMonth": "/month",
     "nextDue": "Next due date",
     "firstDue": "First due date",
     "perInstallmentLabel": "Amount per installment",
@@ -421,7 +422,15 @@
       "overdue": "Overdue"
     },
     "noEvents": "No events on this day",
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ]
   },
   "projection": {
     "title": "Financial Projection",
@@ -492,7 +501,11 @@
       "amountLabel": "Target amount",
       "createGoal": "Create goal"
     },
-    "stepLabels": ["Income", "Bills", "Goals"],
+    "stepLabels": [
+      "Income",
+      "Bills",
+      "Goals"
+    ],
     "welcome": "Welcome to Rook Money",
     "hello": "Hello, {name}! 👋",
     "setup3steps": "Let's set up your finances in {steps} quick steps — takes less than 2 minutes.",
@@ -576,26 +589,74 @@
       "rights": "All rights reserved."
     },
     "trust": [
-      { "value": "Free",     "label": "to start, no card needed" },
-      { "value": "GDPR",     "label": "data protected by law" },
-      { "value": "TLS 256",  "label": "encryption in transit" },
-      { "value": "Cancel",   "label": "anytime, no penalty" }
+      {
+        "value": "Free",
+        "label": "to start, no card needed"
+      },
+      {
+        "value": "GDPR",
+        "label": "data protected by law"
+      },
+      {
+        "value": "TLS 256",
+        "label": "encryption in transit"
+      },
+      {
+        "value": "Cancel",
+        "label": "anytime, no penalty"
+      }
     ],
     "testimonials": [
-      { "name": "Mariana S.", "role": "Freelance designer", "text": "Finally an app that understands variable income. I can see exactly what's left at the end of the month.", "initials": "MS", "color": "#6366f1" },
-      { "name": "Rafael T.",  "role": "Developer",          "text": "The visual goal tracking motivated me to actually save money. Simple and straightforward.",              "initials": "RT", "color": "#3b82f6" },
-      { "name": "Camila F.",  "role": "Freelancer",         "text": "The bills dashboard saved me from missing payments. Highly recommend.",                                  "initials": "CF", "color": "#8b5cf6" }
+      {
+        "name": "Mariana S.",
+        "role": "Freelance designer",
+        "text": "Finally an app that understands variable income. I can see exactly what's left at the end of the month.",
+        "initials": "MS",
+        "color": "#6366f1"
+      },
+      {
+        "name": "Rafael T.",
+        "role": "Developer",
+        "text": "The visual goal tracking motivated me to actually save money. Simple and straightforward.",
+        "initials": "RT",
+        "color": "#3b82f6"
+      },
+      {
+        "name": "Camila F.",
+        "role": "Freelancer",
+        "text": "The bills dashboard saved me from missing payments. Highly recommend.",
+        "initials": "CF",
+        "color": "#8b5cf6"
+      }
     ],
     "faq": {
       "title": "Frequently asked questions",
       "subtitle": "Still have questions? Talk to us.",
       "items": [
-        { "q": "Is it safe to store my financial data here?", "a": "Yes. All data is transmitted with TLS encryption and stored on secure servers. Passwords are hashed with bcrypt and never visible — not even to us." },
-        { "q": "Can I cancel anytime?", "a": "Yes, no penalties or hassle. Cancel the Pro plan anytime in Settings. You keep access until the end of the paid period, then automatically switch to the free plan." },
-        { "q": "Do I need a credit card to start?", "a": "No. The free plan is 100% free and doesn't require a card. We only ask for payment info if you decide to subscribe to Pro." },
-        { "q": "How does the free plan work?", "a": "You get access to the full dashboard, calendar, bills (up to 5), up to 2 goals and 50 transactions/month. For heavy use — unlimited transactions, financial projection, budgets, reports and AI chat — there's PRO at $9.90/month." },
-        { "q": "Does it work on mobile?", "a": "Yes. The interface is fully responsive and works great on any device. Native Android and iOS app coming soon." },
-        { "q": "Is my data available if I cancel?", "a": "You can export all your data as CSV at any time in Settings. When you delete your account, data is permanently removed within 30 days." }
+        {
+          "q": "Is it safe to store my financial data here?",
+          "a": "Yes. All data is transmitted with TLS encryption and stored on secure servers. Passwords are hashed with bcrypt and never visible — not even to us."
+        },
+        {
+          "q": "Can I cancel anytime?",
+          "a": "Yes, no penalties or hassle. Cancel the Pro plan anytime in Settings. You keep access until the end of the paid period, then automatically switch to the free plan."
+        },
+        {
+          "q": "Do I need a credit card to start?",
+          "a": "No. The free plan is 100% free and doesn't require a card. We only ask for payment info if you decide to subscribe to Pro."
+        },
+        {
+          "q": "How does the free plan work?",
+          "a": "You get access to the full dashboard, calendar, bills (up to 5), up to 2 goals and 50 transactions/month. For heavy use — unlimited transactions, financial projection, budgets, reports and AI chat — there's PRO at $9.90/month."
+        },
+        {
+          "q": "Does it work on mobile?",
+          "a": "Yes. The interface is fully responsive and works great on any device. Native Android and iOS app coming soon."
+        },
+        {
+          "q": "Is my data available if I cancel?",
+          "a": "You can export all your data as CSV at any time in Settings. When you delete your account, data is permanently removed within 30 days."
+        }
       ]
     },
     "cta": {
@@ -654,67 +715,311 @@
     "categoryVolume": "Volume & Engagement",
     "categoryFinancial": "Advanced Financial",
     "items": {
-      "welcome":            { "name": "Welcome to Rook", "desc": "Created your account", "tip": "Create your Rook Money account to unlock" },
-      "first-account":      { "name": "First Account", "desc": "Registered your first bank account", "tip": "Record your first income or expense transaction" },
-      "first-income":       { "name": "Salary on the Table", "desc": "Registered your first income", "tip": "Go to Income and register your first income source" },
-      "first-bill":         { "name": "First Bill", "desc": "Registered your first bill", "tip": "Go to Bills and create your first bill to pay" },
-      "first-goal":         { "name": "Dreamer", "desc": "Created your first goal", "tip": "Go to Goals and create your first financial goal" },
-      "first-transaction":  { "name": "First Transaction", "desc": "Recorded your first transaction", "tip": "Record any income or expense transaction" },
-      "complete-profile":   { "name": "Complete Profile", "desc": "Filled name, email and photo", "tip": "Go to Settings and add your profile picture" },
-      "organized":          { "name": "Organized", "desc": "Bills in 3+ categories", "tip": "Have bills spread across at least 3 different categories" },
-      "archivist":          { "name": "Archivist", "desc": "Bills in 7+ categories", "tip": "Have bills spread across at least 7 different categories" },
-      "autopilot":          { "name": "On Autopilot", "desc": "Created first recurring bill", "tip": "Create a recurring bill that repeats every month automatically" },
-      "full-autopilot":     { "name": "Full Autopilot", "desc": "10+ active recurring bills", "tip": "Have 10 or more active recurring bills at the same time" },
-      "split-right":        { "name": "Split Right", "desc": "Linked a person to a bill", "tip": "Go to People and record a debt or loan with someone" },
-      "financial-network":  { "name": "Financial Network", "desc": "5+ people with linked bills", "tip": "Have at least 5 people with debt entries registered" },
-      "multi-income":       { "name": "Multi-Income", "desc": "3+ income sources registered", "tip": "Register 3 or more different income sources" },
-      "diversified":        { "name": "Diversified", "desc": "5+ income sources registered", "tip": "Register 5 or more different income sources" },
-      "full-panorama":      { "name": "Full Panorama", "desc": "Bills, income, goals and transactions", "tip": "Have at least one bill, income, goal and transaction registered" },
-      "punctual":           { "name": "Punctual", "desc": "Paid 5 bills on time", "tip": "Pay 5 bills on or before their due date" },
-      "super-punctual":     { "name": "Super Punctual", "desc": "Paid 25 bills on time", "tip": "Pay 25 bills on or before their due date" },
-      "relentless":         { "name": "Relentless", "desc": "Paid 100 bills on time", "tip": "Pay 100 bills on or before their due date" },
-      "punctuality-legend": { "name": "Punctuality Legend", "desc": "Paid 500 bills on time", "tip": "Pay 500 bills on or before their due date — long-term goal!" },
-      "clean-month":        { "name": "Clean Month", "desc": "Paid all bills in a month", "tip": "Pay every single bill in the current month" },
-      "perfect-quarter":    { "name": "Perfect Quarter", "desc": "3 months without late bills", "tip": "Go 3 consecutive months without any overdue bills" },
-      "golden-semester":    { "name": "Golden Semester", "desc": "6 months without late bills", "tip": "Go 6 consecutive months without any overdue bills" },
-      "flawless-year":      { "name": "Flawless Year", "desc": "12 months without late bills", "tip": "Go 12 consecutive months without any overdue bills" },
-      "cleared-month":      { "name": "Month Cleared", "desc": "No overdue bills this month", "tip": "End the month with zero overdue bills" },
-      "lightning-payer":    { "name": "Lightning Payer", "desc": "Paid same day as created", "tip": "Create a bill and pay it on the same day" },
-      "ahead-of-time":      { "name": "Ahead of Time", "desc": "Paid 7+ days before due date", "tip": "Pay any bill at least 7 days before its due date" },
-      "fortune-teller":     { "name": "Fortune Teller", "desc": "Paid 30+ days before due date", "tip": "Pay any bill at least 30 days before its due date" },
-      "first-deposit":      { "name": "First Deposit", "desc": "First contribution to a goal", "tip": "Make your first contribution to any financial goal" },
-      "steady":             { "name": "Steady", "desc": "5 contributions to goals", "tip": "Make 5 contributions to goals (can be different goals)" },
-      "dedicated":          { "name": "Dedicated", "desc": "20 contributions to goals", "tip": "Make 20 contributions to goals — consistency is key!" },
-      "obsessive":          { "name": "Obsessive", "desc": "50 contributions to goals", "tip": "Make 50 contributions to goals — unstoppable!" },
-      "halfway":            { "name": "Halfway There", "desc": "50% of any goal", "tip": "Reach 50% of the target amount of any goal" },
-      "goal-reached":       { "name": "Goal Reached!", "desc": "Completed a goal", "tip": "Reach 100% of a goal's target amount" },
-      "dream-collector":    { "name": "Dream Collector", "desc": "Completed 3 goals", "tip": "Complete 3 different financial goals" },
-      "achiever":           { "name": "Achiever", "desc": "Completed 5 goals", "tip": "Complete 5 different financial goals" },
-      "dream-machine":      { "name": "Dream Machine", "desc": "Completed 10 goals", "tip": "Complete 10 different financial goals" },
-      "heavy-deposit":      { "name": "Heavy Deposit", "desc": "Single R$1,000+ contribution", "tip": "Make a single contribution of R$1,000 or more to any goal" },
-      "monster-deposit":    { "name": "Monster Deposit", "desc": "Single R$5,000+ contribution", "tip": "Make a single contribution of R$5,000 or more to any goal" },
-      "goal-millionaire":   { "name": "Goal Millionaire", "desc": "R$10,000+ across all goals", "tip": "Have R$10,000 or more accumulated across all your goals" },
-      "10-bills":           { "name": "10 Bills", "desc": "Created 10 bills", "tip": "Create 10 bills in total" },
-      "50-bills":           { "name": "50 Bills", "desc": "Created 50 bills", "tip": "Create 50 bills in total" },
-      "100-bills":          { "name": "Centenary", "desc": "Created 100 bills", "tip": "Create 100 bills in total" },
-      "500-bills":          { "name": "Marathon Runner", "desc": "Created 500 bills", "tip": "Create 500 bills in total — dedication!" },
-      "50-transactions":    { "name": "Logger", "desc": "50 transactions recorded", "tip": "Record 50 income or expense transactions" },
-      "200-transactions":   { "name": "Accountant", "desc": "200 transactions recorded", "tip": "Record 200 income or expense transactions" },
-      "500-transactions":   { "name": "Auditor", "desc": "500 transactions recorded", "tip": "Record 500 transactions — total control!" },
-      "veteran":            { "name": "Veteran", "desc": "Account active for 3 months", "tip": "Keep your account active for at least 3 months" },
-      "rooted":             { "name": "Rooted", "desc": "Account active for 6 months", "tip": "Keep your account active for at least 6 months" },
-      "legendary":          { "name": "Legendary", "desc": "Account active for 1 year", "tip": "Keep your account active for at least 1 year" },
-      "eternal":            { "name": "Eternal", "desc": "Account active for 2 years", "tip": "Keep your account active for at least 2 years" },
-      "positive-balance":   { "name": "Positive Balance", "desc": "Month with income > expenses", "tip": "End a month with your income higher than your expenses" },
-      "surplus-3":          { "name": "Surplus x3", "desc": "3 months with income > expenses", "tip": "Go 3 consecutive months spending less than you earn" },
-      "surplus-6":          { "name": "Surplus x6", "desc": "6 months with income > expenses", "tip": "Go 6 consecutive months spending less than you earn" },
-      "balance-guardian":   { "name": "Balance Guardian", "desc": "12 months with income > expenses", "tip": "Go 12 consecutive months spending less than you earn" },
-      "economist":          { "name": "Economist", "desc": "Spent less than 80% of income", "tip": "In any month, spend less than 80% of your total income" },
-      "frugal":             { "name": "Frugal", "desc": "Spent less than 50% of income", "tip": "In any month, spend less than 50% of your total income" },
-      "debt-free":          { "name": "Debt Free", "desc": "Zero open bills", "tip": "Pay all your bills — none left pending!" },
-      "big-payment":        { "name": "Big Payment", "desc": "Paid a R$1,000+ bill", "tip": "Pay a bill worth R$1,000 or more" },
-      "epic-payment":       { "name": "Epic Payment", "desc": "Paid a R$5,000+ bill", "tip": "Pay a bill worth R$5,000 or more" },
-      "investor":           { "name": "Investor", "desc": "3+ active goals simultaneously", "tip": "Have 3 or more active (not completed) goals at the same time" }
+      "welcome": {
+        "name": "Welcome to Rook",
+        "desc": "Created your account",
+        "tip": "Create your Rook Money account to unlock"
+      },
+      "first-account": {
+        "name": "First Account",
+        "desc": "Registered your first bank account",
+        "tip": "Record your first income or expense transaction"
+      },
+      "first-income": {
+        "name": "Salary on the Table",
+        "desc": "Registered your first income",
+        "tip": "Go to Income and register your first income source"
+      },
+      "first-bill": {
+        "name": "First Bill",
+        "desc": "Registered your first bill",
+        "tip": "Go to Bills and create your first bill to pay"
+      },
+      "first-goal": {
+        "name": "Dreamer",
+        "desc": "Created your first goal",
+        "tip": "Go to Goals and create your first financial goal"
+      },
+      "first-transaction": {
+        "name": "First Transaction",
+        "desc": "Recorded your first transaction",
+        "tip": "Record any income or expense transaction"
+      },
+      "complete-profile": {
+        "name": "Complete Profile",
+        "desc": "Filled name, email and photo",
+        "tip": "Go to Settings and add your profile picture"
+      },
+      "organized": {
+        "name": "Organized",
+        "desc": "Bills in 3+ categories",
+        "tip": "Have bills spread across at least 3 different categories"
+      },
+      "archivist": {
+        "name": "Archivist",
+        "desc": "Bills in 7+ categories",
+        "tip": "Have bills spread across at least 7 different categories"
+      },
+      "autopilot": {
+        "name": "On Autopilot",
+        "desc": "Created first recurring bill",
+        "tip": "Create a recurring bill that repeats every month automatically"
+      },
+      "full-autopilot": {
+        "name": "Full Autopilot",
+        "desc": "10+ active recurring bills",
+        "tip": "Have 10 or more active recurring bills at the same time"
+      },
+      "split-right": {
+        "name": "Split Right",
+        "desc": "Linked a person to a bill",
+        "tip": "Go to People and record a debt or loan with someone"
+      },
+      "financial-network": {
+        "name": "Financial Network",
+        "desc": "5+ people with linked bills",
+        "tip": "Have at least 5 people with debt entries registered"
+      },
+      "multi-income": {
+        "name": "Multi-Income",
+        "desc": "3+ income sources registered",
+        "tip": "Register 3 or more different income sources"
+      },
+      "diversified": {
+        "name": "Diversified",
+        "desc": "5+ income sources registered",
+        "tip": "Register 5 or more different income sources"
+      },
+      "full-panorama": {
+        "name": "Full Panorama",
+        "desc": "Bills, income, goals and transactions",
+        "tip": "Have at least one bill, income, goal and transaction registered"
+      },
+      "punctual": {
+        "name": "Punctual",
+        "desc": "Paid 5 bills on time",
+        "tip": "Pay 5 bills on or before their due date"
+      },
+      "super-punctual": {
+        "name": "Super Punctual",
+        "desc": "Paid 25 bills on time",
+        "tip": "Pay 25 bills on or before their due date"
+      },
+      "relentless": {
+        "name": "Relentless",
+        "desc": "Paid 100 bills on time",
+        "tip": "Pay 100 bills on or before their due date"
+      },
+      "punctuality-legend": {
+        "name": "Punctuality Legend",
+        "desc": "Paid 500 bills on time",
+        "tip": "Pay 500 bills on or before their due date — long-term goal!"
+      },
+      "clean-month": {
+        "name": "Clean Month",
+        "desc": "Paid all bills in a month",
+        "tip": "Pay every single bill in the current month"
+      },
+      "perfect-quarter": {
+        "name": "Perfect Quarter",
+        "desc": "3 months without late bills",
+        "tip": "Go 3 consecutive months without any overdue bills"
+      },
+      "golden-semester": {
+        "name": "Golden Semester",
+        "desc": "6 months without late bills",
+        "tip": "Go 6 consecutive months without any overdue bills"
+      },
+      "flawless-year": {
+        "name": "Flawless Year",
+        "desc": "12 months without late bills",
+        "tip": "Go 12 consecutive months without any overdue bills"
+      },
+      "cleared-month": {
+        "name": "Month Cleared",
+        "desc": "No overdue bills this month",
+        "tip": "End the month with zero overdue bills"
+      },
+      "lightning-payer": {
+        "name": "Lightning Payer",
+        "desc": "Paid same day as created",
+        "tip": "Create a bill and pay it on the same day"
+      },
+      "ahead-of-time": {
+        "name": "Ahead of Time",
+        "desc": "Paid 7+ days before due date",
+        "tip": "Pay any bill at least 7 days before its due date"
+      },
+      "fortune-teller": {
+        "name": "Fortune Teller",
+        "desc": "Paid 30+ days before due date",
+        "tip": "Pay any bill at least 30 days before its due date"
+      },
+      "first-deposit": {
+        "name": "First Deposit",
+        "desc": "First contribution to a goal",
+        "tip": "Make your first contribution to any financial goal"
+      },
+      "steady": {
+        "name": "Steady",
+        "desc": "5 contributions to goals",
+        "tip": "Make 5 contributions to goals (can be different goals)"
+      },
+      "dedicated": {
+        "name": "Dedicated",
+        "desc": "20 contributions to goals",
+        "tip": "Make 20 contributions to goals — consistency is key!"
+      },
+      "obsessive": {
+        "name": "Obsessive",
+        "desc": "50 contributions to goals",
+        "tip": "Make 50 contributions to goals — unstoppable!"
+      },
+      "halfway": {
+        "name": "Halfway There",
+        "desc": "50% of any goal",
+        "tip": "Reach 50% of the target amount of any goal"
+      },
+      "goal-reached": {
+        "name": "Goal Reached!",
+        "desc": "Completed a goal",
+        "tip": "Reach 100% of a goal's target amount"
+      },
+      "dream-collector": {
+        "name": "Dream Collector",
+        "desc": "Completed 3 goals",
+        "tip": "Complete 3 different financial goals"
+      },
+      "achiever": {
+        "name": "Achiever",
+        "desc": "Completed 5 goals",
+        "tip": "Complete 5 different financial goals"
+      },
+      "dream-machine": {
+        "name": "Dream Machine",
+        "desc": "Completed 10 goals",
+        "tip": "Complete 10 different financial goals"
+      },
+      "heavy-deposit": {
+        "name": "Heavy Deposit",
+        "desc": "Single R$1,000+ contribution",
+        "tip": "Make a single contribution of R$1,000 or more to any goal"
+      },
+      "monster-deposit": {
+        "name": "Monster Deposit",
+        "desc": "Single R$5,000+ contribution",
+        "tip": "Make a single contribution of R$5,000 or more to any goal"
+      },
+      "goal-millionaire": {
+        "name": "Goal Millionaire",
+        "desc": "R$10,000+ across all goals",
+        "tip": "Have R$10,000 or more accumulated across all your goals"
+      },
+      "10-bills": {
+        "name": "10 Bills",
+        "desc": "Created 10 bills",
+        "tip": "Create 10 bills in total"
+      },
+      "50-bills": {
+        "name": "50 Bills",
+        "desc": "Created 50 bills",
+        "tip": "Create 50 bills in total"
+      },
+      "100-bills": {
+        "name": "Centenary",
+        "desc": "Created 100 bills",
+        "tip": "Create 100 bills in total"
+      },
+      "500-bills": {
+        "name": "Marathon Runner",
+        "desc": "Created 500 bills",
+        "tip": "Create 500 bills in total — dedication!"
+      },
+      "50-transactions": {
+        "name": "Logger",
+        "desc": "50 transactions recorded",
+        "tip": "Record 50 income or expense transactions"
+      },
+      "200-transactions": {
+        "name": "Accountant",
+        "desc": "200 transactions recorded",
+        "tip": "Record 200 income or expense transactions"
+      },
+      "500-transactions": {
+        "name": "Auditor",
+        "desc": "500 transactions recorded",
+        "tip": "Record 500 transactions — total control!"
+      },
+      "veteran": {
+        "name": "Veteran",
+        "desc": "Account active for 3 months",
+        "tip": "Keep your account active for at least 3 months"
+      },
+      "rooted": {
+        "name": "Rooted",
+        "desc": "Account active for 6 months",
+        "tip": "Keep your account active for at least 6 months"
+      },
+      "legendary": {
+        "name": "Legendary",
+        "desc": "Account active for 1 year",
+        "tip": "Keep your account active for at least 1 year"
+      },
+      "eternal": {
+        "name": "Eternal",
+        "desc": "Account active for 2 years",
+        "tip": "Keep your account active for at least 2 years"
+      },
+      "positive-balance": {
+        "name": "Positive Balance",
+        "desc": "Month with income > expenses",
+        "tip": "End a month with your income higher than your expenses"
+      },
+      "surplus-3": {
+        "name": "Surplus x3",
+        "desc": "3 months with income > expenses",
+        "tip": "Go 3 consecutive months spending less than you earn"
+      },
+      "surplus-6": {
+        "name": "Surplus x6",
+        "desc": "6 months with income > expenses",
+        "tip": "Go 6 consecutive months spending less than you earn"
+      },
+      "balance-guardian": {
+        "name": "Balance Guardian",
+        "desc": "12 months with income > expenses",
+        "tip": "Go 12 consecutive months spending less than you earn"
+      },
+      "economist": {
+        "name": "Economist",
+        "desc": "Spent less than 80% of income",
+        "tip": "In any month, spend less than 80% of your total income"
+      },
+      "frugal": {
+        "name": "Frugal",
+        "desc": "Spent less than 50% of income",
+        "tip": "In any month, spend less than 50% of your total income"
+      },
+      "debt-free": {
+        "name": "Debt Free",
+        "desc": "Zero open bills",
+        "tip": "Pay all your bills — none left pending!"
+      },
+      "big-payment": {
+        "name": "Big Payment",
+        "desc": "Paid a R$1,000+ bill",
+        "tip": "Pay a bill worth R$1,000 or more"
+      },
+      "epic-payment": {
+        "name": "Epic Payment",
+        "desc": "Paid a R$5,000+ bill",
+        "tip": "Pay a bill worth R$5,000 or more"
+      },
+      "investor": {
+        "name": "Investor",
+        "desc": "3+ active goals simultaneously",
+        "tip": "Have 3 or more active (not completed) goals at the same time"
+      }
     }
   }
 }

@@ -85,7 +85,8 @@
       "transactions": "Transações",
       "settings": "Configurações",
       "recurring": "Recorrências",
-      "achievements": "Conquistas"
+      "achievements": "Conquistas",
+      "wallets": "Carteiras"
     },
     "desc": {
       "dashboard": "Saldo, metas, contas e projeções do mês",
@@ -101,7 +102,8 @@
       "import": "Importe extratos bancários em OFX ou CSV",
       "billing": "Gerencie sua assinatura e limites do plano",
       "support": "Abra um ticket, reporte bugs ou envie sugestões",
-      "achievements": "Desbloqueie conquistas usando o sistema"
+      "achievements": "Desbloqueie conquistas usando o sistema",
+      "wallets": "Contas e cartões com saldo"
     }
   },
   "auth": {
@@ -272,7 +274,6 @@
     "alreadyPaidNote": "{count} parcela(s) já paga(s) não serão cadastradas",
     "recurringInfo": "🔁 Pagamento mensal recorrente",
     "recurringNote": "/mês · repete todo mês na data informada",
-    "perMonth": "/mês",
     "nextDue": "Próximo vencimento",
     "firstDue": "1º vencimento",
     "perInstallmentLabel": "Valor por parcela (R$)",
@@ -421,7 +422,15 @@
       "overdue": "Vencido"
     },
     "noEvents": "Nenhum evento neste dia",
-    "weekdays": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+    "weekdays": [
+      "Dom",
+      "Seg",
+      "Ter",
+      "Qua",
+      "Qui",
+      "Sex",
+      "Sáb"
+    ]
   },
   "projection": {
     "title": "Projeção Financeira",
@@ -492,7 +501,11 @@
       "amountLabel": "Valor alvo (R$)",
       "createGoal": "Criar meta"
     },
-    "stepLabels": ["Renda", "Contas", "Metas"],
+    "stepLabels": [
+      "Renda",
+      "Contas",
+      "Metas"
+    ],
     "welcome": "Bem-vindo ao Rook Money",
     "hello": "Olá, {name}! 👋",
     "setup3steps": "Vamos configurar seu financeiro em {steps} passos rápidos — leva menos de 2 minutos.",
@@ -576,26 +589,74 @@
       "rights": "Todos os direitos reservados."
     },
     "trust": [
-      { "value": "Grátis",   "label": "para começar, sem cartão" },
-      { "value": "LGPD",     "label": "dados protegidos por lei" },
-      { "value": "TLS 256",  "label": "criptografia em trânsito" },
-      { "value": "Cancela",  "label": "quando quiser, sem multa" }
+      {
+        "value": "Grátis",
+        "label": "para começar, sem cartão"
+      },
+      {
+        "value": "LGPD",
+        "label": "dados protegidos por lei"
+      },
+      {
+        "value": "TLS 256",
+        "label": "criptografia em trânsito"
+      },
+      {
+        "value": "Cancela",
+        "label": "quando quiser, sem multa"
+      }
     ],
     "testimonials": [
-      { "name": "Mariana S.", "role": "Designer freelancer", "text": "Finalmente um app que entende renda variável. Consigo ver exatamente o que sobra no mês.", "initials": "MS", "color": "#6366f1" },
-      { "name": "Rafael T.",  "role": "Desenvolvedor",       "text": "As metas com acompanhamento visual me motivaram a poupar de verdade. Simples e direto.",       "initials": "RT", "color": "#3b82f6" },
-      { "name": "Camila F.",  "role": "Autônoma",            "text": "O dashboard de contas a pagar me salvou de esquecer boletos. Recomendo demais.",              "initials": "CF", "color": "#8b5cf6" }
+      {
+        "name": "Mariana S.",
+        "role": "Designer freelancer",
+        "text": "Finalmente um app que entende renda variável. Consigo ver exatamente o que sobra no mês.",
+        "initials": "MS",
+        "color": "#6366f1"
+      },
+      {
+        "name": "Rafael T.",
+        "role": "Desenvolvedor",
+        "text": "As metas com acompanhamento visual me motivaram a poupar de verdade. Simples e direto.",
+        "initials": "RT",
+        "color": "#3b82f6"
+      },
+      {
+        "name": "Camila F.",
+        "role": "Autônoma",
+        "text": "O dashboard de contas a pagar me salvou de esquecer boletos. Recomendo demais.",
+        "initials": "CF",
+        "color": "#8b5cf6"
+      }
     ],
     "faq": {
       "title": "Perguntas frequentes",
       "subtitle": "Ainda com dúvidas? Fala com a gente.",
       "items": [
-        { "q": "É seguro guardar meus dados financeiros aqui?", "a": "Sim. Todos os dados são transmitidos com criptografia TLS e armazenados em servidores seguros. Senhas são protegidas com hash bcrypt e nunca ficam visíveis — nem pra gente. Seguimos a LGPD." },
-        { "q": "Posso cancelar quando quiser?", "a": "Sim, sem multa ou burocracia. Cancele o plano Pro a qualquer momento nas Configurações. Você continua com acesso até o fim do período já pago e depois migra pro plano gratuito automaticamente." },
-        { "q": "Preciso de cartão de crédito para começar?", "a": "Não. O plano gratuito é 100% gratuito e não exige cartão. Só pedimos dados de pagamento se você decidir assinar o Pro." },
-        { "q": "Como funciona o plano gratuito?", "a": "Você tem acesso ao dashboard completo, calendário, contas a pagar (até 5), até 2 metas e 50 transações/mês. Para uso intenso — transações ilimitadas, projeção financeira, orçamento, relatórios e chat com IA — existe o PRO por R$19,90/mês." },
-        { "q": "Funciona no celular?", "a": "Sim. A interface é totalmente responsiva e funciona bem em qualquer dispositivo. Em breve app nativo para Android e iOS." },
-        { "q": "Meus dados ficam disponíveis se eu cancelar?", "a": "Você pode exportar todos os seus dados em CSV a qualquer momento nas Configurações. Ao excluir a conta, os dados são removidos permanentemente em até 30 dias." }
+        {
+          "q": "É seguro guardar meus dados financeiros aqui?",
+          "a": "Sim. Todos os dados são transmitidos com criptografia TLS e armazenados em servidores seguros. Senhas são protegidas com hash bcrypt e nunca ficam visíveis — nem pra gente. Seguimos a LGPD."
+        },
+        {
+          "q": "Posso cancelar quando quiser?",
+          "a": "Sim, sem multa ou burocracia. Cancele o plano Pro a qualquer momento nas Configurações. Você continua com acesso até o fim do período já pago e depois migra pro plano gratuito automaticamente."
+        },
+        {
+          "q": "Preciso de cartão de crédito para começar?",
+          "a": "Não. O plano gratuito é 100% gratuito e não exige cartão. Só pedimos dados de pagamento se você decidir assinar o Pro."
+        },
+        {
+          "q": "Como funciona o plano gratuito?",
+          "a": "Você tem acesso ao dashboard completo, calendário, contas a pagar (até 5), até 2 metas e 50 transações/mês. Para uso intenso — transações ilimitadas, projeção financeira, orçamento, relatórios e chat com IA — existe o PRO por R$19,90/mês."
+        },
+        {
+          "q": "Funciona no celular?",
+          "a": "Sim. A interface é totalmente responsiva e funciona bem em qualquer dispositivo. Em breve app nativo para Android e iOS."
+        },
+        {
+          "q": "Meus dados ficam disponíveis se eu cancelar?",
+          "a": "Você pode exportar todos os seus dados em CSV a qualquer momento nas Configurações. Ao excluir a conta, os dados são removidos permanentemente em até 30 dias."
+        }
       ]
     },
     "cta": {
@@ -654,67 +715,311 @@
     "categoryVolume": "Volume & Engajamento",
     "categoryFinancial": "Financeiro Avançado",
     "items": {
-      "welcome":            { "name": "Bem-vindo ao Rook", "desc": "Criou sua conta", "tip": "Crie sua conta no Rook Money para desbloquear" },
-      "first-account":      { "name": "Primeira Conta", "desc": "Cadastrou a primeira conta bancária", "tip": "Registre sua primeira transação de receita ou despesa" },
-      "first-income":       { "name": "Salário na Mesa", "desc": "Cadastrou a primeira renda", "tip": "Vá em Rendas e cadastre sua primeira fonte de renda" },
-      "first-bill":         { "name": "Primeira Fatura", "desc": "Cadastrou a primeira conta a pagar", "tip": "Vá em Contas e cadastre sua primeira conta a pagar" },
-      "first-goal":         { "name": "Sonhador", "desc": "Criou o primeiro objetivo", "tip": "Vá em Metas e crie seu primeiro objetivo financeiro" },
-      "first-transaction":  { "name": "Primeira Transação", "desc": "Registrou a primeira transação", "tip": "Registre qualquer transação de receita ou despesa" },
-      "complete-profile":   { "name": "Perfil Completo", "desc": "Preencheu nome, email e foto", "tip": "Vá em Configurações e adicione sua foto de perfil" },
-      "organized":          { "name": "Organizadinho", "desc": "Contas em 3+ categorias", "tip": "Tenha contas a pagar distribuídas em pelo menos 3 categorias diferentes" },
-      "archivist":          { "name": "Arquivista", "desc": "Contas em 7+ categorias", "tip": "Tenha contas a pagar distribuídas em pelo menos 7 categorias diferentes" },
-      "autopilot":          { "name": "No Automático", "desc": "Criou a primeira conta recorrente", "tip": "Crie uma conta recorrente que se repete todo mês automaticamente" },
-      "full-autopilot":     { "name": "Piloto Automático", "desc": "10+ contas recorrentes ativas", "tip": "Tenha 10 ou mais contas recorrentes ativas ao mesmo tempo" },
-      "split-right":        { "name": "Dividindo Certo", "desc": "Associou uma pessoa a uma conta", "tip": "Vá em Pessoas e registre uma dívida ou empréstimo com alguém" },
-      "financial-network":  { "name": "Rede Financeira", "desc": "5+ pessoas com contas associadas", "tip": "Tenha pelo menos 5 pessoas com entradas de dívidas registradas" },
-      "multi-income":       { "name": "Multi-Renda", "desc": "3+ fontes de renda cadastradas", "tip": "Cadastre 3 ou mais fontes de renda diferentes (emprego, freelance, etc.)" },
-      "diversified":        { "name": "Diversificado", "desc": "5+ fontes de renda cadastradas", "tip": "Cadastre 5 ou mais fontes de renda diferentes" },
-      "full-panorama":      { "name": "Panorama Completo", "desc": "Contas, rendas, metas e transações", "tip": "Tenha pelo menos uma conta, uma renda, uma meta e uma transação cadastrados" },
-      "punctual":           { "name": "Pontual", "desc": "Pagou 5 contas no prazo", "tip": "Pague 5 contas antes ou no dia do vencimento" },
-      "super-punctual":     { "name": "Super Pontual", "desc": "Pagou 25 contas no prazo", "tip": "Pague 25 contas antes ou no dia do vencimento" },
-      "relentless":         { "name": "Implacável", "desc": "Pagou 100 contas no prazo", "tip": "Pague 100 contas antes ou no dia do vencimento" },
-      "punctuality-legend": { "name": "Lenda da Pontualidade", "desc": "Pagou 500 contas no prazo", "tip": "Pague 500 contas antes ou no dia do vencimento — longo prazo!" },
-      "clean-month":        { "name": "Mês Limpo", "desc": "Pagou todas as contas do mês", "tip": "Pague todas as contas do mês atual, sem deixar nenhuma pendente" },
-      "perfect-quarter":    { "name": "Trimestre Perfeito", "desc": "3 meses sem atraso", "tip": "Fique 3 meses consecutivos sem nenhuma conta atrasada" },
-      "golden-semester":    { "name": "Semestre de Ouro", "desc": "6 meses sem atraso", "tip": "Fique 6 meses consecutivos sem nenhuma conta atrasada" },
-      "flawless-year":      { "name": "Ano Impecável", "desc": "12 meses sem atraso", "tip": "Fique 12 meses consecutivos sem nenhuma conta atrasada" },
-      "cleared-month":      { "name": "Zerou o Mês", "desc": "Nenhuma conta atrasada no mês", "tip": "Termine o mês sem nenhuma conta com vencimento atrasado" },
-      "lightning-payer":    { "name": "Pagador Relâmpago", "desc": "Pagou no mesmo dia que cadastrou", "tip": "Cadastre uma conta e pague ela no mesmo dia" },
-      "ahead-of-time":      { "name": "Adiantado", "desc": "Pagou 7+ dias antes do vencimento", "tip": "Pague qualquer conta com pelo menos 7 dias de antecedência" },
-      "fortune-teller":     { "name": "Previsor", "desc": "Pagou 30+ dias antes do vencimento", "tip": "Pague qualquer conta com pelo menos 30 dias de antecedência" },
-      "first-deposit":      { "name": "Primeiro Depósito", "desc": "Primeira contribuição a uma meta", "tip": "Faça seu primeiro aporte em qualquer meta financeira" },
-      "steady":             { "name": "Constante", "desc": "5 contribuições a metas", "tip": "Faça 5 aportes em metas (pode ser em metas diferentes)" },
-      "dedicated":          { "name": "Dedicado", "desc": "20 contribuições a metas", "tip": "Faça 20 aportes em metas — consistência é a chave!" },
-      "obsessive":          { "name": "Obsessivo", "desc": "50 contribuições a metas", "tip": "Faça 50 aportes em metas — você é imparável!" },
-      "halfway":            { "name": "Meio Caminho", "desc": "50% de qualquer meta", "tip": "Atinja 50% do valor alvo de qualquer meta" },
-      "goal-reached":       { "name": "Meta Batida!", "desc": "Completou uma meta", "tip": "Atinja 100% do valor alvo de uma meta" },
-      "dream-collector":    { "name": "Colecionador de Sonhos", "desc": "Completou 3 metas", "tip": "Complete 3 metas financeiras diferentes" },
-      "achiever":           { "name": "Realizador", "desc": "Completou 5 metas", "tip": "Complete 5 metas financeiras diferentes" },
-      "dream-machine":      { "name": "Máquina de Sonhos", "desc": "Completou 10 metas", "tip": "Complete 10 metas financeiras diferentes" },
-      "heavy-deposit":      { "name": "Aporte Pesado", "desc": "Aporte de R$1.000+ em uma meta", "tip": "Faça um único aporte de R$1.000 ou mais em qualquer meta" },
-      "monster-deposit":    { "name": "Aporte Monstro", "desc": "Aporte de R$5.000+ em uma meta", "tip": "Faça um único aporte de R$5.000 ou mais em qualquer meta" },
-      "goal-millionaire":   { "name": "Milionário em Metas", "desc": "R$10.000+ acumulados em metas", "tip": "Tenha R$10.000 ou mais acumulados somando todas as suas metas" },
-      "10-bills":           { "name": "10 Contas", "desc": "Cadastrou 10 contas", "tip": "Cadastre 10 contas a pagar no total" },
-      "50-bills":           { "name": "50 Contas", "desc": "Cadastrou 50 contas", "tip": "Cadastre 50 contas a pagar no total" },
-      "100-bills":          { "name": "Centenário", "desc": "Cadastrou 100 contas", "tip": "Cadastre 100 contas a pagar no total" },
-      "500-bills":          { "name": "Maratonista", "desc": "Cadastrou 500 contas", "tip": "Cadastre 500 contas a pagar no total — dedicação!" },
-      "50-transactions":    { "name": "Registrador", "desc": "50 transações registradas", "tip": "Registre 50 transações de receita ou despesa" },
-      "200-transactions":   { "name": "Contador", "desc": "200 transações registradas", "tip": "Registre 200 transações de receita ou despesa" },
-      "500-transactions":   { "name": "Auditor", "desc": "500 transações registradas", "tip": "Registre 500 transações — controle total!" },
-      "veteran":            { "name": "Veterano", "desc": "Conta ativa por 3 meses", "tip": "Mantenha sua conta ativa por pelo menos 3 meses" },
-      "rooted":             { "name": "Raiz", "desc": "Conta ativa por 6 meses", "tip": "Mantenha sua conta ativa por pelo menos 6 meses" },
-      "legendary":          { "name": "Lendário", "desc": "Conta ativa por 1 ano", "tip": "Mantenha sua conta ativa por pelo menos 1 ano" },
-      "eternal":            { "name": "Eterno", "desc": "Conta ativa por 2 anos", "tip": "Mantenha sua conta ativa por pelo menos 2 anos" },
-      "positive-balance":   { "name": "Saldo Positivo", "desc": "Mês com renda > despesas", "tip": "Termine o mês com suas receitas maiores que as despesas" },
-      "surplus-3":          { "name": "Superávit x3", "desc": "3 meses com renda > despesas", "tip": "Fique 3 meses consecutivos gastando menos do que ganha" },
-      "surplus-6":          { "name": "Superávit x6", "desc": "6 meses com renda > despesas", "tip": "Fique 6 meses consecutivos gastando menos do que ganha" },
-      "balance-guardian":   { "name": "Guardião do Saldo", "desc": "12 meses com renda > despesas", "tip": "Fique 12 meses consecutivos gastando menos do que ganha" },
-      "economist":          { "name": "Economista", "desc": "Gastou menos de 80% da renda", "tip": "Em qualquer mês, gaste menos de 80% da sua renda total" },
-      "frugal":             { "name": "Frugal", "desc": "Gastou menos de 50% da renda", "tip": "Em qualquer mês, gaste menos de 50% da sua renda total" },
-      "debt-free":          { "name": "Sem Dívidas", "desc": "Zero contas em aberto", "tip": "Pague todas as suas contas — nenhuma pendente!" },
-      "big-payment":        { "name": "Grande Pagamento", "desc": "Pagou uma conta de R$1.000+", "tip": "Pague uma conta com valor de R$1.000 ou mais" },
-      "epic-payment":       { "name": "Pagamento Épico", "desc": "Pagou uma conta de R$5.000+", "tip": "Pague uma conta com valor de R$5.000 ou mais" },
-      "investor":           { "name": "Investidor", "desc": "3+ metas ativas simultaneamente", "tip": "Tenha 3 ou mais metas ativas (não completadas) ao mesmo tempo" }
+      "welcome": {
+        "name": "Bem-vindo ao Rook",
+        "desc": "Criou sua conta",
+        "tip": "Crie sua conta no Rook Money para desbloquear"
+      },
+      "first-account": {
+        "name": "Primeira Conta",
+        "desc": "Cadastrou a primeira conta bancária",
+        "tip": "Registre sua primeira transação de receita ou despesa"
+      },
+      "first-income": {
+        "name": "Salário na Mesa",
+        "desc": "Cadastrou a primeira renda",
+        "tip": "Vá em Rendas e cadastre sua primeira fonte de renda"
+      },
+      "first-bill": {
+        "name": "Primeira Fatura",
+        "desc": "Cadastrou a primeira conta a pagar",
+        "tip": "Vá em Contas e cadastre sua primeira conta a pagar"
+      },
+      "first-goal": {
+        "name": "Sonhador",
+        "desc": "Criou o primeiro objetivo",
+        "tip": "Vá em Metas e crie seu primeiro objetivo financeiro"
+      },
+      "first-transaction": {
+        "name": "Primeira Transação",
+        "desc": "Registrou a primeira transação",
+        "tip": "Registre qualquer transação de receita ou despesa"
+      },
+      "complete-profile": {
+        "name": "Perfil Completo",
+        "desc": "Preencheu nome, email e foto",
+        "tip": "Vá em Configurações e adicione sua foto de perfil"
+      },
+      "organized": {
+        "name": "Organizadinho",
+        "desc": "Contas em 3+ categorias",
+        "tip": "Tenha contas a pagar distribuídas em pelo menos 3 categorias diferentes"
+      },
+      "archivist": {
+        "name": "Arquivista",
+        "desc": "Contas em 7+ categorias",
+        "tip": "Tenha contas a pagar distribuídas em pelo menos 7 categorias diferentes"
+      },
+      "autopilot": {
+        "name": "No Automático",
+        "desc": "Criou a primeira conta recorrente",
+        "tip": "Crie uma conta recorrente que se repete todo mês automaticamente"
+      },
+      "full-autopilot": {
+        "name": "Piloto Automático",
+        "desc": "10+ contas recorrentes ativas",
+        "tip": "Tenha 10 ou mais contas recorrentes ativas ao mesmo tempo"
+      },
+      "split-right": {
+        "name": "Dividindo Certo",
+        "desc": "Associou uma pessoa a uma conta",
+        "tip": "Vá em Pessoas e registre uma dívida ou empréstimo com alguém"
+      },
+      "financial-network": {
+        "name": "Rede Financeira",
+        "desc": "5+ pessoas com contas associadas",
+        "tip": "Tenha pelo menos 5 pessoas com entradas de dívidas registradas"
+      },
+      "multi-income": {
+        "name": "Multi-Renda",
+        "desc": "3+ fontes de renda cadastradas",
+        "tip": "Cadastre 3 ou mais fontes de renda diferentes (emprego, freelance, etc.)"
+      },
+      "diversified": {
+        "name": "Diversificado",
+        "desc": "5+ fontes de renda cadastradas",
+        "tip": "Cadastre 5 ou mais fontes de renda diferentes"
+      },
+      "full-panorama": {
+        "name": "Panorama Completo",
+        "desc": "Contas, rendas, metas e transações",
+        "tip": "Tenha pelo menos uma conta, uma renda, uma meta e uma transação cadastrados"
+      },
+      "punctual": {
+        "name": "Pontual",
+        "desc": "Pagou 5 contas no prazo",
+        "tip": "Pague 5 contas antes ou no dia do vencimento"
+      },
+      "super-punctual": {
+        "name": "Super Pontual",
+        "desc": "Pagou 25 contas no prazo",
+        "tip": "Pague 25 contas antes ou no dia do vencimento"
+      },
+      "relentless": {
+        "name": "Implacável",
+        "desc": "Pagou 100 contas no prazo",
+        "tip": "Pague 100 contas antes ou no dia do vencimento"
+      },
+      "punctuality-legend": {
+        "name": "Lenda da Pontualidade",
+        "desc": "Pagou 500 contas no prazo",
+        "tip": "Pague 500 contas antes ou no dia do vencimento — longo prazo!"
+      },
+      "clean-month": {
+        "name": "Mês Limpo",
+        "desc": "Pagou todas as contas do mês",
+        "tip": "Pague todas as contas do mês atual, sem deixar nenhuma pendente"
+      },
+      "perfect-quarter": {
+        "name": "Trimestre Perfeito",
+        "desc": "3 meses sem atraso",
+        "tip": "Fique 3 meses consecutivos sem nenhuma conta atrasada"
+      },
+      "golden-semester": {
+        "name": "Semestre de Ouro",
+        "desc": "6 meses sem atraso",
+        "tip": "Fique 6 meses consecutivos sem nenhuma conta atrasada"
+      },
+      "flawless-year": {
+        "name": "Ano Impecável",
+        "desc": "12 meses sem atraso",
+        "tip": "Fique 12 meses consecutivos sem nenhuma conta atrasada"
+      },
+      "cleared-month": {
+        "name": "Zerou o Mês",
+        "desc": "Nenhuma conta atrasada no mês",
+        "tip": "Termine o mês sem nenhuma conta com vencimento atrasado"
+      },
+      "lightning-payer": {
+        "name": "Pagador Relâmpago",
+        "desc": "Pagou no mesmo dia que cadastrou",
+        "tip": "Cadastre uma conta e pague ela no mesmo dia"
+      },
+      "ahead-of-time": {
+        "name": "Adiantado",
+        "desc": "Pagou 7+ dias antes do vencimento",
+        "tip": "Pague qualquer conta com pelo menos 7 dias de antecedência"
+      },
+      "fortune-teller": {
+        "name": "Previsor",
+        "desc": "Pagou 30+ dias antes do vencimento",
+        "tip": "Pague qualquer conta com pelo menos 30 dias de antecedência"
+      },
+      "first-deposit": {
+        "name": "Primeiro Depósito",
+        "desc": "Primeira contribuição a uma meta",
+        "tip": "Faça seu primeiro aporte em qualquer meta financeira"
+      },
+      "steady": {
+        "name": "Constante",
+        "desc": "5 contribuições a metas",
+        "tip": "Faça 5 aportes em metas (pode ser em metas diferentes)"
+      },
+      "dedicated": {
+        "name": "Dedicado",
+        "desc": "20 contribuições a metas",
+        "tip": "Faça 20 aportes em metas — consistência é a chave!"
+      },
+      "obsessive": {
+        "name": "Obsessivo",
+        "desc": "50 contribuições a metas",
+        "tip": "Faça 50 aportes em metas — você é imparável!"
+      },
+      "halfway": {
+        "name": "Meio Caminho",
+        "desc": "50% de qualquer meta",
+        "tip": "Atinja 50% do valor alvo de qualquer meta"
+      },
+      "goal-reached": {
+        "name": "Meta Batida!",
+        "desc": "Completou uma meta",
+        "tip": "Atinja 100% do valor alvo de uma meta"
+      },
+      "dream-collector": {
+        "name": "Colecionador de Sonhos",
+        "desc": "Completou 3 metas",
+        "tip": "Complete 3 metas financeiras diferentes"
+      },
+      "achiever": {
+        "name": "Realizador",
+        "desc": "Completou 5 metas",
+        "tip": "Complete 5 metas financeiras diferentes"
+      },
+      "dream-machine": {
+        "name": "Máquina de Sonhos",
+        "desc": "Completou 10 metas",
+        "tip": "Complete 10 metas financeiras diferentes"
+      },
+      "heavy-deposit": {
+        "name": "Aporte Pesado",
+        "desc": "Aporte de R$1.000+ em uma meta",
+        "tip": "Faça um único aporte de R$1.000 ou mais em qualquer meta"
+      },
+      "monster-deposit": {
+        "name": "Aporte Monstro",
+        "desc": "Aporte de R$5.000+ em uma meta",
+        "tip": "Faça um único aporte de R$5.000 ou mais em qualquer meta"
+      },
+      "goal-millionaire": {
+        "name": "Milionário em Metas",
+        "desc": "R$10.000+ acumulados em metas",
+        "tip": "Tenha R$10.000 ou mais acumulados somando todas as suas metas"
+      },
+      "10-bills": {
+        "name": "10 Contas",
+        "desc": "Cadastrou 10 contas",
+        "tip": "Cadastre 10 contas a pagar no total"
+      },
+      "50-bills": {
+        "name": "50 Contas",
+        "desc": "Cadastrou 50 contas",
+        "tip": "Cadastre 50 contas a pagar no total"
+      },
+      "100-bills": {
+        "name": "Centenário",
+        "desc": "Cadastrou 100 contas",
+        "tip": "Cadastre 100 contas a pagar no total"
+      },
+      "500-bills": {
+        "name": "Maratonista",
+        "desc": "Cadastrou 500 contas",
+        "tip": "Cadastre 500 contas a pagar no total — dedicação!"
+      },
+      "50-transactions": {
+        "name": "Registrador",
+        "desc": "50 transações registradas",
+        "tip": "Registre 50 transações de receita ou despesa"
+      },
+      "200-transactions": {
+        "name": "Contador",
+        "desc": "200 transações registradas",
+        "tip": "Registre 200 transações de receita ou despesa"
+      },
+      "500-transactions": {
+        "name": "Auditor",
+        "desc": "500 transações registradas",
+        "tip": "Registre 500 transações — controle total!"
+      },
+      "veteran": {
+        "name": "Veterano",
+        "desc": "Conta ativa por 3 meses",
+        "tip": "Mantenha sua conta ativa por pelo menos 3 meses"
+      },
+      "rooted": {
+        "name": "Raiz",
+        "desc": "Conta ativa por 6 meses",
+        "tip": "Mantenha sua conta ativa por pelo menos 6 meses"
+      },
+      "legendary": {
+        "name": "Lendário",
+        "desc": "Conta ativa por 1 ano",
+        "tip": "Mantenha sua conta ativa por pelo menos 1 ano"
+      },
+      "eternal": {
+        "name": "Eterno",
+        "desc": "Conta ativa por 2 anos",
+        "tip": "Mantenha sua conta ativa por pelo menos 2 anos"
+      },
+      "positive-balance": {
+        "name": "Saldo Positivo",
+        "desc": "Mês com renda > despesas",
+        "tip": "Termine o mês com suas receitas maiores que as despesas"
+      },
+      "surplus-3": {
+        "name": "Superávit x3",
+        "desc": "3 meses com renda > despesas",
+        "tip": "Fique 3 meses consecutivos gastando menos do que ganha"
+      },
+      "surplus-6": {
+        "name": "Superávit x6",
+        "desc": "6 meses com renda > despesas",
+        "tip": "Fique 6 meses consecutivos gastando menos do que ganha"
+      },
+      "balance-guardian": {
+        "name": "Guardião do Saldo",
+        "desc": "12 meses com renda > despesas",
+        "tip": "Fique 12 meses consecutivos gastando menos do que ganha"
+      },
+      "economist": {
+        "name": "Economista",
+        "desc": "Gastou menos de 80% da renda",
+        "tip": "Em qualquer mês, gaste menos de 80% da sua renda total"
+      },
+      "frugal": {
+        "name": "Frugal",
+        "desc": "Gastou menos de 50% da renda",
+        "tip": "Em qualquer mês, gaste menos de 50% da sua renda total"
+      },
+      "debt-free": {
+        "name": "Sem Dívidas",
+        "desc": "Zero contas em aberto",
+        "tip": "Pague todas as suas contas — nenhuma pendente!"
+      },
+      "big-payment": {
+        "name": "Grande Pagamento",
+        "desc": "Pagou uma conta de R$1.000+",
+        "tip": "Pague uma conta com valor de R$1.000 ou mais"
+      },
+      "epic-payment": {
+        "name": "Pagamento Épico",
+        "desc": "Pagou uma conta de R$5.000+",
+        "tip": "Pague uma conta com valor de R$5.000 ou mais"
+      },
+      "investor": {
+        "name": "Investidor",
+        "desc": "3+ metas ativas simultaneamente",
+        "tip": "Tenha 3 ou mais metas ativas (não completadas) ao mesmo tempo"
+      }
     }
   }
 }

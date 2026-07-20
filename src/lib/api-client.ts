@@ -104,6 +104,9 @@ export const serverApi = {
   // Categories
   categories: () => serverFetch<Category[]>('/categories'),
 
+  // Accounts / Carteiras
+  accounts: () => serverFetch<{ accounts: Account[]; total: number }>('/accounts'),
+
   // Budget
   budget: (month?: string) =>
     serverFetch<BudgetItem[]>(`/budget${month ? `?month=${month}` : ''}`),
@@ -282,6 +285,15 @@ export const clientApi = {
   deleteBillGroup:        (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
   deleteInstallmentGroup: (groupId: string) => clientFetch<void>(`/bills/group/${groupId}`, { method: 'DELETE' }),
 
+  // Accounts / Carteiras (deleteAccount já é a exclusão da conta do usuário —
+  // por isso as carteiras usam createWallet/updateWallet/deleteWallet)
+  createWallet: (data: AccountInput) =>
+    clientFetch<Account>('/accounts', { method: 'POST', body: JSON.stringify(data) }),
+  updateWallet: (id: string, data: Partial<AccountInput> & { archived?: boolean; isDefault?: boolean }) =>
+    clientFetch<Account>(`/accounts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteWallet: (id: string) =>
+    clientFetch<void>(`/accounts/${id}`, { method: 'DELETE' }),
+
   // Achievements
   checkAchievements: (trigger: string, ctx?: Record<string, unknown>) =>
     clientFetch<AchievementCheckResponse>('/achievements', { method: 'POST', body: JSON.stringify({ trigger, ctx }) }),
@@ -356,6 +368,13 @@ export interface BillInput { name: string; amount: number; dueDate: string; isRe
 export interface RecurringBill { id: string; name: string; amount: number; dayOfMonth: number; isActive: boolean; lastAutoMonth: string | null; startMonth: string | null; notes: string | null; categoryId: string | null; category: Category | null; createdAt: string; updatedAt: string; userId: string }
 export interface RecurringBillInput { name: string; amount: number; dayOfMonth: number; categoryId?: string | null; notes?: string | null; generateNow?: boolean; firstDate?: string }
 export interface Budget { id: string; categoryId: string; month: string; amount: number; category: Category }
+
+export type AccountType = 'CASH' | 'CHECKING' | 'SAVINGS' | 'CREDIT_CARD'
+export interface Account {
+  id: string; name: string; type: AccountType; icon: string; color: string
+  initialBalance: number; isDefault: boolean; archived: boolean; balance: number
+}
+export interface AccountInput { name: string; type?: AccountType; icon?: string; color?: string; initialBalance?: number }
 export interface IncomeSourceInput { name: string; type?: string; amount: number; isRecurring?: boolean; dayOfMonth?: number | null; startDate?: string | null; notes?: string | null; categoryId?: string | null }
 export interface RecurringInput { name: string; type: 'INCOME' | 'EXPENSE'; amount: number; frequency?: string; dayOfMonth?: number | null; description?: string | null; categoryId: string }
 export interface PersonInput { name: string; color?: string | null; notes?: string | null }

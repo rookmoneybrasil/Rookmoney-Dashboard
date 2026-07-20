@@ -16,6 +16,7 @@ import {
   Tag,
   PiggyBank,
   Banknote,
+  Wallet,
   Upload,
   Users,
   CalendarDays,
@@ -100,6 +101,7 @@ const NAV_GROUPS = [
   {
     groupKey: 'money',
     items: [
+      { href: '/wallets', icon: Wallet,   itemKey: 'wallets', color: 'green', pro: false },
       { href: '/income',  icon: Banknote, itemKey: 'income',  color: 'green', pro: false },
       { href: '/bills',   icon: FileText, itemKey: 'bills',   color: 'red',   pro: false },
       { href: '/people',  icon: Users,    itemKey: 'people',  color: 'amber', pro: false },
