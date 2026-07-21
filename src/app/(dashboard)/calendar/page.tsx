@@ -55,13 +55,13 @@ export default function CalendarPage() {
   const selectedEvents: CalendarEvent[] = selectedDay && data ? (data.byDay[selectedDay] ?? []) : []
 
   // Bug 2 fix: totalPending includes 'expected' bills (not-yet-generated templates)
-  // totalExpected only counts income-type events (income sources + recurring income)
+  // totalExpected only counts income-type events (income sources)
   const totalPending  = data?.events
     .filter(e => (e.status === 'pending' || e.status === 'overdue') ||
                  (e.status === 'expected' && e.type === 'bill'))
     .reduce((s, e) => s + Number(e.amount), 0) ?? 0
   const totalExpected = data?.events
-    .filter(e => e.status === 'expected' && (e.type === 'income' || e.type === 'recurring'))
+    .filter(e => e.status === 'expected' && e.type === 'income')
     .reduce((s, e) => s + Number(e.amount), 0) ?? 0
 
   return (

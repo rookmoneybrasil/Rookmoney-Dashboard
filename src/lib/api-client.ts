@@ -317,7 +317,7 @@ export const clientApi = {
     clientFetch<{ boletos: PluggyBoleto[]; items: { id: string; connectorName: string; ok: boolean }[] }>('/pluggy/boletos'),
 }
 
-export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income' | 'recurring'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected' | 'received'; href: string; color: string }
+export interface CalendarEvent { id: string; day: number; type: 'bill' | 'income'; label: string; amount: number; status: 'pending' | 'paid' | 'overdue' | 'expected' | 'received'; href: string; color: string }
 export interface CalendarData { month: string; daysInMonth: number; firstWeekday: number; events: CalendarEvent[]; byDay: Record<string, CalendarEvent[]> }
 
 export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' | 'person' | 'income' | 'rookinho'; title: string; message: string; href: string; urgency: 'high' | 'medium' | 'low'; isNew: boolean }
@@ -327,7 +327,7 @@ export type HealthComponent = { key: string; label: string; score: number; max: 
 export type HealthTip       = { icon: string; message: string; href?: string }
 export type FinancialHealth = { score: number; grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F'; label: string; color: string; components: HealthComponent[]; tips: HealthTip[] }
 export type ProjectionItem  = { id: string; label: string; amount: number; sublabel?: string; icon?: string; overdue?: boolean }
-export type MonthProjection = { month: string; label: string; income: number; expense: number; balance: number; cumulativeBalance: number; monthlyResult?: number; items?: ProjectionItem[]; incomeItems: { sources: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] }; expenseItems: { bills: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] } }
+export type MonthProjection = { month: string; label: string; income: number; expense: number; balance: number; cumulativeBalance: number; monthlyResult?: number; items?: ProjectionItem[]; incomeItems: { sources: ProjectionItem[]; people: ProjectionItem[] }; expenseItems: { bills: ProjectionItem[]; people: ProjectionItem[] } }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -339,8 +339,8 @@ function toQs(params?: Record<string, string>): string {
 
 // ─── Types (mirror API responses) ────────────────────────────────────────────
 
-export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number; recurring: number }
-export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; recurring: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
+export interface UserUsage { transactionsThisMonth: number; bills: number; goals: number; people: number; customCategories: number }
+export interface UserLimits { transactionsPerMonth: number | null; bills: number | null; goals: number | null; people: number | null; customCategories: number | null; budget: boolean; reports: boolean; projection: boolean; import: boolean }
 export interface User { id: string; name: string; email: string; plan: string; hasOnboarded: boolean; whatsappPhone?: string | null; profileImage?: string | null; bio?: string | null; city?: string | null; occupation?: string | null; birthdate?: string | null; createdAt?: string; updatedAt?: string; badges?: Record<string, number>; usage?: UserUsage; limits?: UserLimits; hasGoogle?: boolean; notifBillReminder?: boolean; notifCategoryLimit?: boolean; notifMonthlyEmail?: boolean; currency?: string; dateFormat?: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null; stripeCancelAtPeriodEnd?: boolean; stripeCurrentPeriodEnd?: string | null; subscriptionSource?: string | null }
 export interface AuthResponse { token: string; user: User; eventId?: string }
 export interface Category { id: string; name: string; icon: string; color: string; isDefault: boolean; userId: string | null }
@@ -383,8 +383,8 @@ export interface DashboardData { userName: string; accounts: Account[]; accounts
 export type ProjectionBreakdownItem = { id: string; label: string; amount: number; icon?: string }
 export interface ProjectionMonth {
   month: string; projectedIncome: number; projectedExpense: number; projectedBalance: number
-  incomeItems?:  { sources: ProjectionBreakdownItem[]; recurring: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
-  expenseItems?: { bills: ProjectionBreakdownItem[]; recurring: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
+  incomeItems?:  { sources: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
+  expenseItems?: { bills: ProjectionBreakdownItem[]; people: ProjectionBreakdownItem[] }
 }
 export interface ReportsData { monthly: MonthlyReport[]; period: PeriodReport; categoryTrend: CategoryTrend[]; topExpenses: TopExpense[]; spendingByDay: SpendingDay[]; incomeSources: IncomeSourceReport[] }
 export interface MonthlyReport { monthKey: string; monthFull: string; totalIncome: number; totalExpense: number; balance: number; savingsRate: number }

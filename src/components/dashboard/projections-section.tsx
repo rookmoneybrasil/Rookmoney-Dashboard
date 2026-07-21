@@ -45,8 +45,8 @@ function DetailPanel({ proj, onClose }: { proj: MonthProjection; onClose: () => 
   const incPct     = Math.round((proj.income  / maxBar) * 100)
   const expPct     = Math.round((proj.expense / maxBar) * 100)
 
-  const allIncome   = [...proj.incomeItems.sources, ...proj.incomeItems.recurring, ...proj.incomeItems.people]
-  const allExpenses = [...proj.expenseItems.bills, ...proj.expenseItems.recurring, ...proj.expenseItems.people]
+  const allIncome   = [...proj.incomeItems.sources, ...proj.incomeItems.people]
+  const allExpenses = [...proj.expenseItems.bills, ...proj.expenseItems.people]
 
   return (
     <div className="rounded-xl border border-ink-600 bg-ink-800 overflow-hidden animate-in slide-in-from-top-2 duration-200">
@@ -121,12 +121,6 @@ function DetailPanel({ proj, onClose }: { proj: MonthProjection; onClose: () => 
                   <ItemList items={proj.incomeItems.sources} color="income" />
                 </div>
               )}
-              {proj.incomeItems.recurring.length > 0 && (
-                <div className="mb-3">
-                  <p className="text-xs text-slate-600 uppercase tracking-wider px-3 mb-1">Recorrências</p>
-                  <ItemList items={proj.incomeItems.recurring} color="income" />
-                </div>
-              )}
               {proj.incomeItems.people.length > 0 && (
                 <div>
                   <p className="text-xs text-slate-600 uppercase tracking-wider px-3 mb-1">A receber de pessoas</p>
@@ -150,12 +144,6 @@ function DetailPanel({ proj, onClose }: { proj: MonthProjection; onClose: () => 
                 <div className="mb-3">
                   <p className="text-xs text-slate-600 uppercase tracking-wider px-3 mb-1">Contas e parcelas</p>
                   <ItemList items={proj.expenseItems.bills} color="expense" />
-                </div>
-              )}
-              {proj.expenseItems.recurring.length > 0 && (
-                <div className="mb-3">
-                  <p className="text-xs text-slate-600 uppercase tracking-wider px-3 mb-1">Recorrências</p>
-                  <ItemList items={proj.expenseItems.recurring} color="expense" />
                 </div>
               )}
               {proj.expenseItems.people.length > 0 && (
