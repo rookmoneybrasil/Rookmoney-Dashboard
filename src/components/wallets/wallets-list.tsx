@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Pencil, Trash2, AlertTriangle } from 'lucide-react'
+import { Plus, Pencil, Trash2, AlertTriangle, Archive, ArchiveRestore } from 'lucide-react'
 import { Modal, ModalContent, ModalHeader, ModalTitle, ModalFooter } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { Input, FormField } from '@/components/ui/input'
@@ -24,7 +24,25 @@ export function WalletsList({ accounts, total }: { accounts: Account[]; total: n
   const router = useRouter()
   const [editing, setEditing] = useState<Account | 'new' | null>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
-  const active = accounts.filter(a => !a.archived)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const active   = accounts.filter(a => !a.archived)
+  const archived = accounts.filter(a => a.archived)
+
+  // Arquivar tira a conta da lista, do seletor e do saldo total, mas mantem o
+  // historico. Serve pra conta antiga que voce nao usa mais e nao quer excluir
+  // (excluir move os lancamentos pra outra conta; arquivar preserva onde estao).
+  async function setArchived(id: string, value: boolean) {
+    if (busyId) return
+    setBusyId(id)
+    try {
+      await clientApi.updateWallet(id, { archived: value })
+      router.refresh()
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Erro ao arquivar a conta.')
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   async function del(id: string) {
     try {
@@ -62,6 +80,9 @@ export function WalletsList({ accounts, total }: { accounts: Account[]; total: n
               <button onClick={() => setEditing(a)} className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-brand-400 hover:bg-brand-400/10" title="Editar">
                 <Pencil className="size-3.5" />
               </button>
+              <button onClick={() => setArchived(a.id, true)} disabled={busyId === a.id} className="size-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-300 hover:bg-white/5 disabled:opacity-40" title="Arquivar (mantém o histórico, some do saldo)">
+                <Archive className="size-3.5" />
+              </button>
               {confirmingId === a.id ? (
                 <span className="flex items-center gap-1">
                   <AlertTriangle className="size-3 text-warning shrink-0" />
@@ -82,6 +103,27 @@ export function WalletsList({ accounts, total }: { accounts: Account[]; total: n
           <Plus className="size-4" /> Nova carteira
         </button>
       </div>
+
+      {archived.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p className="text-xs text-slate-600 uppercase tracking-wider">Arquivadas — fora do saldo total</p>
+          {archived.map(a => (
+            <div key={a.id} className="flex items-center gap-3 rounded-xl bg-ink-800/60 border border-white/6 p-3 opacity-70 hover:opacity-100 transition-opacity group">
+              <div className="size-8 rounded-lg flex items-center justify-center text-base shrink-0" style={{ backgroundColor: a.color + '18' }}>
+                {a.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm text-slate-300 truncate">{a.name}</span>
+                <span className="block text-xs text-slate-600">{typeLabel(a.type)}</span>
+              </div>
+              <span className="text-sm tabular-nums text-slate-500">{formatCurrency(a.balance)}</span>
+              <button onClick={() => setArchived(a.id, false)} disabled={busyId === a.id} className="flex items-center gap-1.5 h-7 px-2 rounded-lg text-xs text-slate-400 hover:text-brand-300 hover:bg-brand-400/10 disabled:opacity-40 shrink-0" title="Reativar">
+                <ArchiveRestore className="size-3.5" /> Reativar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {editing && <AccountModal account={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
     </div>
