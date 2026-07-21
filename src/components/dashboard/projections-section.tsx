@@ -18,7 +18,14 @@ function ItemList({ items, color }: { items: ProjectionItem[]; color: 'income' |
         <div key={item.id} className="flex items-center gap-2 py-1.5 px-3 rounded-lg hover:bg-ink-700/40 transition-colors">
           <span className="text-base shrink-0 w-6 text-center leading-none">{item.icon ?? '•'}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-slate-200 truncate">{item.label}</p>
+            <p className="text-sm text-slate-200 truncate">
+              {item.label}
+              {item.overdue && (
+                <span className="ml-1.5 text-[10px] font-semibold text-warning" title="Vencida em um mês anterior — segue em aberto">
+                  ⚠️ atrasada
+                </span>
+              )}
+            </p>
             {item.sublabel && <p className="text-xs text-slate-500 truncate">{item.sublabel}</p>}
           </div>
           <span className={`text-sm font-semibold tabular-nums shrink-0 ${color === 'income' ? 'text-success' : 'text-danger'}`}>

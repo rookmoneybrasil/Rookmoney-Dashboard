@@ -326,7 +326,7 @@ export interface AppNotification { id: string; type: 'bill' | 'goal' | 'budget' 
 export type HealthComponent = { key: string; label: string; score: number; max: number; detail: string; status: 'good' | 'ok' | 'warn' | 'bad' | 'neutral' }
 export type HealthTip       = { icon: string; message: string; href?: string }
 export type FinancialHealth = { score: number; grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F'; label: string; color: string; components: HealthComponent[]; tips: HealthTip[] }
-export type ProjectionItem  = { id: string; label: string; amount: number; sublabel?: string; icon?: string }
+export type ProjectionItem  = { id: string; label: string; amount: number; sublabel?: string; icon?: string; overdue?: boolean }
 export type MonthProjection = { month: string; label: string; income: number; expense: number; balance: number; cumulativeBalance: number; monthlyResult?: number; items?: ProjectionItem[]; incomeItems: { sources: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] }; expenseItems: { bills: ProjectionItem[]; recurring: ProjectionItem[]; people: ProjectionItem[] } }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
