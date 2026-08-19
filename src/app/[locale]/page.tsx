@@ -34,6 +34,7 @@ import { PricingSection } from '@/components/landing/pricing-section'
 import { WhatsAppChat } from '@/components/landing/whatsapp-chat'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { UtmCapture } from '@/components/utm-capture'
+import { APP_STORE_URL, PLAY_STORE_URL } from '@/lib/store-links'
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
@@ -295,15 +296,27 @@ export default async function LandingPage() {
           <div className="flex items-center gap-3">
             <Smartphone className="size-5 text-brand-400" />
             <div>
-              <p className="text-sm font-semibold text-slate-100">Disponível em breve nos apps</p>
+              <p className="text-sm font-semibold text-slate-100">Baixe o app</p>
               <p className="text-xs text-slate-500">Web, Android e iOS — suas finanças em qualquer lugar.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <a href="#" className="opacity-90 hover:opacity-100 transition-opacity">
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Baixar o Rook Money na App Store"
+              className="opacity-90 hover:opacity-100 transition-opacity"
+            >
               <Image src="/rookinho/badge-appstore.png" alt="App Store" width={130} height={40} className="h-10 w-auto" />
             </a>
-            <a href="#" className="opacity-90 hover:opacity-100 transition-opacity">
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Baixar o Rook Money no Google Play"
+              className="opacity-90 hover:opacity-100 transition-opacity"
+            >
               <Image src="/rookinho/badge-googleplay.png" alt="Google Play" width={130} height={40} className="h-10 w-auto" />
             </a>
           </div>

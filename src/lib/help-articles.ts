@@ -1,3 +1,5 @@
+import { APP_STORE_URL, PLAY_STORE_URL } from './store-links'
+
 export type HelpCategory = 'como-usar' | 'planos' | 'conta' | 'app' | 'financeiro'
 
 export interface HelpArticle {
@@ -248,8 +250,8 @@ Seu nome aparece no dashboard, no chat com o Rookinho e nos relatórios.`,
     category: 'app',
     content: `O Rook Money está disponível para:
 
-- **Android:** [Google Play Store](https://play.google.com/store/apps/details?id=com.rookmoney.app)
-- **iOS:** Em breve na App Store
+- **Android:** [Google Play Store](${PLAY_STORE_URL})
+- **iOS:** [App Store](${APP_STORE_URL})
 - **Web:** Acesse [rookmoney.com](https://rookmoney.com) pelo navegador
 
 O app sincroniza automaticamente com a versão web — o que você faz no celular aparece no computador e vice-versa.`,
