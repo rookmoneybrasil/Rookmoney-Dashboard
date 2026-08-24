@@ -39,6 +39,19 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'URL inválida.' }, { status: 400 })
   }
 
+  // Só o próprio dono apaga: sem isso qualquer usuário logado deletava o blob de
+  // qualquer outro, bastando conhecer a URL (a checagem de host não diz nada
+  // sobre quem enviou). O POST acima grava sempre como `avatars/{userId}-{ts}.jpg`.
+  let pathname: string
+  try {
+    pathname = new URL(url).pathname.replace(/^\//, '')
+  } catch {
+    return NextResponse.json({ ok: false, error: 'URL inválida.' }, { status: 400 })
+  }
+  if (!pathname.startsWith(`avatars/${session.userId}-`)) {
+    return NextResponse.json({ ok: false, error: 'Essa imagem não é sua.' }, { status: 403 })
+  }
+
   await del(url).catch(() => {})
   return NextResponse.json({ ok: true })
 }

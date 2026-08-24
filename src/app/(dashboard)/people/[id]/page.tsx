@@ -153,8 +153,6 @@ export default async function PersonPage({ params }: Props) {
     if (match) monthEntryByRecurringId.set(r.id, match)
   }
   const monthRecurringEntryIds = new Set(Array.from(monthEntryByRecurringId.values()).map(e => e.id))
-  const today        = new Date()
-  const cutoff       = new Date(today.getTime() + 45 * 24 * 60 * 60 * 1000)
 
   // For balance: only unsettled entries
   const openEntries    = allEntries.filter((e) => !e.isSettled)
@@ -181,8 +179,6 @@ export default async function PersonPage({ params }: Props) {
   const balMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
   for (const e of openEntries) {
     if (pausedMonthEntryIds.has(e.id)) continue
-    const isOldRecurring = (e.installmentTotal ?? 0) >= 24
-    if (isOldRecurring && new Date(e.date) > cutoff) continue
 
     // Count everything owed up to the end of the current month (overdue + this
     // month), for both single entries AND installments. Future installments

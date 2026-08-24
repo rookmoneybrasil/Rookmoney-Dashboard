@@ -177,7 +177,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
                             </div>
                           </WithTooltip>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-200 truncate">{tx.description ?? tx.category.name}</p>
+                            <p className="text-sm font-medium text-slate-200 truncate">
+                              {tx.description ?? tx.category.name}
+                              {/* Sem o selo, uma transação ignorada aparece aqui como qualquer
+                                  outra enquanto os totais acima já a excluíram — parece conta errada. */}
+                              {tx.ignored && <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-md font-medium bg-slate-500/15 text-slate-400 border border-slate-500/20 align-middle">Ignorada</span>}
+                            </p>
                             <p className="text-xs text-slate-500">{tx.category.name} · {formatDate(new Date(tx.date))}</p>
                           </div>
                           <span className={`text-sm font-semibold tabular-nums ${tx.type === 'INCOME' ? 'text-success' : 'text-slate-300'}`}>
