@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
+import { resolveDefaultAccountId } from '@/lib/account'
 
 const Schema = z.object({
   name:        z.string().min(2).max(100),
@@ -133,6 +134,14 @@ export async function registerReceipt(
   const now       = new Date()
   const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 
+  // A conta da própria renda quando ela tem uma, senão a padrão — mesma regra da
+  // API. Sem accountId o recebimento entra no "Receitas do mês" e some do saldo
+  // das Carteiras (computeAccountBalances ignora transação sem conta).
+  const source = sourceId
+    ? await db.incomeSource.findFirst({ where: { id: sourceId, userId: session.userId }, select: { accountId: true } })
+    : null
+  const accountId = source?.accountId ?? (await resolveDefaultAccountId(session.userId))
+
   const ops: Promise<unknown>[] = [
     db.transaction.create({
       data: {
@@ -142,6 +151,7 @@ export async function registerReceipt(
         date:        new Date(date),
         userId:      session.userId,
         categoryId,
+        accountId,
       },
     }),
   ]
@@ -162,41 +172,4 @@ export async function registerReceipt(
   revalidatePath('/transactions')
   revalidatePath('/dashboard')
   return {}
-}
-
-export async function processAutoIncome(userId: string) {
-  const now        = new Date()
-  const today      = now.getDate()
-  const yearMonth  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-
-  const sources = await db.incomeSource.findMany({
-    where: {
-      userId,
-      isRecurring: true,
-      dayOfMonth:  { not: null },
-      categoryId:  { not: null },
-    },
-  })
-
-  for (const source of sources) {
-    if (source.lastAutoPayMonth === yearMonth) continue
-    if (today < source.dayOfMonth!) continue
-
-    await db.$transaction([
-      db.transaction.create({
-        data: {
-          amount:      source.amount,
-          type:        'INCOME',
-          description: source.name,
-          date:        new Date(now.getFullYear(), now.getMonth(), source.dayOfMonth!),
-          userId,
-          categoryId:  source.categoryId!,
-        },
-      }),
-      db.incomeSource.update({
-        where: { id: source.id },
-        data:  { lastAutoPayMonth: yearMonth },
-      }),
-    ])
-  }
 }

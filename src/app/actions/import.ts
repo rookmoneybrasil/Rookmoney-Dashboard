@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { getLimits } from '@/lib/plans'
+import { resolveDefaultAccountId } from '@/lib/account'
 import { parseISO, isValid, format } from 'date-fns'
 
 type ImportRow = {
@@ -40,6 +41,10 @@ export async function importTransactions(rows: ImportRow[]): Promise<ImportResul
 
   if (!rows.length) return { error: 'Nenhuma transação para importar.' }
 
+  // Toda Transaction precisa de accountId, senão o valor importado entra no
+  // "Receitas/Despesas do mês" e some do saldo das Carteiras.
+  const accountId = await resolveDefaultAccountId(session.userId)
+
   const validated: Array<{
     userId:      string
     date:        Date
@@ -47,6 +52,7 @@ export async function importTransactions(rows: ImportRow[]): Promise<ImportResul
     amount:      number
     type:        'INCOME' | 'EXPENSE'
     categoryId:  string
+    accountId:   string
   }> = []
 
   // Bug 3 fix: build a fingerprint set to skip exact duplicates in the batch
@@ -86,8 +92,10 @@ export async function importTransactions(rows: ImportRow[]): Promise<ImportResul
       amount:      row.amount,
       type:        normalizedType,
       categoryId:  row.categoryId,
+      accountId,
     })
   }
+
 
   if (!validated.length) {
     return { error: 'Nenhuma transação nova encontrada. Possíveis motivos: formato inválido, tipo não reconhecido, ou transações já existentes.' }
